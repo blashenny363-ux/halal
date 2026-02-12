@@ -1,1 +1,2 @@
 {"text":"Ale","senderId":"p_mljx7sodru7m_person","senderName":"Ale Dengi","time":1770928743726}
+{"text":"Dengi","senderId":"p_mljx7sodru7m_person","senderName":"Ale Dengi","time":1770928750074}
