@@ -2,3 +2,4 @@
 {"text":"Hi","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919669375}
 {"text":"A vo nixy","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919681571}
 {"text":"Narmas epte","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919690475}
+{"text":"Tok kakova xya na angliskom","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919718541}
