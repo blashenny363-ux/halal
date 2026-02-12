@@ -177,7 +177,7 @@
             top: 12px;
             right: 20px;
         }
-        .search-info {
+        .search-info, .recent-chat-item {
             background: #1a232c;
             border-radius: 16px;
             padding: 14px 18px;
@@ -186,6 +186,17 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .search-info:hover, .recent-chat-item:hover {
+            background: #1e2e42;
+            border-color: #0d47a1;
+        }
+        .recent-header {
+            color: #9ac7ff;
+            margin-bottom: 12px;
+            font-weight: 500;
         }
         @media (max-width: 500px) {
             .app { padding: 16px; }
@@ -246,7 +257,16 @@
             </div>
         </div>
 
-        <div class="card" style="margin-top: 20px;">
+        <!-- СПИСОК ПОСЛЕДНИХ ЧАТОВ -->
+        <div class="card" id="recentChatsCard" style="margin-top: 20px;">
+            <div class="recent-header">🕘 последние чаты</div>
+            <div id="recentChatsContainer" style="min-height: 20px;">
+                <!-- динамически заполняется -->
+                <div style="color: #8899aa; text-align: center; padding: 10px;">пока нет чатов</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 0px;">
             <div style="margin-bottom: 14px;">🔎 найти по ID</div>
             <div class="flex">
                 <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
@@ -282,6 +302,65 @@
     let currentChatType = null;
     let messagesUpdateInterval = null;
 
+    // ----- ПОСЛЕДНИЕ ЧАТЫ -----
+    let recentChats = []; // массив объектов { id, name, lastTime }
+
+    function loadRecentChats() {
+        const stored = localStorage.getItem('halal_recent_chats');
+        if (stored) {
+            try {
+                recentChats = JSON.parse(stored);
+            } catch (e) { recentChats = []; }
+        } else {
+            recentChats = [];
+        }
+        renderRecentChats();
+    }
+
+    function saveRecentChats() {
+        localStorage.setItem('halal_recent_chats', JSON.stringify(recentChats));
+    }
+
+    function updateRecentChats(peerId, peerName) {
+        if (!peerId || peerId === myId || currentChatType !== 'private') return; // только личные чаты, не с собой
+        const existing = recentChats.find(c => c.id === peerId);
+        if (existing) {
+            existing.lastTime = Date.now();
+            existing.name = peerName; // обновим имя на всякий
+        } else {
+            recentChats.push({
+                id: peerId,
+                name: peerName || peerId,
+                lastTime: Date.now()
+            });
+        }
+        // сортируем по времени (сначала новые)
+        recentChats.sort((a,b) => b.lastTime - a.lastTime);
+        // ограничим количество (например, 20)
+        if (recentChats.length > 20) recentChats = recentChats.slice(0,20);
+        saveRecentChats();
+        renderRecentChats();
+    }
+
+    function renderRecentChats() {
+        const container = document.getElementById('recentChatsContainer');
+        if (!container) return;
+        if (!recentChats || recentChats.length === 0) {
+            container.innerHTML = '<div style="color: #8899aa; text-align: center; padding: 10px;">пока нет чатов</div>';
+            return;
+        }
+        let html = '';
+        recentChats.forEach(chat => {
+            html += `<div class="recent-chat-item" data-peer-id="${chat.id}">
+                <span style="font-size:1.4rem;">👤</span>
+                <span style="color:#b4e0ff; font-weight:500;">${chat.name}</span>
+                <span style="color:#8899aa; margin-left:auto; font-size:0.8rem;">${new Date(chat.lastTime).toLocaleTimeString().slice(0,5)}</span>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // ----- ОСНОВНЫЕ ФУНКЦИИ GITHUB -----
     async function getDatabaseFromGitHub() {
         if (!githubConfig) return [];
         const { token, owner, repo, path } = githubConfig;
@@ -508,7 +587,15 @@
         document.getElementById('chatWithLabel').innerHTML = `💬 ${type === 'channel' ? 'канал' : 'чат'} ${peerInfo}`;
         if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
         await loadMessages();
-        messagesUpdateInterval = setInterval(loadMessages, 30000);
+        // Обновление каждые 5 секунд (было 30)
+        messagesUpdateInterval = setInterval(loadMessages, 5000);
+        // Если это личный чат — добавим в последние чаты
+        if (type === 'private') {
+            // Ищем имя собеседника в кэше
+            const entry = dbCache.find(e => e.id === chatId);
+            const name = entry ? entry.rawName.replace('_',' ') : chatId;
+            updateRecentChats(chatId, name);
+        }
     }
 
     async function loadMessages() {
@@ -526,6 +613,12 @@
             newMsgs.forEach(m => {
                 const isOwn = m.senderId === myId;
                 addMessageToChat(`${m.senderName || m.senderId}: ${m.text}`, isOwn);
+                // Если это личный чат и сообщение не от меня — добавим собеседника в последние чаты
+                if (currentChatType === 'private' && !isOwn) {
+                    const peerId = currentChatId;
+                    const senderName = m.senderName || peerId;
+                    updateRecentChats(peerId, senderName);
+                }
             });
         }
     }
@@ -539,6 +632,8 @@
                 document.getElementById('registerCard').style.display = 'none';
                 document.getElementById('mainInterface').style.display = 'block';
                 document.getElementById('myIdDisplay').innerText = myId;
+                // Загружаем последние чаты
+                loadRecentChats();
             } else {
                 document.getElementById('registerCard').style.display = 'block';
                 document.getElementById('mainInterface').style.display = 'none';
@@ -603,6 +698,7 @@
                 document.getElementById('myIdDisplay').innerText = myId;
                 await getDatabaseFromGitHub();
                 document.getElementById('registrationError').style.display = 'none';
+                loadRecentChats();
             } else {
                 document.getElementById('registrationError').style.display = 'block';
                 document.getElementById('registrationError').innerText = `❌ ошибка: ${result.error}`;
@@ -631,6 +727,7 @@
                 document.getElementById('myIdDisplay').innerText = myId;
                 await getDatabaseFromGitHub();
                 document.getElementById('registrationError').style.display = 'none';
+                loadRecentChats();
             } else {
                 document.getElementById('registrationError').style.display = 'block';
                 document.getElementById('registrationError').innerText = `❌ ошибка: ${result.error}`;
@@ -680,6 +777,30 @@
             }
         };
 
+        // Клик по последним чатам
+        document.getElementById('recentChatsContainer').addEventListener('click', async function(e) {
+            const item = e.target.closest('.recent-chat-item');
+            if (!item) return;
+            const peerId = item.dataset.peerId;
+            if (!peerId) return;
+            // Ищем в кэше
+            const entry = dbCache.find(e => e.id === peerId);
+            if (entry) {
+                const nameParts = entry.rawName.split('_');
+                const firstName = nameParts[0] || '';
+                const lastName = nameParts[1] || '';
+                await enterChat(entry.id, 'private', `${firstName} ${lastName}`);
+                // Покажем в поиске
+                document.getElementById('searchResult').innerHTML = `<div class="search-info">
+                    <span style="font-size:1.4rem;">👤</span>
+                    <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
+                </div>`;
+            } else {
+                // если вдруг нет в кэше, но есть в recent
+                await enterChat(peerId, 'private', peerId);
+            }
+        });
+
         document.getElementById('sendMsgBtn').onclick = async function () {
             const msg = document.getElementById('messageInput').value.trim();
             if (!msg || !currentChatId) {
@@ -697,6 +818,11 @@
                 await appendToChannelMessages(currentChatId, msgObj);
             } else {
                 await appendToPrivateMessages(currentChatId, msgObj);
+                // Добавляем собеседника в последние чаты (при отправке сообщения)
+                const peerId = currentChatId;
+                const entry = dbCache.find(e => e.id === peerId);
+                const peerName = entry ? entry.rawName.replace('_',' ') : peerId;
+                updateRecentChats(peerId, peerName);
             }
             addMessageToChat(`${senderName}: ${msg}`, true);
             document.getElementById('messageInput').value = '';
