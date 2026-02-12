@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>halal messange</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -273,17 +272,15 @@
 </div>
 
 <script>
-    let localPeer = null;
-    let currentConnection = null;
-    let currentChannelId = null;
     let myId = null;
     let myName = null;
     let mySurname = null;
     let myIsChannel = false;
     let githubConfig = null;
     let dbCache = [];
-    let channelMessagesCache = {};
-    let channelUpdateInterval = null;
+    let currentChatId = null;
+    let currentChatType = null;
+    let messagesUpdateInterval = null;
 
     async function getDatabaseFromGitHub() {
         if (!githubConfig) return [];
@@ -299,7 +296,7 @@
             }
             if (!res.ok) {
                 const err = await res.json();
-                throw new Error(`GitHub ${res.status}: ${err.message || 'неизвестная ошибка'}`);
+                throw new Error(`GitHub ${res.status}: ${err.message}`);
             }
             const data = await res.json();
             const content = atob(data.content);
@@ -311,7 +308,6 @@
             dbCache = items;
             return items;
         } catch (e) {
-            console.error('Ошибка чтения базы:', e);
             document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
             return [];
         }
@@ -321,20 +317,11 @@
         if (!githubConfig) return;
         const { token, owner, repo, path } = githubConfig;
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        try {
-            const res = await fetch(url, {
-                method: 'PUT',
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ message: 'init database', content: btoa('') })
-            });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(`GitHub ${res.status}: ${err.message || 'не удалось создать файл'}`);
-            }
-        } catch (e) {
-            console.error('Ошибка создания файла:', e);
-            throw e;
-        }
+        await fetch(url, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+            body: JSON.stringify({ message: 'init database', content: btoa('') })
+        });
     }
 
     async function appendToDatabase(entryName, id) {
@@ -350,31 +337,16 @@
                 const data = await res.json();
                 sha = data.sha;
                 currentContent = atob(data.content);
-            } else if (res.status !== 404) {
-                const err = await res.json();
-                throw new Error(`GitHub ${res.status}: ${err.message || 'ошибка чтения'}`);
             }
-        } catch (e) {
-            return { success: false, error: e.message };
-        }
-
+        } catch (e) {}
         const newLine = `${entryName} ${id}`;
         const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
-        
         try {
-            const putRes = await fetch(url, {
+            await fetch(url, {
                 method: 'PUT',
                 headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ 
-                    message: `add ${entryName}`, 
-                    content: btoa(newContent), 
-                    sha: sha || undefined 
-                })
+                body: JSON.stringify({ message: `add ${entryName}`, content: btoa(newContent), sha: sha || undefined })
             });
-            if (!putRes.ok) {
-                const err = await putRes.json();
-                throw new Error(`GitHub ${putRes.status}: ${err.message || 'ошибка записи'}`);
-            }
             dbCache.push({ rawName: entryName, id, name: entryName, surname: '' });
             return { success: true };
         } catch (e) {
@@ -392,7 +364,6 @@
                 headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
             });
             if (res.status === 404) return [];
-            if (!res.ok) return [];
             const data = await res.json();
             const content = atob(data.content);
             return content.trim().split('\n').filter(l => l).map(line => {
@@ -419,34 +390,62 @@
         } catch (e) {}
         const newLine = JSON.stringify(msgObj);
         const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
+        await fetch(url, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+            body: JSON.stringify({ message: `message in ${channelId}`, content: btoa(newContent), sha: sha || undefined })
+        });
+    }
+
+    async function getPrivateMessages(peerId) {
+        if (!githubConfig || !myId) return [];
+        const ids = [myId, peerId].sort();
+        const chatId = `private_${ids[0]}_${ids[1]}`;
+        const { token, owner, repo } = githubConfig;
+        const path = `${chatId}.txt`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
         try {
-            await fetch(url, {
-                method: 'PUT',
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ 
-                    message: `message in ${channelId}`, 
-                    content: btoa(newContent), 
-                    sha: sha || undefined 
-                })
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
             });
+            if (res.status === 404) return [];
+            const data = await res.json();
+            const content = atob(data.content);
+            return content.trim().split('\n').filter(l => l).map(line => {
+                try { return JSON.parse(line); } catch { return null; }
+            }).filter(m => m);
+        } catch { return []; }
+    }
+
+    async function appendToPrivateMessages(peerId, msgObj) {
+        if (!githubConfig || !myId) return;
+        const ids = [myId, peerId].sort();
+        const chatId = `private_${ids[0]}_${ids[1]}`;
+        const { token, owner, repo } = githubConfig;
+        const path = `${chatId}.txt`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        let sha = null, currentContent = '';
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                sha = data.sha;
+                currentContent = atob(data.content);
+            }
         } catch (e) {}
+        const newLine = JSON.stringify(msgObj);
+        const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
+        await fetch(url, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+            body: JSON.stringify({ message: `private message`, content: btoa(newContent), sha: sha || undefined })
+        });
     }
 
     function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
     function generateChannelId() { return 'c_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_channel'; }
-
-    function savePrivateMessage(peerId, msg, isOutgoing) {
-        const key = `chat_${peerId}`;
-        let history = JSON.parse(localStorage.getItem(key) || '[]');
-        history.push({ text: msg, outgoing: isOutgoing, time: Date.now() });
-        if (history.length > 100) history = history.slice(-100);
-        localStorage.setItem(key, JSON.stringify(history));
-    }
-
-    function loadPrivateMessages(peerId) {
-        const key = `chat_${peerId}`;
-        return JSON.parse(localStorage.getItem(key) || '[]');
-    }
 
     function loadGitHubConfig() {
         const stored = localStorage.getItem('halal_github_config');
@@ -489,38 +488,6 @@
         return false;
     }
 
-    function initPeer(peerId) {
-        if (!peerId.endsWith('_person')) return;
-        if (localPeer) localPeer.destroy();
-        localPeer = new Peer(peerId);
-        localPeer.on('open', () => { 
-            document.getElementById('myIdDisplay').innerText = peerId;
-        });
-        localPeer.on('connection', (conn) => {
-            conn.on('open', () => {
-                currentConnection = conn;
-                currentChannelId = null;
-                document.getElementById('connectionStatus').innerText = '🟢 личный чат';
-                document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${conn.peer}`;
-                const history = loadPrivateMessages(conn.peer);
-                const container = document.getElementById('messagesContainer');
-                container.innerHTML = '';
-                history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
-                setupConnection(conn);
-            });
-        });
-    }
-
-    function setupConnection(conn) {
-        conn.on('data', (data) => {
-            addMessageToChat(data, false);
-            savePrivateMessage(conn.peer, data, false);
-        });
-        conn.on('close', () => {
-            if (currentConnection === conn) { currentConnection = null; document.getElementById('connectionStatus').innerText = '⚪ не в сети'; }
-        });
-    }
-
     function addMessageToChat(text, isOwn = true) {
         const container = document.getElementById('messagesContainer');
         const msgDiv = document.createElement('div');
@@ -533,26 +500,34 @@
 
     function clearMessages() { document.getElementById('messagesContainer').innerHTML = ''; }
 
-    async function enterChannel(channelId) {
+    async function enterChat(chatId, type, peerInfo) {
         clearMessages();
-        currentChannelId = channelId;
-        currentConnection = null;
-        document.getElementById('connectionStatus').innerText = '📢 канал';
-        document.getElementById('chatWithLabel').innerHTML = `💬 канал ${channelId}`;
-        const msgs = await getChannelMessages(channelId);
-        channelMessagesCache[channelId] = msgs;
-        msgs.forEach(m => addMessageToChat(`${m.sender || 'аноним'}: ${m.text}`, false));
-        if (channelUpdateInterval) clearInterval(channelUpdateInterval);
-        channelUpdateInterval = setInterval(async () => {
-            if (currentChannelId === channelId) {
-                const newMsgs = await getChannelMessages(channelId);
-                if (newMsgs.length > channelMessagesCache[channelId].length) {
-                    const added = newMsgs.slice(channelMessagesCache[channelId].length);
-                    added.forEach(m => addMessageToChat(`${m.sender || 'аноним'}: ${m.text}`, false));
-                    channelMessagesCache[channelId] = newMsgs;
-                }
-            }
-        }, 30000);
+        currentChatId = chatId;
+        currentChatType = type;
+        document.getElementById('connectionStatus').innerText = type === 'channel' ? '📢 канал' : '👤 личный чат';
+        document.getElementById('chatWithLabel').innerHTML = `💬 ${type === 'channel' ? 'канал' : 'чат'} ${peerInfo}`;
+        if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
+        await loadMessages();
+        messagesUpdateInterval = setInterval(loadMessages, 30000);
+    }
+
+    async function loadMessages() {
+        if (!currentChatId) return;
+        let msgs = [];
+        if (currentChatType === 'channel') {
+            msgs = await getChannelMessages(currentChatId);
+        } else {
+            msgs = await getPrivateMessages(currentChatId);
+        }
+        const container = document.getElementById('messagesContainer');
+        const currentCount = container.children.length;
+        if (msgs.length > currentCount) {
+            const newMsgs = msgs.slice(currentCount);
+            newMsgs.forEach(m => {
+                const isOwn = m.senderId === myId;
+                addMessageToChat(`${m.senderName || m.senderId}: ${m.text}`, isOwn);
+            });
+        }
     }
 
     window.onload = async function () {
@@ -563,8 +538,7 @@
             if (loadOwnProfile()) {
                 document.getElementById('registerCard').style.display = 'none';
                 document.getElementById('mainInterface').style.display = 'block';
-                if (!myIsChannel) initPeer(myId);
-                else document.getElementById('myIdDisplay').innerText = myId;
+                document.getElementById('myIdDisplay').innerText = myId;
             } else {
                 document.getElementById('registerCard').style.display = 'block';
                 document.getElementById('mainInterface').style.display = 'none';
@@ -577,20 +551,20 @@
             document.getElementById('mainInterface').style.display = 'none';
         }
 
-        document.getElementById('globalGithubBtn').onclick = function() {
+        document.getElementById('globalGithubBtn').onclick = () => {
             document.getElementById('githubSetupCard').style.display = 'block';
         };
 
-        document.getElementById('closeSetupBtn').onclick = function() {
+        document.getElementById('closeSetupBtn').onclick = () => {
             document.getElementById('githubSetupCard').style.display = 'none';
         };
 
-        document.getElementById('showUserRegBtn').onclick = function() {
+        document.getElementById('showUserRegBtn').onclick = () => {
             document.getElementById('userRegBlock').style.display = 'block';
             document.getElementById('channelRegBlock').style.display = 'none';
             document.getElementById('registrationError').style.display = 'none';
         };
-        document.getElementById('showChannelRegBtn').onclick = function() {
+        document.getElementById('showChannelRegBtn').onclick = () => {
             document.getElementById('userRegBlock').style.display = 'none';
             document.getElementById('channelRegBlock').style.display = 'block';
             document.getElementById('registrationError').style.display = 'none';
@@ -609,7 +583,7 @@
         document.getElementById('registerBtn').onclick = async function () {
             if (!githubConfig) {
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ сначала настрой GitHub (кнопка с белым кружком)';
+                document.getElementById('registrationError').innerText = '❌ сначала настрой GitHub';
                 return;
             }
             const name = document.getElementById('firstName').value.trim();
@@ -626,19 +600,19 @@
                 localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, surname, isChannel: false }));
                 document.getElementById('registerCard').style.display = 'none';
                 document.getElementById('mainInterface').style.display = 'block';
-                initPeer(myId);
+                document.getElementById('myIdDisplay').innerText = myId;
                 await getDatabaseFromGitHub();
                 document.getElementById('registrationError').style.display = 'none';
             } else {
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = `❌ ошибка сохранения: ${result.error || 'неизвестная ошибка'}`;
+                document.getElementById('registrationError').innerText = `❌ ошибка: ${result.error}`;
             }
         };
 
         document.getElementById('createChannelBtn').onclick = async function () {
             if (!githubConfig) {
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ сначала настрой GitHub (кнопка с белым кружком)';
+                document.getElementById('registrationError').innerText = '❌ сначала настрой GitHub';
                 return;
             }
             const chName = document.getElementById('channelName').value.trim();
@@ -659,11 +633,11 @@
                 document.getElementById('registrationError').style.display = 'none';
             } else {
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = `❌ ошибка создания: ${result.error || 'неизвестная ошибка'}`;
+                document.getElementById('registrationError').innerText = `❌ ошибка: ${result.error}`;
             }
         };
 
-        document.getElementById('copyIdBtn').onclick = function () {
+        document.getElementById('copyIdBtn').onclick = () => {
             navigator.clipboard.writeText(myId);
             alert('ID скопирован');
         };
@@ -677,7 +651,7 @@
             const errorDiv = document.getElementById('registrationError');
             
             if (!entry) {
-                resDiv.innerHTML = '<div class="search-info" style="border-color:#ff5555;"><span style="color:#ffaaaa;">❌ пользователь не найден</span></div>';
+                resDiv.innerHTML = '<div class="search-info" style="border-color:#ff5555;"><span style="color:#ffaaaa;">❌ не найден</span></div>';
                 return;
             }
 
@@ -687,80 +661,53 @@
                     <span style="color:#b4e0ff; font-weight:500;">${entry.rawName.replace('channel_','')}</span>
                     <span style="color:#8899aa; margin-left:auto;">вход в канал...</span>
                 </div>`;
-                await enterChannel(entry.id);
+                await enterChat(entry.id, 'channel', entry.rawName.replace('channel_',''));
             } else {
+                if (!myId) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerText = '❌ ты не зарегистрирован';
+                    return;
+                }
                 const nameParts = entry.rawName.split('_');
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts[1] || '';
                 resDiv.innerHTML = `<div class="search-info">
                     <span style="font-size:1.4rem;">👤</span>
                     <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
-                    <span style="color:#8899aa; margin-left:auto;">подключение...</span>
+                    <span style="color:#8899aa; margin-left:auto;">вход в чат...</span>
                 </div>`;
-
-                if (!localPeer) {
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerText = '❌ ты не зарегистрирован как person';
-                    return;
-                }
-
-                if (currentConnection) currentConnection.close();
-
-                try {
-                    const conn = localPeer.connect(entry.id);
-                    const timeout = setTimeout(() => {
-                        errorDiv.style.display = 'block';
-                        errorDiv.innerText = '❌ таймаут подключения';
-                    }, 10000);
-
-                    conn.on('open', () => {
-                        clearTimeout(timeout);
-                        currentConnection = conn;
-                        currentChannelId = null;
-                        document.getElementById('connectionStatus').innerText = '🟢 личный чат';
-                        document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${entry.id}`;
-                        clearMessages();
-                        const history = loadPrivateMessages(entry.id);
-                        history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
-                        setupConnection(conn);
-                        errorDiv.style.display = 'none';
-                    });
-
-                    conn.on('error', (err) => {
-                        clearTimeout(timeout);
-                        errorDiv.style.display = 'block';
-                        errorDiv.innerText = '❌ ошибка подключения: ' + err.type;
-                    });
-                } catch (e) {
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerText = '❌ ошибка: ' + e.message;
-                }
+                await enterChat(entry.id, 'private', `${firstName} ${lastName}`);
             }
         };
 
         document.getElementById('sendMsgBtn').onclick = async function () {
             const msg = document.getElementById('messageInput').value.trim();
-            if (!msg) return;
-            if (currentChannelId) {
-                const senderName = myIsChannel ? `📢 ${myName}` : `${myName || ''} ${mySurname || ''}`.trim() || myId;
-                const msgObj = { text: msg, sender: senderName, time: Date.now() };
-                await appendToChannelMessages(currentChannelId, msgObj);
-                addMessageToChat(`${senderName}: ${msg}`, true);
-                if (!channelMessagesCache[currentChannelId]) channelMessagesCache[currentChannelId] = [];
-                channelMessagesCache[currentChannelId].push(msgObj);
-                document.getElementById('messageInput').value = '';
-            } else if (currentConnection) {
-                currentConnection.send(msg);
-                addMessageToChat(msg, true);
-                savePrivateMessage(currentConnection.peer, msg, true);
-                document.getElementById('messageInput').value = '';
-            } else {
-                alert('нет активного чата или канала');
+            if (!msg || !currentChatId) {
+                alert('нет активного чата');
+                return;
             }
+            const senderName = myIsChannel ? `📢 ${myName}` : `${myName} ${mySurname}`.trim() || myId;
+            const msgObj = { 
+                text: msg, 
+                senderId: myId,
+                senderName: senderName,
+                time: Date.now() 
+            };
+            if (currentChatType === 'channel') {
+                await appendToChannelMessages(currentChatId, msgObj);
+            } else {
+                await appendToPrivateMessages(currentChatId, msgObj);
+            }
+            addMessageToChat(`${senderName}: ${msg}`, true);
+            document.getElementById('messageInput').value = '';
+            await loadMessages();
         };
 
         document.getElementById('messageInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('sendMsgBtn').click(); }
+            if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault(); 
+                document.getElementById('sendMsgBtn').click(); 
+            }
         });
     };
 </script>
