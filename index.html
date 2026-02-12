@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>halal messange</title>
     <style>
+        
         * {
             margin: 0;
             padding: 0;
@@ -207,33 +208,33 @@
     </div>
 
     <div class="card" id="githubSetupCard" style="display: none;">
-        <div style="margin-bottom: 14px; color:#9ac7ff;">🔧 доступ к базе GitHub</div>
+        <div style="margin-bottom: 14px; color:#9ac7ff;">доступ к базе GitHub</div>
         <input type="text" id="githubToken" placeholder="вставь GitHub классический токен (repo)" value="">
         <div class="flex">
             <input type="text" id="githubOwner" placeholder="владелец" value="blashenny363-ux" style="flex:1;">
             <input type="text" id="githubRepo" placeholder="репозиторий" value="halal" style="flex:1;">
         </div>
         <input type="text" id="githubPath" placeholder="путь к database.txt" value="database.txt">
-        <button class="btn" id="saveGitHubBtn">💾 сохранить</button>
+        <button class="btn" id="saveGitHubBtn">сохранить</button>
         <div id="githubStatus" class="small-note"></div>
         <div style="margin-top: 12px; text-align: right;">
-            <button class="btn-small" id="closeSetupBtn" style="background: #1e2a36;">✖ закрыть</button>
+            <button class="btn-small" id="closeSetupBtn" style="background: #1e2a36;">закрыть</button>
         </div>
     </div>
 
     <div class="card" id="registerCard" style="display: block;">
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn btn-small" id="showUserRegBtn" style="background: #0d2c4e;">👤 регистрация</button>
-            <button class="btn btn-small" id="showChannelRegBtn" style="background: #0a2a3a;">📢 создать канал</button>
+            <button class="btn btn-small" id="showUserRegBtn" style="background: #0d2c4e;">регистрация</button>
+            <button class="btn btn-small" id="showChannelRegBtn" style="background: #0a2a3a;">создать канал</button>
         </div>
         <div id="userRegBlock">
-            <input type="text" id="firstName" placeholder="имя">
-            <input type="text" id="lastName" placeholder="фамилия">
-            <button class="btn" id="registerBtn">✅ получить ID</button>
+            <input type="text" id="firstName" placeholder="имя (англ)">
+            <input type="text" id="lastName" placeholder="фамилия (англ)">
+            <button class="btn" id="registerBtn"> получить ID в стандоф</button>
         </div>
         <div id="channelRegBlock" style="display: none;">
-            <input type="text" id="channelName" placeholder="название канала">
-            <button class="btn" id="createChannelBtn">📢 создать канал</button>
+            <input type="text" id="channelName" placeholder="название канала (англ)">
+            <button class="btn" id="createChannelBtn">создать канал</button>
         </div>
         <div id="registrationError" class="error-text" style="display: none;"></div>
     </div>
@@ -242,12 +243,12 @@
         <div class="own-id-box" id="ownIdBox">
             <span id="myIdDisplay" style="font-weight:600; color:#b3e0ff;"></span>
             <div style="display: flex; gap: 6px;">
-                <button class="btn btn-small" id="copyIdBtn">📋 копировать</button>
+                <button class="btn btn-small" id="copyIdBtn"> копировать</button>
             </div>
         </div>
 
         <div class="card" style="margin-top: 20px;">
-            <div style="margin-bottom: 14px;">🔎 найти по ID</div>
+            <div style="margin-bottom: 14px;">найти по ID в стандофе</div>
             <div class="flex">
                 <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
                 <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
@@ -261,11 +262,11 @@
                 <span id="connectionStatus" class="badge"></span>
             </div>
             <div id="messagesContainer" class="messages">
-                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 введи ID и нажми найти</div>
+                <div style="color: #8899aa; text-align: center; padding: 20px;"></div>
             </div>
             <div class="flex">
-                <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
-                <button class="btn btn-small" id="sendMsgBtn" style="flex:1;">🚀 отправить</button>
+                <textarea id="messageInput" placeholder="сообщение" rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
+                <button class="btn btn-small" id="sendMsgBtn" style="flex:1;">отправить</button>
             </div>
         </div>
     </div>
@@ -281,7 +282,9 @@
     let currentChatId = null;
     let currentChatType = null;
     let messagesUpdateInterval = null;
+    let cleanupInterval = null;
 
+    
     async function getDatabaseFromGitHub() {
         if (!githubConfig) return [];
         const { token, owner, repo, path } = githubConfig;
@@ -354,6 +357,41 @@
         }
     }
 
+    async function deleteFile(path, sha) {
+        if (!githubConfig) return;
+        const { token, owner, repo } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        try {
+            await fetch(url, {
+                method: 'DELETE',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ message: `cleanup old chat`, sha: sha })
+            });
+        } catch (e) {}
+    }
+
+    
+    async function cleanupOldChats() {
+        if (!githubConfig) return;
+        const { token, owner, repo } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/`;
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (!res.ok) return;
+            const files = await res.json();
+            for (const file of files) {
+                // удаляем все файлы, начинающиеся с private_ или channel_
+                if (file.name.startsWith('private_') || file.name.startsWith('channel_')) {
+                    await deleteFile(file.path, file.sha);
+                    console.log(`удалён файл: ${file.name}`);
+                }
+            }
+        } catch (e) {}
+    }
+
+    
     async function getChannelMessages(channelId) {
         if (!githubConfig) return [];
         const { token, owner, repo } = githubConfig;
@@ -444,9 +482,11 @@
         });
     }
 
+   
     function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
     function generateChannelId() { return 'c_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_channel'; }
 
+    
     function loadGitHubConfig() {
         const stored = localStorage.getItem('halal_github_config');
         if (stored) {
@@ -471,7 +511,7 @@
         }
         githubConfig = { token, owner, repo, path };
         localStorage.setItem('halal_github_config', JSON.stringify(githubConfig));
-        document.getElementById('githubStatus').innerHTML = '<span style="color:#aaffaa;">✅ настройки сохранены</span>';
+        document.getElementById('githubStatus').innerHTML = '<span style="color:#aaffaa;">настройки сохранены</span>';
         return true;
     }
 
@@ -488,6 +528,7 @@
         return false;
     }
 
+    
     function addMessageToChat(text, isOwn = true) {
         const container = document.getElementById('messagesContainer');
         const msgDiv = document.createElement('div');
@@ -504,8 +545,8 @@
         clearMessages();
         currentChatId = chatId;
         currentChatType = type;
-        document.getElementById('connectionStatus').innerText = type === 'channel' ? '📢 канал' : '👤 личный чат';
-        document.getElementById('chatWithLabel').innerHTML = `💬 ${type === 'channel' ? 'канал' : 'чат'} ${peerInfo}`;
+        document.getElementById('connectionStatus').innerText = type === 'channel' ? 'канал' : 'личный чат';
+        document.getElementById('chatWithLabel').innerHTML = `${type === 'channel' ? 'канал' : 'чат'} ${peerInfo}`;
         if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
         await loadMessages();
         messagesUpdateInterval = setInterval(loadMessages, 30000);
@@ -530,6 +571,7 @@
         }
     }
 
+    
     window.onload = async function () {
         const hasConfig = loadGitHubConfig();
 
@@ -545,12 +587,18 @@
             }
             await getDatabaseFromGitHub();
             setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+            
+            
+            cleanupInterval = setInterval(async () => { await cleanupOldChats(); }, 86400000);
+            // первый запуск через 5 секунд после загрузки (чтобы не тормозить интерфейс)
+            setTimeout(async () => { await cleanupOldChats(); }, 5000);
         } else {
             document.getElementById('githubSetupCard').style.display = 'block';
             document.getElementById('registerCard').style.display = 'block';
             document.getElementById('mainInterface').style.display = 'none';
         }
 
+        
         document.getElementById('globalGithubBtn').onclick = () => {
             document.getElementById('githubSetupCard').style.display = 'block';
         };
@@ -577,6 +625,9 @@
                 document.getElementById('mainInterface').style.display = 'none';
                 await getDatabaseFromGitHub();
                 setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+                
+                cleanupInterval = setInterval(async () => { await cleanupOldChats(); }, 86400000);
+                setTimeout(async () => { await cleanupOldChats(); }, 5000);
             }
         };
 
@@ -590,7 +641,7 @@
             const surname = document.getElementById('lastName').value.trim();
             if (!name || !surname) { 
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ введи имя и фамилию';
+                document.getElementById('registrationError').innerText = '❌ введи имя и фамилию (англ)';
                 return; 
             }
             const newId = generatePersonId();
@@ -618,7 +669,7 @@
             const chName = document.getElementById('channelName').value.trim();
             if (!chName) { 
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ введи название канала';
+                document.getElementById('registrationError').innerText = '❌ введи название канала (англ)';
                 return; 
             }
             const newId = generateChannelId();
@@ -672,7 +723,7 @@
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts[1] || '';
                 resDiv.innerHTML = `<div class="search-info">
-                    <span style="font-size:1.4rem;">👤</span>
+                    <span style="font-size:1.4rem;"></span>
                     <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
                     <span style="color:#8899aa; margin-left:auto;">вход в чат...</span>
                 </div>`;
@@ -686,7 +737,7 @@
                 alert('нет активного чата');
                 return;
             }
-            const senderName = myIsChannel ? `📢 ${myName}` : `${myName} ${mySurname}`.trim() || myId;
+            const senderName = myIsChannel ? `${myName}` : `${myName} ${mySurname}`.trim() || myId;
             const msgObj = { 
                 text: msg, 
                 senderId: myId,
