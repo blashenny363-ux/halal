@@ -45,7 +45,6 @@
             padding: 20px;
             margin-bottom: 22px;
             border: 1px solid #263238;
-            position: relative;
         }
         .btn {
             background: #0d2c4e;
@@ -188,7 +187,7 @@
 </head>
 <body>
 <div class="app" id="app">
-    <h1> halal messange</h1>
+    <h1>halal messange</h1>
 
     <div class="github-corner">
         <button class="btn-icon" id="globalGithubBtn" title="Настройки GitHub">
@@ -221,7 +220,7 @@
         <div id="userRegBlock">
             <input type="text" id="firstName" placeholder="имя">
             <input type="text" id="lastName" placeholder="фамилия">
-            <button class="btn" id="registerBtn">✅ получить ID в стандофе</button>
+            <button class="btn" id="registerBtn">✅ получить ID в стандоф</button>
         </div>
         <div id="channelRegBlock" style="display: none;">
             <input type="text" id="channelName" placeholder="название канала">
@@ -239,7 +238,7 @@
         </div>
 
         <div class="card" style="margin-top: 20px;">
-            <div style="margin-bottom: 14px;">🔎 найти по ID в стенде</div>
+            <div style="margin-bottom: 14px;">🔎 найти по ID в стандоф</div>
             <div class="flex">
                 <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
                 <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
@@ -484,7 +483,9 @@
         if (!peerId.endsWith('_person')) return;
         if (localPeer) localPeer.destroy();
         localPeer = new Peer(peerId);
-        localPeer.on('open', () => { document.getElementById('myIdDisplay').innerText = peerId; });
+        localPeer.on('open', () => { 
+            document.getElementById('myIdDisplay').innerText = peerId;
+        });
         localPeer.on('connection', (conn) => {
             conn.on('open', () => {
                 currentConnection = conn;
@@ -668,32 +669,40 @@
             }
             if (entry.id.endsWith('_channel')) {
                 resDiv.innerHTML = `<span style="color:#b4e0ff;">📢 канал: ${entry.rawName.replace('channel_','')}</span>
-                                   <button class="btn btn-small" id="joinChannelBtn" style="margin-top:10px;">🔗 войти</button>`;
-                document.getElementById('joinChannelBtn').onclick = () => enterChannel(entry.id);
+                                   <button class="btn btn-small join-channel-btn" data-channel-id="${entry.id}" style="margin-top:10px;">🔗 войти</button>`;
             } else {
                 const nameParts = entry.rawName.split('_');
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts[1] || '';
                 resDiv.innerHTML = `<span style="color:#b4e0ff;">👤 ${firstName} ${lastName}</span>
-                                   <button class="btn btn-small" id="connectToPersonBtn" style="margin-top:10px;">🔗 написать</button>`;
-                document.getElementById('connectToPersonBtn').onclick = () => {
-                    if (!localPeer) { alert('ты не зарегистрирован как person'); return; }
-                    if (currentConnection) currentConnection.close();
-                    const conn = localPeer.connect(entry.id);
-                    conn.on('open', () => {
-                        currentConnection = conn;
-                        currentChannelId = null;
-                        document.getElementById('connectionStatus').innerText = '🟢 личный чат';
-                        document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${entry.id}`;
-                        clearMessages();
-                        const history = loadPrivateMessages(entry.id);
-                        history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
-                        setupConnection(conn);
-                    });
-                    conn.on('error', (err) => { alert('ошибка подключения: ' + err.type); });
-                };
+                                   <button class="btn btn-small connect-person-btn" data-peer-id="${entry.id}" style="margin-top:10px;">🔗 написать</button>`;
             }
         };
+
+        document.getElementById('searchResult').addEventListener('click', function(e) {
+            const target = e.target;
+            if (target.classList.contains('connect-person-btn')) {
+                const peerId = target.dataset.peerId;
+                if (!localPeer) { alert('ты не зарегистрирован как person'); return; }
+                if (currentConnection) currentConnection.close();
+                const conn = localPeer.connect(peerId);
+                conn.on('open', () => {
+                    currentConnection = conn;
+                    currentChannelId = null;
+                    document.getElementById('connectionStatus').innerText = '🟢 личный чат';
+                    document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${peerId}`;
+                    clearMessages();
+                    const history = loadPrivateMessages(peerId);
+                    history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
+                    setupConnection(conn);
+                });
+                conn.on('error', (err) => { alert('ошибка подключения: ' + err.type); });
+            }
+            if (target.classList.contains('join-channel-btn')) {
+                const channelId = target.dataset.channelId;
+                enterChannel(channelId);
+            }
+        });
 
         document.getElementById('sendMsgBtn').onclick = async function () {
             const msg = document.getElementById('messageInput').value.trim();
