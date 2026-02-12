@@ -6,6 +6,7 @@
     <title>halal messange</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
+        /* ⚡ Визуал полностью сохранён — тёмная тема, тёмно-синие кнопки, адаптив */
         * {
             margin: 0;
             padding: 0;
@@ -162,7 +163,8 @@
 
     <div class="card" id="githubSetupCard">
         <div style="margin-bottom: 14px; color:#9ac7ff;">🔧 доступ к базе GitHub</div>
-        <input type="text" id="githubToken" placeholder="Personal Access Token" value="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">
+        <!-- ⚠️ поле токена пустое — вставьте сюда свой новый классический токен с правами repo -->
+        <input type="text" id="githubToken" placeholder="вставь GitHub классический токен (repo)" value="">
         <div class="flex">
             <input type="text" id="githubOwner" placeholder="владелец" value="blashenny363-ux" style="flex:1;">
             <input type="text" id="githubRepo" placeholder="репозиторий" value="halal" style="flex:1;">
@@ -210,7 +212,7 @@
                 <span id="connectionStatus" class="badge"></span>
             </div>
             <div id="messagesContainer" class="messages">
-                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 найди какульку</div>
+                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 найди какулю</div>
             </div>
             <div class="flex">
                 <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
@@ -221,6 +223,7 @@
 </div>
 
 <script>
+    
     let localPeer = null;
     let currentConnection = null;
     let currentChannelId = null;
