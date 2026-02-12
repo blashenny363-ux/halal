@@ -30,15 +30,13 @@
             padding: 20px;
             border: 1px solid #1e2a36;
         }
-        h1, h2, h3 {
-            font-weight: 500;
-        }
         h1 {
             font-size: 1.9rem;
             color: #c8dfff;
             border-left: 5px solid #0d47a1;
             padding-left: 15px;
             margin-bottom: 18px;
+            font-weight: 500;
         }
         .card {
             background: #141a20;
@@ -143,9 +141,14 @@
             font-size: 0.8rem;
             margin-top: 6px;
         }
-        hr {
-            border: 0.5px solid #1e3748;
-            margin: 22px 0;
+        .error-text {
+            color: #ffaaaa;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            background: #2a1a1a;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border-left: 4px solid #ff5555;
         }
         @media (max-width: 500px) {
             .app { padding: 16px; }
@@ -177,12 +180,13 @@
         <div id="userRegBlock">
             <input type="text" id="firstName" placeholder="имя">
             <input type="text" id="lastName" placeholder="фамилия">
-            <button class="btn" id="registerBtn">✅ получить ID</button>
+            <button class="btn" id="registerBtn">✅ получить ID в стандоф</button>
         </div>
         <div id="channelRegBlock" style="display: none;">
             <input type="text" id="channelName" placeholder="название канала">
             <button class="btn" id="createChannelBtn">📢 создать канал</button>
         </div>
+        <div id="registrationError" class="error-text" style="display: none;"></div>
     </div>
 
     <div id="mainInterface" style="display: none;">
@@ -206,7 +210,7 @@
                 <span id="connectionStatus" class="badge"></span>
             </div>
             <div id="messagesContainer" class="messages">
-                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 найди собеседника</div>
+                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 найди фуфлежуя</div>
             </div>
             <div class="flex">
                 <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
@@ -241,7 +245,10 @@
                 await createEmptyDatabaseFile();
                 return [];
             }
-            if (!res.ok) throw new Error('GitHub error');
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(`GitHub ${res.status}: ${err.message || 'неизвестная ошибка'}`);
+            }
             const data = await res.json();
             const content = atob(data.content);
             const lines = content.trim().split('\n').filter(l => l.trim());
@@ -252,6 +259,8 @@
             dbCache = items;
             return items;
         } catch (e) {
+            console.error('Ошибка чтения базы:', e);
+            document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
             return [];
         }
     }
@@ -260,15 +269,27 @@
         if (!githubConfig) return;
         const { token, owner, repo, path } = githubConfig;
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        await fetch(url, {
-            method: 'PUT',
-            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-            body: JSON.stringify({ message: 'init database', content: btoa('') })
-        });
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ 
+                    message: 'init database', 
+                    content: btoa('') 
+                })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(`GitHub ${res.status}: ${err.message || 'не удалось создать файл'}`);
+            }
+        } catch (e) {
+            console.error('Ошибка создания файла:', e);
+            throw e;
+        }
     }
 
     async function appendToDatabase(entryName, id) {
-        if (!githubConfig) return false;
+        if (!githubConfig) return { success: false, error: 'GitHub не настроен' };
         const { token, owner, repo, path } = githubConfig;
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
         let sha = null, currentContent = '';
@@ -280,19 +301,36 @@
                 const data = await res.json();
                 sha = data.sha;
                 currentContent = atob(data.content);
+            } else if (res.status !== 404) {
+                const err = await res.json();
+                throw new Error(`GitHub ${res.status}: ${err.message || 'ошибка чтения'}`);
             }
-        } catch (e) {}
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+
         const newLine = `${entryName} ${id}`;
         const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
+        
         try {
-            await fetch(url, {
+            const putRes = await fetch(url, {
                 method: 'PUT',
                 headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ message: `add ${entryName}`, content: btoa(newContent), sha: sha || undefined })
+                body: JSON.stringify({ 
+                    message: `add ${entryName}`, 
+                    content: btoa(newContent), 
+                    sha: sha || undefined 
+                })
             });
+            if (!putRes.ok) {
+                const err = await putRes.json();
+                throw new Error(`GitHub ${putRes.status}: ${err.message || 'ошибка записи'}`);
+            }
             dbCache.push({ rawName: entryName, id, name: entryName, surname: '' });
-            return true;
-        } catch (e) { return false; }
+            return { success: true };
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
     }
 
     async function getChannelMessages(channelId) {
@@ -332,11 +370,17 @@
         } catch (e) {}
         const newLine = JSON.stringify(msgObj);
         const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
-        await fetch(url, {
-            method: 'PUT',
-            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-            body: JSON.stringify({ message: `message in ${channelId}`, content: btoa(newContent), sha: sha || undefined })
-        });
+        try {
+            await fetch(url, {
+                method: 'PUT',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ 
+                    message: `message in ${channelId}`, 
+                    content: btoa(newContent), 
+                    sha: sha || undefined 
+                })
+            });
+        } catch (e) {}
     }
 
     function generatePersonId() {
@@ -377,9 +421,13 @@
         const owner = document.getElementById('githubOwner').value.trim();
         const repo = document.getElementById('githubRepo').value.trim();
         let path = document.getElementById('githubPath').value.trim() || 'database.txt';
-        if (!token || !owner || !repo) { alert('заполни все поля'); return false; }
+        if (!token || !owner || !repo) { 
+            document.getElementById('githubStatus').innerHTML = '<span style="color:#ffaaaa;">❌ заполни все поля</span>';
+            return false; 
+        }
         githubConfig = { token, owner, repo, path };
         localStorage.setItem('halal_github_config', JSON.stringify(githubConfig));
+        document.getElementById('githubStatus').innerHTML = '<span style="color:#aaffaa;">✅ настройки сохранены</span>';
         return true;
     }
 
@@ -496,10 +544,12 @@
         document.getElementById('showUserRegBtn').onclick = function() {
             document.getElementById('userRegBlock').style.display = 'block';
             document.getElementById('channelRegBlock').style.display = 'none';
+            document.getElementById('registrationError').style.display = 'none';
         };
         document.getElementById('showChannelRegBtn').onclick = function() {
             document.getElementById('userRegBlock').style.display = 'none';
             document.getElementById('channelRegBlock').style.display = 'block';
+            document.getElementById('registrationError').style.display = 'none';
         };
 
         document.getElementById('saveGitHubBtn').onclick = async function () {
@@ -514,32 +564,48 @@
         document.getElementById('registerBtn').onclick = async function () {
             const name = document.getElementById('firstName').value.trim();
             const surname = document.getElementById('lastName').value.trim();
-            if (!name || !surname) { alert('введи имя и фамилию'); return; }
+            if (!name || !surname) { 
+                document.getElementById('registrationError').style.display = 'block';
+                document.getElementById('registrationError').innerText = '❌ введи имя и фамилию';
+                return; 
+            }
             const newId = generatePersonId();
-            const ok = await appendToDatabase(`${name}_${surname}`, newId);
-            if (ok) {
+            const result = await appendToDatabase(`${name}_${surname}`, newId);
+            if (result.success) {
                 myId = newId; myName = name; mySurname = surname; myIsChannel = false;
                 localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, surname, isChannel: false }));
                 document.getElementById('registerCard').style.display = 'none';
                 document.getElementById('mainInterface').style.display = 'block';
                 initPeer(myId);
                 await getDatabaseFromGitHub();
-            } else alert('ошибка сохранения');
+                document.getElementById('registrationError').style.display = 'none';
+            } else {
+                document.getElementById('registrationError').style.display = 'block';
+                document.getElementById('registrationError').innerText = `❌ ошибка сохранения: ${result.error || 'неизвестная ошибка'}`;
+            }
         };
 
         document.getElementById('createChannelBtn').onclick = async function () {
             const chName = document.getElementById('channelName').value.trim();
-            if (!chName) { alert('введи название канала'); return; }
+            if (!chName) { 
+                document.getElementById('registrationError').style.display = 'block';
+                document.getElementById('registrationError').innerText = '❌ введи название канала';
+                return; 
+            }
             const newId = generateChannelId();
-            const ok = await appendToDatabase(`channel_${chName}`, newId);
-            if (ok) {
+            const result = await appendToDatabase(`channel_${chName}`, newId);
+            if (result.success) {
                 myId = newId; myName = chName; mySurname = ''; myIsChannel = true;
                 localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: chName, surname: '', isChannel: true }));
                 document.getElementById('registerCard').style.display = 'none';
                 document.getElementById('mainInterface').style.display = 'block';
                 document.getElementById('myIdDisplay').innerText = myId;
                 await getDatabaseFromGitHub();
-            } else alert('ошибка создания канала');
+                document.getElementById('registrationError').style.display = 'none';
+            } else {
+                document.getElementById('registrationError').style.display = 'block';
+                document.getElementById('registrationError').innerText = `❌ ошибка создания: ${result.error || 'неизвестная ошибка'}`;
+            }
         };
 
         document.getElementById('copyIdBtn').onclick = function () {
@@ -579,6 +645,9 @@
                         const history = loadPrivateMessages(entry.id);
                         history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
                         setupConnection(conn);
+                    });
+                    conn.on('error', (err) => {
+                        alert('ошибка подключения: ' + err.type);
                     });
                 };
             }
