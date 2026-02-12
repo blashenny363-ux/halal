@@ -6,3 +6,4 @@
 {"text":"Ale","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919738524}
 {"text":"Pidoras soo vidno?","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919758488}
 {"text":"Napishi","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919785388}
+{"text":"Shoto","senderId":"p_mljpda40g096_person","senderName":"rash Xyecoc","time":1770919791738}
