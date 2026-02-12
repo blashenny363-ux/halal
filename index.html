@@ -178,7 +178,7 @@
             top: 12px;
             right: 20px;
         }
-        .search-entry {
+        .search-info {
             background: #1a232c;
             border-radius: 16px;
             padding: 14px 18px;
@@ -230,7 +230,7 @@
         <div id="userRegBlock">
             <input type="text" id="firstName" placeholder="имя">
             <input type="text" id="lastName" placeholder="фамилия">
-            <button class="btn" id="registerBtn">✅ получить ID в стенде</button>
+            <button class="btn" id="registerBtn">✅ получить ID</button>
         </div>
         <div id="channelRegBlock" style="display: none;">
             <input type="text" id="channelName" placeholder="название канала">
@@ -248,12 +248,12 @@
         </div>
 
         <div class="card" style="margin-top: 20px;">
-            <div style="margin-bottom: 14px;">🔎 найти по ID в стендоф</div>
+            <div style="margin-bottom: 14px;">🔎 найти по ID</div>
             <div class="flex">
                 <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
                 <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
             </div>
-            <div id="searchResult" style="margin-top: 16px;"></div>
+            <div id="searchResult" style="margin-top: 16px; min-height: 60px;"></div>
         </div>
 
         <div style="margin-top: 8px;">
@@ -262,7 +262,7 @@
                 <span id="connectionStatus" class="badge"></span>
             </div>
             <div id="messagesContainer" class="messages">
-                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 найди какулю</div>
+                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 введи ID и нажми найти</div>
             </div>
             <div class="flex">
                 <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
@@ -671,50 +671,70 @@
         document.getElementById('searchBtn').onclick = async function () {
             const searchId = document.getElementById('searchIdInput').value.trim();
             if (!searchId) return;
+
             const entry = dbCache.find(e => e.id === searchId);
             const resDiv = document.getElementById('searchResult');
+            const errorDiv = document.getElementById('registrationError');
+            
             if (!entry) {
-                resDiv.innerHTML = '<div class="search-entry" style="background: #2a1a1a; border-color:#ff5555;"><span style="color:#ffaaaa;">❌ не найден</span></div>';
+                resDiv.innerHTML = '<div class="search-info" style="border-color:#ff5555;"><span style="color:#ffaaaa;">❌ пользователь не найден</span></div>';
                 return;
             }
 
             if (entry.id.endsWith('_channel')) {
-                resDiv.innerHTML = `<div class="search-entry">
+                resDiv.innerHTML = `<div class="search-info">
                     <span style="font-size:1.4rem;">📢</span>
                     <span style="color:#b4e0ff; font-weight:500;">${entry.rawName.replace('channel_','')}</span>
-                    <span style="color:#8899aa; margin-left:auto; font-size:0.85rem;">канал</span>
+                    <span style="color:#8899aa; margin-left:auto;">вход в канал...</span>
                 </div>`;
                 await enterChannel(entry.id);
             } else {
                 const nameParts = entry.rawName.split('_');
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts[1] || '';
-                resDiv.innerHTML = `<div class="search-entry">
+                resDiv.innerHTML = `<div class="search-info">
                     <span style="font-size:1.4rem;">👤</span>
                     <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
-                    <span style="color:#8899aa; margin-left:auto; font-size:0.85rem;">${entry.id}</span>
+                    <span style="color:#8899aa; margin-left:auto;">подключение...</span>
                 </div>`;
+
                 if (!localPeer) {
-                    document.getElementById('registrationError').style.display = 'block';
-                    document.getElementById('registrationError').innerText = '❌ ты не зарегистрирован как person';
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerText = '❌ ты не зарегистрирован как person';
                     return;
                 }
+
                 if (currentConnection) currentConnection.close();
-                const conn = localPeer.connect(entry.id);
-                conn.on('open', () => {
-                    currentConnection = conn;
-                    currentChannelId = null;
-                    document.getElementById('connectionStatus').innerText = '🟢 личный чат';
-                    document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${entry.id}`;
-                    clearMessages();
-                    const history = loadPrivateMessages(entry.id);
-                    history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
-                    setupConnection(conn);
-                });
-                conn.on('error', (err) => { 
-                    document.getElementById('registrationError').style.display = 'block';
-                    document.getElementById('registrationError').innerText = '❌ ошибка подключения: ' + err.type;
-                });
+
+                try {
+                    const conn = localPeer.connect(entry.id);
+                    const timeout = setTimeout(() => {
+                        errorDiv.style.display = 'block';
+                        errorDiv.innerText = '❌ таймаут подключения';
+                    }, 10000);
+
+                    conn.on('open', () => {
+                        clearTimeout(timeout);
+                        currentConnection = conn;
+                        currentChannelId = null;
+                        document.getElementById('connectionStatus').innerText = '🟢 личный чат';
+                        document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${entry.id}`;
+                        clearMessages();
+                        const history = loadPrivateMessages(entry.id);
+                        history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
+                        setupConnection(conn);
+                        errorDiv.style.display = 'none';
+                    });
+
+                    conn.on('error', (err) => {
+                        clearTimeout(timeout);
+                        errorDiv.style.display = 'block';
+                        errorDiv.innerText = '❌ ошибка подключения: ' + err.type;
+                    });
+                } catch (e) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerText = '❌ ошибка: ' + e.message;
+                }
             }
         };
 
