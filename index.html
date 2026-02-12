@@ -183,16 +183,10 @@
             border-radius: 16px;
             padding: 14px 18px;
             margin-bottom: 8px;
-            cursor: pointer;
-            transition: 0.1s;
             border: 1px solid #2e4055;
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        .search-entry:hover {
-            background: #1e2e42;
-            border-color: #0d47a1;
         }
         @media (max-width: 500px) {
             .app { padding: 16px; }
@@ -203,7 +197,7 @@
 </head>
 <body>
 <div class="app" id="app">
-    <h1>halal messange</h1>
+    <h1> halal messange</h1>
 
     <div class="github-corner">
         <button class="btn-icon" id="globalGithubBtn" title="Настройки GitHub">
@@ -254,7 +248,7 @@
         </div>
 
         <div class="card" style="margin-top: 20px;">
-            <div style="margin-bottom: 14px;">🔎 найти по ID в стандофе</div>
+            <div style="margin-bottom: 14px;">🔎 найти по ID в стендоф</div>
             <div class="flex">
                 <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
                 <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
@@ -683,51 +677,46 @@
                 resDiv.innerHTML = '<div class="search-entry" style="background: #2a1a1a; border-color:#ff5555;"><span style="color:#ffaaaa;">❌ не найден</span></div>';
                 return;
             }
+
             if (entry.id.endsWith('_channel')) {
-                resDiv.innerHTML = `<div class="search-entry" data-channel-id="${entry.id}">
+                resDiv.innerHTML = `<div class="search-entry">
                     <span style="font-size:1.4rem;">📢</span>
                     <span style="color:#b4e0ff; font-weight:500;">${entry.rawName.replace('channel_','')}</span>
                     <span style="color:#8899aa; margin-left:auto; font-size:0.85rem;">канал</span>
                 </div>`;
+                await enterChannel(entry.id);
             } else {
                 const nameParts = entry.rawName.split('_');
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts[1] || '';
-                resDiv.innerHTML = `<div class="search-entry" data-peer-id="${entry.id}">
+                resDiv.innerHTML = `<div class="search-entry">
                     <span style="font-size:1.4rem;">👤</span>
                     <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
                     <span style="color:#8899aa; margin-left:auto; font-size:0.85rem;">${entry.id}</span>
                 </div>`;
-            }
-        };
-
-        document.getElementById('searchResult').addEventListener('click', function(e) {
-            const entryDiv = e.target.closest('.search-entry');
-            if (!entryDiv) return;
-            
-            const peerId = entryDiv.dataset.peerId;
-            if (peerId) {
-                if (!localPeer) { alert('ты не зарегистрирован как person'); return; }
+                if (!localPeer) {
+                    document.getElementById('registrationError').style.display = 'block';
+                    document.getElementById('registrationError').innerText = '❌ ты не зарегистрирован как person';
+                    return;
+                }
                 if (currentConnection) currentConnection.close();
-                const conn = localPeer.connect(peerId);
+                const conn = localPeer.connect(entry.id);
                 conn.on('open', () => {
                     currentConnection = conn;
                     currentChannelId = null;
                     document.getElementById('connectionStatus').innerText = '🟢 личный чат';
-                    document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${peerId}`;
+                    document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${entry.id}`;
                     clearMessages();
-                    const history = loadPrivateMessages(peerId);
+                    const history = loadPrivateMessages(entry.id);
                     history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
                     setupConnection(conn);
                 });
-                conn.on('error', (err) => { alert('ошибка подключения: ' + err.type); });
+                conn.on('error', (err) => { 
+                    document.getElementById('registrationError').style.display = 'block';
+                    document.getElementById('registrationError').innerText = '❌ ошибка подключения: ' + err.type;
+                });
             }
-            
-            const channelId = entryDiv.dataset.channelId;
-            if (channelId) {
-                enterChannel(channelId);
-            }
-        });
+        };
 
         document.getElementById('sendMsgBtn').onclick = async function () {
             const msg = document.getElementById('messageInput').value.trim();
