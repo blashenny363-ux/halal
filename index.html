@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>halal messange</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background: #0a0c0e;
+            color: #e6edf3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px;
+        }
+        .app {
+            max-width: 750px;
+            width: 100%;
+            background: #0f1215;
+            border-radius: 28px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            padding: 20px;
+            border: 1px solid #1e2a36;
+        }
+        h1, h2, h3 {
+            font-weight: 500;
+        }
+        h1 {
+            font-size: 1.9rem;
+            color: #c8dfff;
+            border-left: 5px solid #0d47a1;
+            padding-left: 15px;
+            margin-bottom: 18px;
+        }
+        .card {
+            background: #141a20;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 22px;
+            border: 1px solid #263238;
+        }
+        .btn {
+            background: #0d2c4e;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 22px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.15s;
+            border-bottom: 2px solid #051e34;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+        .btn-small {
+            width: auto;
+            padding: 8px 18px;
+        }
+        .btn:hover {
+            background: #0d47a1;
+            border-bottom-color: #0a356b;
+        }
+        input, textarea {
+            background: #1e262c;
+            border: 1px solid #2e3b45;
+            border-radius: 30px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 14px;
+        }
+        input:focus, textarea:focus {
+            border-color: #1e88e5;
+            outline: none;
+            background: #1a2127;
+        }
+        .flex {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .own-id-box {
+            background: #0b1b2a;
+            padding: 14px 20px;
+            border-radius: 40px;
+            border: 1px solid #0d47a1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-all;
+        }
+        .messages {
+            background: #0c1116;
+            border-radius: 24px;
+            padding: 18px;
+            height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0;
+            border: 1px solid #1f3a4b;
+        }
+        .message {
+            max-width: 80%;
+            padding: 11px 17px;
+            border-radius: 20px;
+            background: #1e2a36;
+            align-self: flex-start;
+            color: #f0f6fc;
+            border-bottom-left-radius: 6px;
+            word-wrap: break-word;
+        }
+        .message.own {
+            background: #0a3a5c;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+            border-bottom-left-radius: 20px;
+        }
+        .badge {
+            background: #0f2a40;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #b0d4ff;
+        }
+        .small-note {
+            color: #8899aa;
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        hr {
+            border: 0.5px solid #1e3748;
+            margin: 22px 0;
+        }
+        @media (max-width: 500px) {
+            .app { padding: 16px; }
+            h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <h1> halal messange</h1>
+
+    <div class="card" id="githubSetupCard">
+        <div style="margin-bottom: 14px; color:#9ac7ff;">🔧 доступ к базе GitHub</div>
+        <input type="text" id="githubToken" placeholder="Personal Access Token" value="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">
+        <div class="flex">
+            <input type="text" id="githubOwner" placeholder="владелец" value="blashenny363-ux" style="flex:1;">
+            <input type="text" id="githubRepo" placeholder="репозиторий" value="halal" style="flex:1;">
+        </div>
+        <input type="text" id="githubPath" placeholder="путь к database.txt" value="database.txt">
+        <button class="btn" id="saveGitHubBtn">💾 сохранить</button>
+        <div id="githubStatus" class="small-note"></div>
+    </div>
+
+    <div class="card" id="registerCard" style="display: none;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn btn-small" id="showUserRegBtn" style="background: #0d2c4e;">👤 регистрация</button>
+            <button class="btn btn-small" id="showChannelRegBtn" style="background: #0a2a3a;">📢 создать канал</button>
+        </div>
+        <div id="userRegBlock">
+            <input type="text" id="firstName" placeholder="имя">
+            <input type="text" id="lastName" placeholder="фамилия">
+            <button class="btn" id="registerBtn">✅ получить ID</button>
+        </div>
+        <div id="channelRegBlock" style="display: none;">
+            <input type="text" id="channelName" placeholder="название канала">
+            <button class="btn" id="createChannelBtn">📢 создать канал</button>
+        </div>
+    </div>
+
+    <div id="mainInterface" style="display: none;">
+        <div class="own-id-box" id="ownIdBox">
+            <span id="myIdDisplay" style="font-weight:600; color:#b3e0ff;"></span>
+            <button class="btn btn-small" id="copyIdBtn">📋 копировать</button>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div style="margin-bottom: 14px;">🔎 найти по ID</div>
+            <div class="flex">
+                <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
+                <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
+            </div>
+            <div id="searchResult" style="margin-top: 16px;"></div>
+        </div>
+
+        <div style="margin-top: 8px;">
+            <div class="flex" style="justify-content: space-between;">
+                <h3 id="chatWithLabel" style="color:#8fcbff;">💬 нет чата</h3>
+                <span id="connectionStatus" class="badge"></span>
+            </div>
+            <div id="messagesContainer" class="messages">
+                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 найди собеседника</div>
+            </div>
+            <div class="flex">
+                <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
+                <button class="btn btn-small" id="sendMsgBtn" style="flex:1;">🚀 отправить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localPeer = null;
+    let currentConnection = null;
+    let currentChannelId = null;
+    let myId = null;
+    let myName = null;
+    let mySurname = null;
+    let myIsChannel = false;
+    let githubConfig = null;
+    let dbCache = [];
+    let channelMessagesCache = {};
+    let channelUpdateInterval = null;
+
+    async function getDatabaseFromGitHub() {
+        if (!githubConfig) return [];
+        const { token, owner, repo, path } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (res.status === 404) {
+                await createEmptyDatabaseFile();
+                return [];
+            }
+            if (!res.ok) throw new Error('GitHub error');
+            const data = await res.json();
+            const content = atob(data.content);
+            const lines = content.trim().split('\n').filter(l => l.trim());
+            const items = lines.map(line => {
+                const [rawName, id] = line.split(' ');
+                return { rawName, id, name: rawName, surname: '' };
+            }).filter(i => i.id);
+            dbCache = items;
+            return items;
+        } catch (e) {
+            return [];
+        }
+    }
+
+    async function createEmptyDatabaseFile() {
+        if (!githubConfig) return;
+        const { token, owner, repo, path } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        await fetch(url, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+            body: JSON.stringify({ message: 'init database', content: btoa('') })
+        });
+    }
+
+    async function appendToDatabase(entryName, id) {
+        if (!githubConfig) return false;
+        const { token, owner, repo, path } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        let sha = null, currentContent = '';
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                sha = data.sha;
+                currentContent = atob(data.content);
+            }
+        } catch (e) {}
+        const newLine = `${entryName} ${id}`;
+        const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
+        try {
+            await fetch(url, {
+                method: 'PUT',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ message: `add ${entryName}`, content: btoa(newContent), sha: sha || undefined })
+            });
+            dbCache.push({ rawName: entryName, id, name: entryName, surname: '' });
+            return true;
+        } catch (e) { return false; }
+    }
+
+    async function getChannelMessages(channelId) {
+        if (!githubConfig) return [];
+        const { token, owner, repo } = githubConfig;
+        const path = `channel_${channelId}.txt`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (res.status === 404) return [];
+            if (!res.ok) return [];
+            const data = await res.json();
+            const content = atob(data.content);
+            return content.trim().split('\n').filter(l => l).map(line => {
+                try { return JSON.parse(line); } catch { return null; }
+            }).filter(m => m);
+        } catch { return []; }
+    }
+
+    async function appendToChannelMessages(channelId, msgObj) {
+        if (!githubConfig) return;
+        const { token, owner, repo } = githubConfig;
+        const path = `channel_${channelId}.txt`;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        let sha = null, currentContent = '';
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                sha = data.sha;
+                currentContent = atob(data.content);
+            }
+        } catch (e) {}
+        const newLine = JSON.stringify(msgObj);
+        const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
+        await fetch(url, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+            body: JSON.stringify({ message: `message in ${channelId}`, content: btoa(newContent), sha: sha || undefined })
+        });
+    }
+
+    function generatePersonId() {
+        return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person';
+    }
+    function generateChannelId() {
+        return 'c_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_channel';
+    }
+
+    function savePrivateMessage(peerId, msg, isOutgoing) {
+        const key = `chat_${peerId}`;
+        let history = JSON.parse(localStorage.getItem(key) || '[]');
+        history.push({ text: msg, outgoing: isOutgoing, time: Date.now() });
+        if (history.length > 100) history = history.slice(-100);
+        localStorage.setItem(key, JSON.stringify(history));
+    }
+
+    function loadPrivateMessages(peerId) {
+        const key = `chat_${peerId}`;
+        return JSON.parse(localStorage.getItem(key) || '[]');
+    }
+
+    function loadGitHubConfig() {
+        const stored = localStorage.getItem('halal_github_config');
+        if (stored) {
+            githubConfig = JSON.parse(stored);
+            document.getElementById('githubToken').value = githubConfig.token || '';
+            document.getElementById('githubOwner').value = githubConfig.owner || '';
+            document.getElementById('githubRepo').value = githubConfig.repo || '';
+            document.getElementById('githubPath').value = githubConfig.path || 'database.txt';
+            return true;
+        }
+        return false;
+    }
+
+    function saveGitHubConfig() {
+        const token = document.getElementById('githubToken').value.trim();
+        const owner = document.getElementById('githubOwner').value.trim();
+        const repo = document.getElementById('githubRepo').value.trim();
+        let path = document.getElementById('githubPath').value.trim() || 'database.txt';
+        if (!token || !owner || !repo) { alert('заполни все поля'); return false; }
+        githubConfig = { token, owner, repo, path };
+        localStorage.setItem('halal_github_config', JSON.stringify(githubConfig));
+        return true;
+    }
+
+    function loadOwnProfile() {
+        const stored = localStorage.getItem('halal_my_profile');
+        if (stored) {
+            const p = JSON.parse(stored);
+            myId = p.id;
+            myName = p.name;
+            mySurname = p.surname;
+            myIsChannel = p.isChannel || false;
+            return true;
+        }
+        return false;
+    }
+
+    function initPeer(peerId) {
+        if (!peerId.endsWith('_person')) return;
+        if (localPeer) localPeer.destroy();
+        localPeer = new Peer(peerId);
+        localPeer.on('open', () => {
+            document.getElementById('myIdDisplay').innerText = peerId;
+        });
+        localPeer.on('connection', (conn) => {
+            conn.on('open', () => {
+                currentConnection = conn;
+                currentChannelId = null;
+                document.getElementById('connectionStatus').innerText = '🟢 личный чат';
+                document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${conn.peer}`;
+                const history = loadPrivateMessages(conn.peer);
+                const container = document.getElementById('messagesContainer');
+                container.innerHTML = '';
+                history.forEach(msg => {
+                    addMessageToChat(msg.text, msg.outgoing);
+                });
+                setupConnection(conn);
+            });
+        });
+    }
+
+    function setupConnection(conn) {
+        conn.on('data', (data) => {
+            addMessageToChat(data, false);
+            savePrivateMessage(conn.peer, data, false);
+        });
+        conn.on('close', () => {
+            if (currentConnection === conn) {
+                currentConnection = null;
+                document.getElementById('connectionStatus').innerText = '⚪ не в сети';
+            }
+        });
+    }
+
+    function addMessageToChat(text, isOwn = true) {
+        const container = document.getElementById('messagesContainer');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message');
+        if (isOwn) msgDiv.classList.add('own');
+        msgDiv.innerText = text;
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function clearMessages() {
+        document.getElementById('messagesContainer').innerHTML = '';
+    }
+
+    async function enterChannel(channelId) {
+        clearMessages();
+        currentChannelId = channelId;
+        currentConnection = null;
+        document.getElementById('connectionStatus').innerText = '📢 канал';
+        document.getElementById('chatWithLabel').innerHTML = `💬 канал ${channelId}`;
+        const msgs = await getChannelMessages(channelId);
+        channelMessagesCache[channelId] = msgs;
+        msgs.forEach(m => {
+            addMessageToChat(`${m.sender || 'аноним'}: ${m.text}`, false);
+        });
+        if (channelUpdateInterval) clearInterval(channelUpdateInterval);
+        channelUpdateInterval = setInterval(async () => {
+            if (currentChannelId === channelId) {
+                const newMsgs = await getChannelMessages(channelId);
+                if (newMsgs.length > channelMessagesCache[channelId].length) {
+                    const added = newMsgs.slice(channelMessagesCache[channelId].length);
+                    added.forEach(m => {
+                        addMessageToChat(`${m.sender || 'аноним'}: ${m.text}`, false);
+                    });
+                    channelMessagesCache[channelId] = newMsgs;
+                }
+            }
+        }, 30000);
+    }
+
+    window.onload = async function () {
+        if (loadGitHubConfig()) {
+            document.getElementById('githubSetupCard').style.display = 'none';
+            await getDatabaseFromGitHub();
+            setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+        }
+
+        if (loadOwnProfile()) {
+            document.getElementById('registerCard').style.display = 'none';
+            document.getElementById('mainInterface').style.display = 'block';
+            if (!myIsChannel) initPeer(myId);
+            else document.getElementById('myIdDisplay').innerText = myId;
+        } else {
+            if (githubConfig) {
+                document.getElementById('registerCard').style.display = 'block';
+                document.getElementById('mainInterface').style.display = 'none';
+                document.getElementById('githubSetupCard').style.display = 'none';
+            }
+        }
+
+        document.getElementById('showUserRegBtn').onclick = function() {
+            document.getElementById('userRegBlock').style.display = 'block';
+            document.getElementById('channelRegBlock').style.display = 'none';
+        };
+        document.getElementById('showChannelRegBtn').onclick = function() {
+            document.getElementById('userRegBlock').style.display = 'none';
+            document.getElementById('channelRegBlock').style.display = 'block';
+        };
+
+        document.getElementById('saveGitHubBtn').onclick = async function () {
+            if (saveGitHubConfig()) {
+                document.getElementById('githubSetupCard').style.display = 'none';
+                document.getElementById('registerCard').style.display = 'block';
+                await getDatabaseFromGitHub();
+                setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+            }
+        };
+
+        document.getElementById('registerBtn').onclick = async function () {
+            const name = document.getElementById('firstName').value.trim();
+            const surname = document.getElementById('lastName').value.trim();
+            if (!name || !surname) { alert('введи имя и фамилию'); return; }
+            const newId = generatePersonId();
+            const ok = await appendToDatabase(`${name}_${surname}`, newId);
+            if (ok) {
+                myId = newId; myName = name; mySurname = surname; myIsChannel = false;
+                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, surname, isChannel: false }));
+                document.getElementById('registerCard').style.display = 'none';
+                document.getElementById('mainInterface').style.display = 'block';
+                initPeer(myId);
+                await getDatabaseFromGitHub();
+            } else alert('ошибка сохранения');
+        };
+
+        document.getElementById('createChannelBtn').onclick = async function () {
+            const chName = document.getElementById('channelName').value.trim();
+            if (!chName) { alert('введи название канала'); return; }
+            const newId = generateChannelId();
+            const ok = await appendToDatabase(`channel_${chName}`, newId);
+            if (ok) {
+                myId = newId; myName = chName; mySurname = ''; myIsChannel = true;
+                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: chName, surname: '', isChannel: true }));
+                document.getElementById('registerCard').style.display = 'none';
+                document.getElementById('mainInterface').style.display = 'block';
+                document.getElementById('myIdDisplay').innerText = myId;
+                await getDatabaseFromGitHub();
+            } else alert('ошибка создания канала');
+        };
+
+        document.getElementById('copyIdBtn').onclick = function () {
+            navigator.clipboard.writeText(myId);
+            alert('ID скопирован');
+        };
+
+        document.getElementById('searchBtn').onclick = async function () {
+            const searchId = document.getElementById('searchIdInput').value.trim();
+            if (!searchId) return;
+            const entry = dbCache.find(e => e.id === searchId);
+            const resDiv = document.getElementById('searchResult');
+            if (!entry) {
+                resDiv.innerHTML = '<span style="color:#ffaaaa;">❌ не найден</span>';
+                return;
+            }
+            if (entry.id.endsWith('_channel')) {
+                resDiv.innerHTML = `<span style="color:#b4e0ff;">📢 канал: ${entry.rawName.replace('channel_','')}</span>
+                                   <button class="btn btn-small" id="joinChannelBtn" style="margin-top:10px;">🔗 войти</button>`;
+                document.getElementById('joinChannelBtn').onclick = () => enterChannel(entry.id);
+            } else {
+                const nameParts = entry.rawName.split('_');
+                const firstName = nameParts[0] || '';
+                const lastName = nameParts[1] || '';
+                resDiv.innerHTML = `<span style="color:#b4e0ff;">👤 ${firstName} ${lastName}</span>
+                                   <button class="btn btn-small" id="connectToPersonBtn" style="margin-top:10px;">🔗 написать</button>`;
+                document.getElementById('connectToPersonBtn').onclick = () => {
+                    if (!localPeer) { alert('ты не зарегистрирован как person'); return; }
+                    if (currentConnection) currentConnection.close();
+                    const conn = localPeer.connect(entry.id);
+                    conn.on('open', () => {
+                        currentConnection = conn;
+                        currentChannelId = null;
+                        document.getElementById('connectionStatus').innerText = '🟢 личный чат';
+                        document.getElementById('chatWithLabel').innerHTML = `💬 чат с ${entry.id}`;
+                        clearMessages();
+                        const history = loadPrivateMessages(entry.id);
+                        history.forEach(msg => addMessageToChat(msg.text, msg.outgoing));
+                        setupConnection(conn);
+                    });
+                };
+            }
+        };
+
+        document.getElementById('sendMsgBtn').onclick = async function () {
+            const msg = document.getElementById('messageInput').value.trim();
+            if (!msg) return;
+            if (currentChannelId) {
+                const senderName = myIsChannel ? `📢 ${myName}` : `${myName || ''} ${mySurname || ''}`.trim() || myId;
+                const msgObj = { text: msg, sender: senderName, time: Date.now() };
+                await appendToChannelMessages(currentChannelId, msgObj);
+                addMessageToChat(`${senderName}: ${msg}`, true);
+                if (!channelMessagesCache[currentChannelId]) channelMessagesCache[currentChannelId] = [];
+                channelMessagesCache[currentChannelId].push(msgObj);
+                document.getElementById('messageInput').value = '';
+            } else if (currentConnection) {
+                currentConnection.send(msg);
+                addMessageToChat(msg, true);
+                savePrivateMessage(currentConnection.peer, msg, true);
+                document.getElementById('messageInput').value = '';
+            } else {
+                alert('нет активного чата или канала');
+            }
+        };
+
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('sendMsgBtn').click();
+            }
+        });
+    };
+</script>
+</body>
+</html>
