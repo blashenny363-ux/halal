@@ -178,6 +178,22 @@
             top: 12px;
             right: 20px;
         }
+        .search-entry {
+            background: #1a232c;
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid #2e4055;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-entry:hover {
+            background: #1e2e42;
+            border-color: #0d47a1;
+        }
         @media (max-width: 500px) {
             .app { padding: 16px; }
             h1 { font-size: 1.6rem; }
@@ -220,7 +236,7 @@
         <div id="userRegBlock">
             <input type="text" id="firstName" placeholder="имя">
             <input type="text" id="lastName" placeholder="фамилия">
-            <button class="btn" id="registerBtn">✅ получить ID в стандоф</button>
+            <button class="btn" id="registerBtn">✅ получить ID в стенде</button>
         </div>
         <div id="channelRegBlock" style="display: none;">
             <input type="text" id="channelName" placeholder="название канала">
@@ -238,7 +254,7 @@
         </div>
 
         <div class="card" style="margin-top: 20px;">
-            <div style="margin-bottom: 14px;">🔎 найти по ID в стандоф</div>
+            <div style="margin-bottom: 14px;">🔎 найти по ID в стандофе</div>
             <div class="flex">
                 <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
                 <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
@@ -664,25 +680,33 @@
             const entry = dbCache.find(e => e.id === searchId);
             const resDiv = document.getElementById('searchResult');
             if (!entry) {
-                resDiv.innerHTML = '<span style="color:#ffaaaa;">❌ не найден</span>';
+                resDiv.innerHTML = '<div class="search-entry" style="background: #2a1a1a; border-color:#ff5555;"><span style="color:#ffaaaa;">❌ не найден</span></div>';
                 return;
             }
             if (entry.id.endsWith('_channel')) {
-                resDiv.innerHTML = `<span style="color:#b4e0ff;">📢 канал: ${entry.rawName.replace('channel_','')}</span>
-                                   <button class="btn btn-small join-channel-btn" data-channel-id="${entry.id}" style="margin-top:10px;">🔗 войти</button>`;
+                resDiv.innerHTML = `<div class="search-entry" data-channel-id="${entry.id}">
+                    <span style="font-size:1.4rem;">📢</span>
+                    <span style="color:#b4e0ff; font-weight:500;">${entry.rawName.replace('channel_','')}</span>
+                    <span style="color:#8899aa; margin-left:auto; font-size:0.85rem;">канал</span>
+                </div>`;
             } else {
                 const nameParts = entry.rawName.split('_');
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts[1] || '';
-                resDiv.innerHTML = `<span style="color:#b4e0ff;">👤 ${firstName} ${lastName}</span>
-                                   <button class="btn btn-small connect-person-btn" data-peer-id="${entry.id}" style="margin-top:10px;">🔗 написать</button>`;
+                resDiv.innerHTML = `<div class="search-entry" data-peer-id="${entry.id}">
+                    <span style="font-size:1.4rem;">👤</span>
+                    <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
+                    <span style="color:#8899aa; margin-left:auto; font-size:0.85rem;">${entry.id}</span>
+                </div>`;
             }
         };
 
         document.getElementById('searchResult').addEventListener('click', function(e) {
-            const target = e.target;
-            if (target.classList.contains('connect-person-btn')) {
-                const peerId = target.dataset.peerId;
+            const entryDiv = e.target.closest('.search-entry');
+            if (!entryDiv) return;
+            
+            const peerId = entryDiv.dataset.peerId;
+            if (peerId) {
                 if (!localPeer) { alert('ты не зарегистрирован как person'); return; }
                 if (currentConnection) currentConnection.close();
                 const conn = localPeer.connect(peerId);
@@ -698,8 +722,9 @@
                 });
                 conn.on('error', (err) => { alert('ошибка подключения: ' + err.type); });
             }
-            if (target.classList.contains('join-channel-btn')) {
-                const channelId = target.dataset.channelId;
+            
+            const channelId = entryDiv.dataset.channelId;
+            if (channelId) {
                 enterChannel(channelId);
             }
         });
