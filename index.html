@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>halal messange</title>
     <style>
+        /* все стили без изменений (темная тема, адаптив) */
         * {
             margin: 0;
             padding: 0;
@@ -196,7 +197,7 @@
 </head>
 <body>
 <div class="app" id="app">
-    <h1> halal messange</h1>
+    <h1>time messange</h1>
 
     <div class="github-corner">
         <button class="btn-icon" id="globalGithubBtn" title="Настройки GitHub">
@@ -227,12 +228,12 @@
             <button class="btn btn-small" id="showChannelRegBtn" style="background: #0a2a3a;">📢 создать канал</button>
         </div>
         <div id="userRegBlock">
-            <input type="text" id="firstName" placeholder="имя">
-            <input type="text" id="lastName" placeholder="фамилия">
+            <input type="text" id="firstName" placeholder="имя (англ)">
+            <input type="text" id="lastName" placeholder="фамилия (англ)">
             <button class="btn" id="registerBtn">✅ получить ID</button>
         </div>
         <div id="channelRegBlock" style="display: none;">
-            <input type="text" id="channelName" placeholder="название канала">
+            <input type="text" id="channelName" placeholder="название канала (англ)">
             <button class="btn" id="createChannelBtn">📢 создать канал</button>
         </div>
         <div id="registrationError" class="error-text" style="display: none;"></div>
@@ -264,7 +265,7 @@
                 <div style="color: #8899aa; text-align: center; padding: 20px;">👋 введи ID и нажми найти</div>
             </div>
             <div class="flex">
-                <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
+                <textarea id="messageInput" placeholder="сообщение (можно на русском)..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
                 <button class="btn btn-small" id="sendMsgBtn" style="flex:1;">🚀 отправить</button>
             </div>
         </div>
@@ -281,7 +282,9 @@
     let currentChatId = null;
     let currentChatType = null;
     let messagesUpdateInterval = null;
+    let cleanupInterval = null;
 
+    // ========== GITHUB API (ЧТЕНИЕ/ЗАПИСЬ/УДАЛЕНИЕ) ==========
     async function getDatabaseFromGitHub() {
         if (!githubConfig) return [];
         const { token, owner, repo, path } = githubConfig;
@@ -354,6 +357,41 @@
         }
     }
 
+    async function deleteFile(path, sha) {
+        if (!githubConfig) return;
+        const { token, owner, repo } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        try {
+            await fetch(url, {
+                method: 'DELETE',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ message: `cleanup old chat`, sha: sha })
+            });
+        } catch (e) {}
+    }
+
+    // ========== ОЧИСТКА СТАРЫХ ЧАТОВ (КАЖДЫЕ 24 ЧАСА) ==========
+    async function cleanupOldChats() {
+        if (!githubConfig) return;
+        const { token, owner, repo } = githubConfig;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/`;
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+            });
+            if (!res.ok) return;
+            const files = await res.json();
+            for (const file of files) {
+                // удаляем все файлы, начинающиеся с private_ или channel_
+                if (file.name.startsWith('private_') || file.name.startsWith('channel_')) {
+                    await deleteFile(file.path, file.sha);
+                    console.log(`удалён файл: ${file.name}`);
+                }
+            }
+        } catch (e) {}
+    }
+
+    // ========== РАБОТА С СООБЩЕНИЯМИ ==========
     async function getChannelMessages(channelId) {
         if (!githubConfig) return [];
         const { token, owner, repo } = githubConfig;
@@ -444,9 +482,11 @@
         });
     }
 
+    // ========== ГЕНЕРАЦИЯ ID ==========
     function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
     function generateChannelId() { return 'c_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_channel'; }
 
+    // ========== НАСТРОЙКИ ==========
     function loadGitHubConfig() {
         const stored = localStorage.getItem('halal_github_config');
         if (stored) {
@@ -488,6 +528,7 @@
         return false;
     }
 
+    // ========== ЧАТ UI ==========
     function addMessageToChat(text, isOwn = true) {
         const container = document.getElementById('messagesContainer');
         const msgDiv = document.createElement('div');
@@ -530,6 +571,7 @@
         }
     }
 
+    // ========== ЗАПУСК ==========
     window.onload = async function () {
         const hasConfig = loadGitHubConfig();
 
@@ -545,12 +587,18 @@
             }
             await getDatabaseFromGitHub();
             setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+            
+            // Запускаем очистку старых чатов каждые 24 часа
+            cleanupInterval = setInterval(async () => { await cleanupOldChats(); }, 86400000);
+            // первый запуск через 5 секунд после загрузки (чтобы не тормозить интерфейс)
+            setTimeout(async () => { await cleanupOldChats(); }, 5000);
         } else {
             document.getElementById('githubSetupCard').style.display = 'block';
             document.getElementById('registerCard').style.display = 'block';
             document.getElementById('mainInterface').style.display = 'none';
         }
 
+        // ========== ОБРАБОТЧИКИ ==========
         document.getElementById('globalGithubBtn').onclick = () => {
             document.getElementById('githubSetupCard').style.display = 'block';
         };
@@ -577,6 +625,9 @@
                 document.getElementById('mainInterface').style.display = 'none';
                 await getDatabaseFromGitHub();
                 setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+                
+                cleanupInterval = setInterval(async () => { await cleanupOldChats(); }, 86400000);
+                setTimeout(async () => { await cleanupOldChats(); }, 5000);
             }
         };
 
@@ -590,7 +641,7 @@
             const surname = document.getElementById('lastName').value.trim();
             if (!name || !surname) { 
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ введи имя и фамилию';
+                document.getElementById('registrationError').innerText = '❌ введи имя и фамилию (англ)';
                 return; 
             }
             const newId = generatePersonId();
@@ -618,7 +669,7 @@
             const chName = document.getElementById('channelName').value.trim();
             if (!chName) { 
                 document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ введи название канала';
+                document.getElementById('registrationError').innerText = '❌ введи название канала (англ)';
                 return; 
             }
             const newId = generateChannelId();
