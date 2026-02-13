@@ -19,3 +19,4 @@
 {"text":"Zachem v centre","senderId":"p_mljx7sodru7m_person","senderName":"Ale Dengi","time":1770991719378}
 {"text":"ashky hochy","senderId":"p_mljx4gw0akxo_person","senderName":"watch demo","time":1770991957882}
 {"text":"Ne mogy","senderId":"p_mljx7sodru7m_person","senderName":"Ale Dengi","time":1770991970847}
+{"text":"Coppi","senderId":"p_mljx7sodru7m_person","senderName":"Ale Dengi","time":1770991975428}
