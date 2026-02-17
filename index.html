@@ -68,15 +68,24 @@
             --hover-bg: #40474f;
         }
 
-        body.own-color-gold {
-            --message-own-bg: #d4af37;
-        }
-        body.own-color-blue {
-            --message-own-bg: #2b5278;
-        }
-        body.own-color-green {
-            --message-own-bg: #2e7d32;
-        }
+        body.own-color-gold { --message-own-bg: #d4af37; }
+        body.own-color-blue { --message-own-bg: #2b5278; }
+        body.own-color-green { --message-own-bg: #2e7d32; }
+        body.own-color-red { --message-own-bg: #e53e3e; }
+        body.own-color-purple { --message-own-bg: #9b59b6; }
+        body.own-color-orange { --message-own-bg: #f39c12; }
+
+        body.other-color-default { --message-other-bg: #182533; }
+        body.other-color-light { --message-other-bg: #2a3a4a; }
+        body.other-color-dark { --message-other-bg: #10171e; }
+        body.other-color-mid { --message-other-bg: #1e2b36; }
+
+        body.accent-color-gold { --accent-color: #d4af37; }
+        body.accent-color-blue { --accent-color: #2b5278; }
+        body.accent-color-green { --accent-color: #2e7d32; }
+        body.accent-color-red { --accent-color: #e53e3e; }
+        body.accent-color-purple { --accent-color: #9b59b6; }
+        body.accent-color-orange { --accent-color: #f39c12; }
 
         .app {
             position: relative;
@@ -560,6 +569,8 @@
             animation: modalFadeIn 0.3s;
             color: var(--text-primary);
             transition: background-color 0.3s, border-color 0.3s;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         @keyframes modalFadeIn {
@@ -595,6 +606,12 @@
             cursor: pointer;
             margin-top: 5px;
             transition: background-color 0.3s;
+        }
+
+        .modal-content button.small {
+            padding: 8px;
+            margin-top: 0;
+            margin-bottom: 10px;
         }
 
         .modal-tabs {
@@ -707,6 +724,12 @@
             padding: 8px;
             border-radius: 8px;
         }
+
+        .profile-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -814,7 +837,21 @@
         <div class="modal" id="customizeModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeCustomizeBtn">&times;</span>
-                <h3>🎨 Настройки внешнего вида</h3>
+                <h3>🎨 Настройки профиля</h3>
+                
+                <div class="profile-section">
+                    <label>Ваше имя</label>
+                    <input type="text" id="profileName" placeholder="Имя">
+                    <button class="small" id="updateNameBtn">Обновить имя</button>
+                    
+                    <label>Ваш ID</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="profileId" readonly value="">
+                        <button class="small" id="copyIdBtn">Копировать</button>
+                    </div>
+                </div>
+
+                <h4>Цветовые настройки</h4>
                 <div class="customize-options">
                     <label>Тема:
                         <select id="themeSelect">
@@ -828,10 +865,31 @@
                             <option value="gold">Золотой</option>
                             <option value="blue">Синий</option>
                             <option value="green">Зелёный</option>
+                            <option value="red">Красный</option>
+                            <option value="purple">Фиолетовый</option>
+                            <option value="orange">Оранжевый</option>
+                        </select>
+                    </label>
+                    <label>Цвет сообщений собеседника:
+                        <select id="otherColorSelect">
+                            <option value="default">Стандартный (тёмный)</option>
+                            <option value="light">Светло-серый</option>
+                            <option value="dark">Тёмно-серый</option>
+                            <option value="mid">Средний</option>
+                        </select>
+                    </label>
+                    <label>Акцентный цвет (кнопки, аватар):
+                        <select id="accentColorSelect">
+                            <option value="gold">Золотой</option>
+                            <option value="blue">Синий</option>
+                            <option value="green">Зелёный</option>
+                            <option value="red">Красный</option>
+                            <option value="purple">Фиолетовый</option>
+                            <option value="orange">Оранжевый</option>
                         </select>
                     </label>
                 </div>
-                <button id="saveCustomizeBtn">Сохранить</button>
+                <button id="saveCustomizeBtn">Сохранить настройки</button>
             </div>
         </div>
     </div>
@@ -930,6 +988,44 @@
                 return { success: true };
             } catch (e) {
                 return { success: false, error: e.message };
+            }
+        }
+
+        async function updateNameInDatabase(oldName, newName, id) {
+            if (!githubConfig) return false;
+            const { token, owner, repo, path } = githubConfig;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            try {
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (!res.ok) return false;
+                const data = await res.json();
+                const sha = data.sha;
+                let content = decodeURIComponent(escape(atob(data.content)));
+                const lines = content.split('\n');
+                const newLines = lines.map(line => {
+                    if (line.includes(id)) {
+                        return `${newName} ${id}`;
+                    }
+                    return line;
+                });
+                const newContent = newLines.join('\n');
+                await fetch(url, {
+                    method: 'PUT',
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                    body: JSON.stringify({ 
+                        message: `update name for ${id}`, 
+                        content: btoa(unescape(encodeURIComponent(newContent))), 
+                        sha: sha 
+                    })
+                });
+                // обновить кэш
+                const entry = dbCache.find(e => e.id === id);
+                if (entry) entry.rawName = newName;
+                return true;
+            } catch (e) {
+                return false;
             }
         }
 
@@ -1220,21 +1316,31 @@
             return { id: entry.id, name: chatName, type };
         }
 
-        function applyCustomization(theme, ownColor) {
-            document.body.classList.remove('light-theme', 'grey-theme', 'own-color-gold', 'own-color-blue', 'own-color-green');
+        function applyCustomization(theme, ownColor, otherColor, accentColor) {
+            document.body.classList.remove('light-theme', 'grey-theme');
             if (theme === 'light') document.body.classList.add('light-theme');
             else if (theme === 'grey') document.body.classList.add('grey-theme');
-            if (ownColor === 'gold') document.body.classList.add('own-color-gold');
-            else if (ownColor === 'blue') document.body.classList.add('own-color-blue');
-            else if (ownColor === 'green') document.body.classList.add('own-color-green');
+
+            document.body.classList.remove('own-color-gold', 'own-color-blue', 'own-color-green', 'own-color-red', 'own-color-purple', 'own-color-orange');
+            if (ownColor) document.body.classList.add(`own-color-${ownColor}`);
+
+            document.body.classList.remove('other-color-default', 'other-color-light', 'other-color-dark', 'other-color-mid');
+            if (otherColor) document.body.classList.add(`other-color-${otherColor}`);
+
+            document.body.classList.remove('accent-color-gold', 'accent-color-blue', 'accent-color-green', 'accent-color-red', 'accent-color-purple', 'accent-color-orange');
+            if (accentColor) document.body.classList.add(`accent-color-${accentColor}`);
         }
 
         function loadCustomization() {
             const theme = localStorage.getItem('halal_theme') || 'dark';
             const ownColor = localStorage.getItem('halal_own_color') || 'gold';
+            const otherColor = localStorage.getItem('halal_other_color') || 'default';
+            const accentColor = localStorage.getItem('halal_accent_color') || 'gold';
             document.getElementById('themeSelect').value = theme;
             document.getElementById('ownColorSelect').value = ownColor;
-            applyCustomization(theme, ownColor);
+            document.getElementById('otherColorSelect').value = otherColor;
+            document.getElementById('accentColorSelect').value = accentColor;
+            applyCustomization(theme, ownColor, otherColor, accentColor);
         }
 
         window.onload = async function () {
@@ -1246,19 +1352,63 @@
             loadCustomization();
 
             document.getElementById('userInfoBlock').addEventListener('click', () => {
-                modalCustomize.classList.add('active');
+                if (myId) {
+                    document.getElementById('profileName').value = myName || '';
+                    document.getElementById('profileId').value = myId || '';
+                    modalCustomize.classList.add('active');
+                } else {
+                    alert('Сначала войдите в систему');
+                }
             });
 
             document.getElementById('closeCustomizeBtn').onclick = () => {
                 modalCustomize.classList.remove('active');
             };
 
+            document.getElementById('copyIdBtn').onclick = () => {
+                if (myId) {
+                    navigator.clipboard.writeText(myId);
+                    alert('ID скопирован');
+                }
+            };
+
+            document.getElementById('updateNameBtn').onclick = async function () {
+                const newName = document.getElementById('profileName').value.trim();
+                if (!newName) {
+                    alert('Имя не может быть пустым');
+                    return;
+                }
+                const oldName = myName;
+                if (newName === oldName) return;
+                // обновить в базе данных GitHub
+                const success = await updateNameInDatabase(oldName, newName, myId);
+                if (success) {
+                    myName = newName;
+                    // обновить localStorage
+                    localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail }));
+                    // обновить пользователя в массиве users
+                    const userIndex = users.findIndex(u => u.id === myId);
+                    if (userIndex !== -1) {
+                        users[userIndex].name = newName;
+                        localStorage.setItem('halal_users', JSON.stringify(users));
+                    }
+                    updateSidebarUserInfo();
+                    alert('Имя обновлено');
+                } else {
+                    alert('Ошибка при обновлении имени в GitHub');
+                }
+            };
+
             document.getElementById('saveCustomizeBtn').onclick = () => {
                 const theme = document.getElementById('themeSelect').value;
                 const ownColor = document.getElementById('ownColorSelect').value;
+                const otherColor = document.getElementById('otherColorSelect').value;
+                const accentColor = document.getElementById('accentColorSelect').value;
                 localStorage.setItem('halal_theme', theme);
                 localStorage.setItem('halal_own_color', ownColor);
-                applyCustomization(theme, ownColor);
+                localStorage.setItem('halal_other_color', otherColor);
+                localStorage.setItem('halal_accent_color', accentColor);
+                applyCustomization(theme, ownColor, otherColor, accentColor);
                 modalCustomize.classList.remove('active');
             };
 
