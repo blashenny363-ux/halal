@@ -3,839 +3,1444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>halal messange</title>
+    <title>halal</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
+
         body {
-            background: #0a0c0e;
-            color: #e6edf3;
+            background: #0b141a;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 12px;
-        }
-        .app {
-            max-width: 750px;
-            width: 100%;
-            background: #0f1215;
-            border-radius: 28px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-            padding: 20px;
-            border: 1px solid #1e2a36;
-            position: relative;
-        }
-        h1 {
-            font-size: 1.9rem;
-            color: #c8dfff;
-            border-left: 5px solid #0d47a1;
-            padding-left: 15px;
-            margin-bottom: 18px;
-            font-weight: 500;
-        }
-        .card {
-            background: #141a20;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 22px;
-            border: 1px solid #263238;
-        }
-        .btn {
-            background: #0d2c4e;
-            border: none;
-            border-radius: 40px;
-            padding: 12px 22px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.15s;
-            border-bottom: 2px solid #051e34;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: 100%;
-        }
-        .btn-small {
-            width: auto;
-            padding: 8px 18px;
-        }
-        .btn:hover {
-            background: #0d47a1;
-            border-bottom-color: #0a356b;
-        }
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 0;
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: 0.2s;
+            transition: background-color 0.3s, color 0.2s;
         }
-        .btn-icon:hover {
-            transform: scale(1.05);
-            background: #f0f6fc;
+
+        :root {
+            --bg-primary: #17212b;
+            --bg-secondary: #0b141a;
+            --bg-sidebar: #17212b;
+            --bg-header: #1e2b36;
+            --bg-input: #242f3d;
+            --text-primary: #fff;
+            --text-secondary: #8e9fad;
+            --border-color: #0f1a22;
+            --message-own-bg: #d4af37;
+            --message-other-bg: #182533;
+            --accent-color: #d4af37;
+            --hover-bg: #2b3b4a;
         }
-        .btn-icon svg {
-            width: 24px;
-            height: 24px;
+
+        body.light-theme {
+            --bg-primary: #f0f4fa;
+            --bg-secondary: #e6ecf5;
+            --bg-sidebar: #ffffff;
+            --bg-header: #dbe2ed;
+            --bg-input: #c9d4e3;
+            --text-primary: #000;
+            --text-secondary: #4a5a6e;
+            --border-color: #b0c4de;
+            --message-own-bg: #d4af37;
+            --message-other-bg: #ffffff;
+            --accent-color: #d4af37;
+            --hover-bg: #c0cbd8;
         }
-        input, textarea {
-            background: #1e262c;
-            border: 1px solid #2e3b45;
-            border-radius: 30px;
-            padding: 14px 20px;
-            color: white;
-            font-size: 1rem;
+
+        body.grey-theme {
+            --bg-primary: #2c2f33;
+            --bg-secondary: #23272a;
+            --bg-sidebar: #2c2f33;
+            --bg-header: #3a3f44;
+            --bg-input: #40454a;
+            --text-primary: #fff;
+            --text-secondary: #99aab5;
+            --border-color: #202225;
+            --message-own-bg: #5865f2;
+            --message-other-bg: #3a3f44;
+            --accent-color: #5865f2;
+            --hover-bg: #40474f;
+        }
+
+        body.own-color-gold {
+            --message-own-bg: #d4af37;
+        }
+        body.own-color-blue {
+            --message-own-bg: #2b5278;
+        }
+        body.own-color-green {
+            --message-own-bg: #2e7d32;
+        }
+
+        .app {
+            position: relative;
             width: 100%;
-            margin-bottom: 14px;
+            max-width: 420px;
+            height: 100vh;
+            background: var(--bg-primary);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+            transition: background-color 0.3s;
         }
-        input:focus, textarea:focus {
-            border-color: #1e88e5;
-            outline: none;
-            background: #1a2127;
-        }
-        .flex {
+
+        .sidebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-sidebar);
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+            z-index: 2;
+        }
+
+        .sidebar.hide {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 15px 20px;
+            display: flex;
             align-items: center;
-            flex-wrap: wrap;
-        }
-        .own-id-box {
-            background: #0b1b2a;
-            padding: 14px 20px;
-            border-radius: 40px;
-            border: 1px solid #0d47a1;
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            word-break: break-all;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-header);
+            transition: background-color 0.3s, border-color 0.3s;
         }
-        .messages {
-            background: #0c1116;
-            border-radius: 24px;
-            padding: 18px;
-            height: 250px;
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+            color: white;
+            text-transform: uppercase;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .user-info:hover .avatar {
+            transform: scale(1.1);
+        }
+
+        .animated-emoji {
+            display: inline-block;
+            animation: pulseRotate 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseRotate {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(5deg); }
+            50% { transform: scale(1) rotate(0deg); }
+            75% { transform: scale(1.1) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .icon-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            background: var(--bg-header);
+            transition: background-color 0.3s;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--bg-input);
+            border: none;
+            border-radius: 22px;
+            padding: 12px 20px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            transition: background-color 0.3s, color 0.2s;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .chats-list {
+            flex: 1;
             overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.1s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chat-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .chat-item.active {
+            background: var(--bg-input);
+        }
+
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .chat-item:hover .chat-avatar {
+            transform: scale(1.05);
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-name {
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s;
+        }
+
+        .chat-preview {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s;
+        }
+
+        .games-btn-container {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-sidebar);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .games-btn {
+            background: var(--bg-input);
+            border: none;
+            border-radius: 30px;
+            padding: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.15s, color 0.2s;
+        }
+
+        .games-btn:hover {
+            background: var(--accent-color);
+        }
+
+        .chat-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-secondary);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, background-color 0.3s;
+            transform: translateX(100%);
+            z-index: 3;
+        }
+
+        .chat-panel.show {
+            transform: translateX(0);
+        }
+
+        .chat-header {
+            padding: 10px 20px;
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.15s, color 0.2s;
+        }
+
+        .back-button:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .chat-header-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+            animation: pulse 3s infinite;
+            transition: background-color 0.3s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background-color: var(--accent-color); filter: brightness(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .chat-header-info h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+
+        .chat-header-info span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 25px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin: 16px 0;
-            border: 1px solid #1f3a4b;
+            background: var(--bg-secondary);
+            transition: background-color 0.3s;
         }
+
         .message {
             max-width: 80%;
-            padding: 11px 17px;
-            border-radius: 20px;
-            background: #1e2a36;
+            padding: 10px 14px;
+            border-radius: 18px;
+            background: var(--message-other-bg);
             align-self: flex-start;
-            color: #f0f6fc;
-            border-bottom-left-radius: 6px;
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.4;
             word-wrap: break-word;
+            transition: all 0.2s;
         }
+
         .message.own {
-            background: #0a3a5c;
+            background: var(--message-own-bg);
             align-self: flex-end;
             border-bottom-right-radius: 6px;
-            border-bottom-left-radius: 20px;
         }
-        .badge {
-            background: #0f2a40;
-            padding: 5px 14px;
+
+        .message.new {
+            animation: messageGlow 0.6s ease-out;
+        }
+
+        @keyframes messageGlow {
+            0% {
+                opacity: 0;
+                transform: scale(0.7);
+                background: #ffaa00;
+                color: #000;
+                box-shadow: 0 0 20px #ffaa00;
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+                background: #ffd966;
+                color: #000;
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                background: inherit;
+                color: inherit;
+                box-shadow: none;
+            }
+        }
+
+        .message .sender-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .message-input-area {
+            padding: 15px 20px;
+            background: var(--bg-header);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .message-input-area textarea {
+            flex: 1;
+            background: var(--bg-input);
+            border: none;
+            border-radius: 25px;
+            padding: 14px 20px;
+            color: var(--text-primary);
+            font-size: 15px;
+            resize: none;
+            max-height: 120px;
+            outline: none;
+            transition: background-color 0.3s, color 0.2s, box-shadow 0.2s;
+        }
+
+        .message-input-area textarea:focus {
+            box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+        }
+
+        .send-btn {
+            background: var(--accent-color);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s, background-color 0.3s;
+        }
+
+        .send-btn:active {
+            transform: scale(0.9);
+        }
+
+        .send-btn.animate {
+            animation: sendPop 0.3s ease;
+        }
+
+        @keyframes sendPop {
+            0% { transform: scale(1); background: #ffaa00; }
+            50% { transform: scale(1.3); background: #ffd966; }
+            100% { transform: scale(1); background: var(--accent-color); }
+        }
+
+        .send-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .send-btn:hover {
+            filter: brightness(1.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 360px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            animation: modalFadeIn 0.3s;
+            color: var(--text-primary);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            transition: color 0.2s;
+        }
+
+        .modal-content input, .modal-content select {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
             border-radius: 30px;
-            font-size: 0.8rem;
-            color: #b0d4ff;
-        }
-        .small-note {
-            color: #8899aa;
-            font-size: 0.8rem;
-            margin-top: 6px;
-        }
-        .error-text {
-            color: #ffaaaa;
-            font-size: 0.85rem;
-            margin-top: 8px;
-            background: #2a1a1a;
-            padding: 8px 12px;
-            border-radius: 12px;
-            border-left: 4px solid #ff5555;
-        }
-        .github-corner {
-            position: absolute;
-            top: 12px;
-            right: 20px;
-        }
-        .search-info, .recent-chat-item {
-            background: #1a232c;
-            border-radius: 16px;
             padding: 14px 18px;
-            margin-bottom: 8px;
-            border: 1px solid #2e4055;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            transition: background-color 0.3s, border-color 0.3s, color 0.2s;
+        }
+
+        .modal-content button {
+            background: var(--accent-color);
+            border: none;
+            border-radius: 30px;
+            padding: 14px;
+            color: white;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-tab {
+            flex: 1;
+            background: var(--bg-input);
+            border: none;
+            border-radius: 30px;
+            padding: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.2s;
+        }
+
+        .modal-tab.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .error-text {
+            color: #ff8a8a;
+            background: #2a1f1f;
+            padding: 10px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .success-text {
+            color: #8aff8a;
+            background: #1f2a1f;
+            padding: 10px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .iframe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+        }
+
+        .iframe-container.active {
+            display: flex;
+        }
+
+        .iframe-header {
+            padding: 15px 20px;
+            background: var(--bg-header);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .iframe-header button {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .iframe-header h3 {
+            color: var(--accent-color);
+        }
+
+        iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+        }
+
+        .customize-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .customize-options label {
             display: flex;
             align-items: center;
             gap: 10px;
-            cursor: pointer;
-            transition: 0.1s;
+            color: var(--text-primary);
         }
-        .search-info:hover, .recent-chat-item:hover {
-            background: #1e2e42;
-            border-color: #0d47a1;
-        }
-        .recent-header {
-            color: #9ac7ff;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-        @media (max-width: 500px) {
-            .app { padding: 16px; }
-            h1 { font-size: 1.6rem; }
-            .github-corner { top: 8px; right: 16px; }
+
+        .customize-options select {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
-<div class="app" id="app">
-    <h1> halal messange</h1>
+    <div class="app" id="app">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info" id="userInfoBlock">
+                    <div class="avatar" id="avatarPlaceholder">H</div>
+                    <span class="user-name" id="sidebarUserName">
+                        <span class="animated-emoji">🤖</span> halal
+                    </span>
+                </div>
+                <div class="sidebar-actions">
+                    <button class="icon-btn" id="globalGithubBtn" title="Настройки GitHub">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.38.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.58.68.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z"/></svg>
+                    </button>
+                </div>
+            </div>
 
-    <div class="github-corner">
-        <button class="btn-icon" id="globalGithubBtn" title="Настройки GitHub">
-            <svg viewBox="0 0 24 24" width="24" height="24">
-                <path fill="#0d2c4e" d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.38.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.58.68.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z"/>
-            </svg>
-        </button>
+            <div class="search-box">
+                <input type="text" id="searchIdInput" placeholder="🔍 Поиск по ID...">
+            </div>
+
+            <div class="chats-list" id="chatsList">
+            </div>
+
+            <div class="games-btn-container">
+                <button class="games-btn" id="gamesButton">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z"/></svg>
+                    Игры
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-panel" id="chatPanel">
+            <div class="chat-header" id="chatHeader" style="display: none;">
+                <div class="chat-header-left">
+                    <button class="back-button" id="backToChatsBtn" title="Назад к списку чатов">←</button>
+                    <div class="chat-header-avatar" id="chatAvatar">👤</div>
+                    <div class="chat-header-info">
+                        <h3 id="chatTitle">Выберите чат</h3>
+                        <span id="chatStatus" class="badge"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div style="color: var(--text-secondary); text-align: center; padding: 40px;">👋 Начните общение</div>
+            </div>
+
+            <div class="message-input-area" id="messageArea" style="display: none;">
+                <textarea id="messageInput" placeholder="Сообщение..." rows="1"></textarea>
+                <button class="send-btn" id="sendMsgBtn">
+                    <svg viewBox="0 0 24 24"><path d="M2 21L23 12 2 3v7l15 2-15 2v7z"/></svg>
+                </button>
+            </div>
+
+            <div class="iframe-container" id="gamesContainer">
+                <div class="iframe-header">
+                    <button id="backFromGamesBtn">← Назад</button>
+                    <h3>halal games — Фрукты</h3>
+                </div>
+                <iframe src="https://blashenny363-ux.github.io/frukti/" title="Игра Фрукты"></iframe>
+            </div>
+        </div>
+
+        <div class="modal" id="githubModal">
+            <div class="modal-content">
+                <span class="modal-close" id="closeModalBtn">&times;</span>
+                <h3>🔧 Доступ к базе GitHub</h3>
+                <input type="text" id="githubToken" placeholder="Классический токен (repo)" value="">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="githubOwner" placeholder="Владелец" value="blashenny363-ux" style="flex:1;">
+                    <input type="text" id="githubRepo" placeholder="Репозиторий" value="halal" style="flex:1;">
+                </div>
+                <input type="text" id="githubPath" placeholder="Путь к database.txt" value="database.txt">
+                <button id="saveGitHubBtn">💾 Сохранить</button>
+                <div id="githubStatus" class="small-note" style="color: var(--text-secondary); margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <div class="modal" id="registerModal">
+            <div class="modal-content">
+                <h3>📱 Регистрация / Вход</h3>
+                <div class="modal-tabs">
+                    <button class="modal-tab active" id="tabRegister">Регистрация</button>
+                    <button class="modal-tab" id="tabLogin">Вход</button>
+                </div>
+                <div id="registerBlock">
+                    <input type="text" id="regName" placeholder="Имя">
+                    <input type="email" id="regEmail" placeholder="Email">
+                    <input type="password" id="regPassword" placeholder="Пароль">
+                    <button id="registerBtn">Зарегистрироваться</button>
+                </div>
+                <div id="loginBlock" style="display: none;">
+                    <input type="email" id="loginEmail" placeholder="Email">
+                    <input type="password" id="loginPassword" placeholder="Пароль">
+                    <button id="loginBtn">Войти</button>
+                </div>
+                <div id="authError" class="error-text" style="display: none;"></div>
+                <div id="authSuccess" class="success-text" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="modal" id="customizeModal">
+            <div class="modal-content">
+                <span class="modal-close" id="closeCustomizeBtn">&times;</span>
+                <h3>🎨 Настройки внешнего вида</h3>
+                <div class="customize-options">
+                    <label>Тема:
+                        <select id="themeSelect">
+                            <option value="dark">Тёмная</option>
+                            <option value="light">Светлая</option>
+                            <option value="grey">Серая</option>
+                        </select>
+                    </label>
+                    <label>Цвет моих сообщений:
+                        <select id="ownColorSelect">
+                            <option value="gold">Золотой</option>
+                            <option value="blue">Синий</option>
+                            <option value="green">Зелёный</option>
+                        </select>
+                    </label>
+                </div>
+                <button id="saveCustomizeBtn">Сохранить</button>
+            </div>
+        </div>
     </div>
 
-    <div class="card" id="githubSetupCard" style="display: none;">
-        <div style="margin-bottom: 14px; color:#9ac7ff;">🔧 доступ к базе GitHub</div>
-        <input type="text" id="githubToken" placeholder="вставь GitHub классический токен (repo)" value="">
-        <div class="flex">
-            <input type="text" id="githubOwner" placeholder="владелец" value="blashenny363-ux" style="flex:1;">
-            <input type="text" id="githubRepo" placeholder="репозиторий" value="halal" style="flex:1;">
-        </div>
-        <input type="text" id="githubPath" placeholder="путь к database.txt" value="database.txt">
-        <button class="btn" id="saveGitHubBtn">💾 сохранить</button>
-        <div id="githubStatus" class="small-note"></div>
-        <div style="margin-top: 12px; text-align: right;">
-            <button class="btn-small" id="closeSetupBtn" style="background: #1e2a36;">✖ закрыть</button>
-        </div>
-    </div>
+    <script>
+        let myId = null;
+        let myName = null;
+        let myEmail = null;
+        let myIsChannel = false;
+        let githubConfig = null;
+        let dbCache = [];
+        let currentChatId = null;
+        let currentChatType = null;
+        let currentPeerInfo = '';
+        let messagesUpdateInterval = null;
+        let dbUpdateInterval = null;
+        let chats = [];
+        let prevMessagesCount = 0;
+        let users = JSON.parse(localStorage.getItem('halal_users')) || [];
 
-    <div class="card" id="registerCard" style="display: block;">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn btn-small" id="showUserRegBtn" style="background: #0d2c4e;">👤 регистрация</button>
-            <button class="btn btn-small" id="showChannelRegBtn" style="background: #0a2a3a;">📢 создать канал</button>
-        </div>
-        <div id="userRegBlock">
-            <input type="text" id="firstName" placeholder="имя">
-            <input type="text" id="lastName" placeholder="фамилия">
-            <button class="btn" id="registerBtn">✅ получить ID</button>
-        </div>
-        <div id="channelRegBlock" style="display: none;">
-            <input type="text" id="channelName" placeholder="название канала">
-            <button class="btn" id="createChannelBtn">📢 создать канал</button>
-        </div>
-        <div id="registrationError" class="error-text" style="display: none;"></div>
-    </div>
+        function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
 
-    <div id="mainInterface" style="display: none;">
-        <div class="own-id-box" id="ownIdBox">
-            <span id="myIdDisplay" style="font-weight:600; color:#b3e0ff;"></span>
-            <div style="display: flex; gap: 6px;">
-                <button class="btn btn-small" id="copyIdBtn">📋 копировать</button>
-            </div>
-        </div>
-
-        <!-- СПИСОК ПОСЛЕДНИХ ЧАТОВ -->
-        <div class="card" id="recentChatsCard" style="margin-top: 20px;">
-            <div class="recent-header">🕘 последние чаты</div>
-            <div id="recentChatsContainer" style="min-height: 20px;">
-                <!-- динамически заполняется -->
-                <div style="color: #8899aa; text-align: center; padding: 10px;">пока нет чатов</div>
-            </div>
-        </div>
-
-        <div class="card" style="margin-top: 0px;">
-            <div style="margin-bottom: 14px;">🔎 найти по ID</div>
-            <div class="flex">
-                <input type="text" id="searchIdInput" placeholder="введи ID" style="flex:3; margin-bottom:0;">
-                <button class="btn btn-small" id="searchBtn" style="flex:1;">найти</button>
-            </div>
-            <div id="searchResult" style="margin-top: 16px; min-height: 60px;"></div>
-        </div>
-
-        <div style="margin-top: 8px;">
-            <div class="flex" style="justify-content: space-between;">
-                <h3 id="chatWithLabel" style="color:#8fcbff;">💬 нет чата</h3>
-                <span id="connectionStatus" class="badge"></span>
-            </div>
-            <div id="messagesContainer" class="messages">
-                <div style="color: #8899aa; text-align: center; padding: 20px;">👋 введи ID и нажми найти</div>
-            </div>
-            <div class="flex">
-                <textarea id="messageInput" placeholder="сообщение..." rows="1" style="resize: none; flex:4; margin-bottom:0; border-radius: 30px;"></textarea>
-                <button class="btn btn-small" id="sendMsgBtn" style="flex:1;">🚀 отправить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    let myId = null;
-    let myName = null;
-    let mySurname = null;
-    let myIsChannel = false;
-    let githubConfig = null;
-    let dbCache = [];
-    let currentChatId = null;
-    let currentChatType = null;
-    let messagesUpdateInterval = null;
-
-    // ----- ПОСЛЕДНИЕ ЧАТЫ -----
-    let recentChats = []; // массив объектов { id, name, lastTime }
-
-    function loadRecentChats() {
-        const stored = localStorage.getItem('halal_recent_chats');
-        if (stored) {
+        async function getDatabaseFromGitHub() {
+            if (!githubConfig) return [];
+            const { token, owner, repo, path } = githubConfig;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             try {
-                recentChats = JSON.parse(stored);
-            } catch (e) { recentChats = []; }
-        } else {
-            recentChats = [];
-        }
-        renderRecentChats();
-    }
-
-    function saveRecentChats() {
-        localStorage.setItem('halal_recent_chats', JSON.stringify(recentChats));
-    }
-
-    function updateRecentChats(peerId, peerName) {
-        if (!peerId || peerId === myId || currentChatType !== 'private') return; // только личные чаты, не с собой
-        const existing = recentChats.find(c => c.id === peerId);
-        if (existing) {
-            existing.lastTime = Date.now();
-            existing.name = peerName; // обновим имя на всякий
-        } else {
-            recentChats.push({
-                id: peerId,
-                name: peerName || peerId,
-                lastTime: Date.now()
-            });
-        }
-        // сортируем по времени (сначала новые)
-        recentChats.sort((a,b) => b.lastTime - a.lastTime);
-        // ограничим количество (например, 20)
-        if (recentChats.length > 20) recentChats = recentChats.slice(0,20);
-        saveRecentChats();
-        renderRecentChats();
-    }
-
-    function renderRecentChats() {
-        const container = document.getElementById('recentChatsContainer');
-        if (!container) return;
-        if (!recentChats || recentChats.length === 0) {
-            container.innerHTML = '<div style="color: #8899aa; text-align: center; padding: 10px;">пока нет чатов</div>';
-            return;
-        }
-        let html = '';
-        recentChats.forEach(chat => {
-            html += `<div class="recent-chat-item" data-peer-id="${chat.id}">
-                <span style="font-size:1.4rem;">👤</span>
-                <span style="color:#b4e0ff; font-weight:500;">${chat.name}</span>
-                <span style="color:#8899aa; margin-left:auto; font-size:0.8rem;">${new Date(chat.lastTime).toLocaleTimeString().slice(0,5)}</span>
-            </div>`;
-        });
-        container.innerHTML = html;
-    }
-
-    // ----- ОСНОВНЫЕ ФУНКЦИИ GITHUB -----
-    async function getDatabaseFromGitHub() {
-        if (!githubConfig) return [];
-        const { token, owner, repo, path } = githubConfig;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-            });
-            if (res.status === 404) {
-                await createEmptyDatabaseFile();
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (res.status === 404) {
+                    await createEmptyDatabaseFile();
+                    return [];
+                }
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(`GitHub ${res.status}: ${err.message}`);
+                }
+                const data = await res.json();
+                const content = decodeURIComponent(escape(atob(data.content)));
+                const lines = content.trim().split('\n').filter(l => l.trim());
+                const items = lines.map(line => {
+                    const [rawName, id] = line.split(' ');
+                    return { rawName, id, name: rawName, surname: '' };
+                }).filter(i => i.id);
+                dbCache = items;
+                return items;
+            } catch (e) {
+                document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
                 return [];
             }
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(`GitHub ${res.status}: ${err.message}`);
-            }
-            const data = await res.json();
-            const content = atob(data.content);
-            const lines = content.trim().split('\n').filter(l => l.trim());
-            const items = lines.map(line => {
-                const [rawName, id] = line.split(' ');
-                return { rawName, id, name: rawName, surname: '' };
-            }).filter(i => i.id);
-            dbCache = items;
-            return items;
-        } catch (e) {
-            document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
-            return [];
         }
-    }
 
-    async function createEmptyDatabaseFile() {
-        if (!githubConfig) return;
-        const { token, owner, repo, path } = githubConfig;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        await fetch(url, {
-            method: 'PUT',
-            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-            body: JSON.stringify({ message: 'init database', content: btoa('') })
-        });
-    }
-
-    async function appendToDatabase(entryName, id) {
-        if (!githubConfig) return { success: false, error: 'GitHub не настроен' };
-        const { token, owner, repo, path } = githubConfig;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        let sha = null, currentContent = '';
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                sha = data.sha;
-                currentContent = atob(data.content);
-            }
-        } catch (e) {}
-        const newLine = `${entryName} ${id}`;
-        const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
-        try {
+        async function createEmptyDatabaseFile() {
+            if (!githubConfig) return;
+            const { token, owner, repo, path } = githubConfig;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             await fetch(url, {
                 method: 'PUT',
                 headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ message: `add ${entryName}`, content: btoa(newContent), sha: sha || undefined })
+                body: JSON.stringify({ 
+                    message: 'init database', 
+                    content: btoa(unescape(encodeURIComponent(''))) 
+                })
             });
-            dbCache.push({ rawName: entryName, id, name: entryName, surname: '' });
-            return { success: true };
-        } catch (e) {
-            return { success: false, error: e.message };
         }
-    }
 
-    async function getChannelMessages(channelId) {
-        if (!githubConfig) return [];
-        const { token, owner, repo } = githubConfig;
-        const path = `channel_${channelId}.txt`;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-            });
-            if (res.status === 404) return [];
-            const data = await res.json();
-            const content = atob(data.content);
-            return content.trim().split('\n').filter(l => l).map(line => {
-                try { return JSON.parse(line); } catch { return null; }
-            }).filter(m => m);
-        } catch { return []; }
-    }
-
-    async function appendToChannelMessages(channelId, msgObj) {
-        if (!githubConfig) return;
-        const { token, owner, repo } = githubConfig;
-        const path = `channel_${channelId}.txt`;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        let sha = null, currentContent = '';
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                sha = data.sha;
-                currentContent = atob(data.content);
-            }
-        } catch (e) {}
-        const newLine = JSON.stringify(msgObj);
-        const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
-        await fetch(url, {
-            method: 'PUT',
-            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-            body: JSON.stringify({ message: `message in ${channelId}`, content: btoa(newContent), sha: sha || undefined })
-        });
-    }
-
-    async function getPrivateMessages(peerId) {
-        if (!githubConfig || !myId) return [];
-        const ids = [myId, peerId].sort();
-        const chatId = `private_${ids[0]}_${ids[1]}`;
-        const { token, owner, repo } = githubConfig;
-        const path = `${chatId}.txt`;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-            });
-            if (res.status === 404) return [];
-            const data = await res.json();
-            const content = atob(data.content);
-            return content.trim().split('\n').filter(l => l).map(line => {
-                try { return JSON.parse(line); } catch { return null; }
-            }).filter(m => m);
-        } catch { return []; }
-    }
-
-    async function appendToPrivateMessages(peerId, msgObj) {
-        if (!githubConfig || !myId) return;
-        const ids = [myId, peerId].sort();
-        const chatId = `private_${ids[0]}_${ids[1]}`;
-        const { token, owner, repo } = githubConfig;
-        const path = `${chatId}.txt`;
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        let sha = null, currentContent = '';
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                sha = data.sha;
-                currentContent = atob(data.content);
-            }
-        } catch (e) {}
-        const newLine = JSON.stringify(msgObj);
-        const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
-        await fetch(url, {
-            method: 'PUT',
-            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-            body: JSON.stringify({ message: `private message`, content: btoa(newContent), sha: sha || undefined })
-        });
-    }
-
-    function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
-    function generateChannelId() { return 'c_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_channel'; }
-
-    function loadGitHubConfig() {
-        const stored = localStorage.getItem('halal_github_config');
-        if (stored) {
-            githubConfig = JSON.parse(stored);
-            document.getElementById('githubToken').value = githubConfig.token || '';
-            document.getElementById('githubOwner').value = githubConfig.owner || '';
-            document.getElementById('githubRepo').value = githubConfig.repo || '';
-            document.getElementById('githubPath').value = githubConfig.path || 'database.txt';
-            return true;
-        }
-        return false;
-    }
-
-    function saveGitHubConfig() {
-        const token = document.getElementById('githubToken').value.trim();
-        const owner = document.getElementById('githubOwner').value.trim();
-        const repo = document.getElementById('githubRepo').value.trim();
-        let path = document.getElementById('githubPath').value.trim() || 'database.txt';
-        if (!token || !owner || !repo) { 
-            document.getElementById('githubStatus').innerHTML = '<span style="color:#ffaaaa;">❌ заполни все поля</span>';
-            return false; 
-        }
-        githubConfig = { token, owner, repo, path };
-        localStorage.setItem('halal_github_config', JSON.stringify(githubConfig));
-        document.getElementById('githubStatus').innerHTML = '<span style="color:#aaffaa;">✅ настройки сохранены</span>';
-        return true;
-    }
-
-    function loadOwnProfile() {
-        const stored = localStorage.getItem('halal_my_profile');
-        if (stored) {
-            const p = JSON.parse(stored);
-            myId = p.id;
-            myName = p.name;
-            mySurname = p.surname;
-            myIsChannel = p.isChannel || false;
-            return true;
-        }
-        return false;
-    }
-
-    function addMessageToChat(text, isOwn = true) {
-        const container = document.getElementById('messagesContainer');
-        const msgDiv = document.createElement('div');
-        msgDiv.classList.add('message');
-        if (isOwn) msgDiv.classList.add('own');
-        msgDiv.innerText = text;
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function clearMessages() { document.getElementById('messagesContainer').innerHTML = ''; }
-
-    async function enterChat(chatId, type, peerInfo) {
-        clearMessages();
-        currentChatId = chatId;
-        currentChatType = type;
-        document.getElementById('connectionStatus').innerText = type === 'channel' ? '📢 канал' : '👤 личный чат';
-        document.getElementById('chatWithLabel').innerHTML = `💬 ${type === 'channel' ? 'канал' : 'чат'} ${peerInfo}`;
-        if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
-        await loadMessages();
-        // Обновление каждые 5 секунд (было 30)
-        messagesUpdateInterval = setInterval(loadMessages, 5000);
-        // Если это личный чат — добавим в последние чаты
-        if (type === 'private') {
-            // Ищем имя собеседника в кэше
-            const entry = dbCache.find(e => e.id === chatId);
-            const name = entry ? entry.rawName.replace('_',' ') : chatId;
-            updateRecentChats(chatId, name);
-        }
-    }
-
-    async function loadMessages() {
-        if (!currentChatId) return;
-        let msgs = [];
-        if (currentChatType === 'channel') {
-            msgs = await getChannelMessages(currentChatId);
-        } else {
-            msgs = await getPrivateMessages(currentChatId);
-        }
-        const container = document.getElementById('messagesContainer');
-        const currentCount = container.children.length;
-        if (msgs.length > currentCount) {
-            const newMsgs = msgs.slice(currentCount);
-            newMsgs.forEach(m => {
-                const isOwn = m.senderId === myId;
-                addMessageToChat(`${m.senderName || m.senderId}: ${m.text}`, isOwn);
-                // Если это личный чат и сообщение не от меня — добавим собеседника в последние чаты
-                if (currentChatType === 'private' && !isOwn) {
-                    const peerId = currentChatId;
-                    const senderName = m.senderName || peerId;
-                    updateRecentChats(peerId, senderName);
+        async function appendToDatabase(entryName, id) {
+            if (!githubConfig) return { success: false, error: 'GitHub не настроен' };
+            const { token, owner, repo, path } = githubConfig;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            let sha = null, currentContent = '';
+            try {
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    sha = data.sha;
+                    currentContent = decodeURIComponent(escape(atob(data.content)));
                 }
+            } catch (e) {}
+            const newLine = `${entryName} ${id}`;
+            const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
+            try {
+                await fetch(url, {
+                    method: 'PUT',
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                    body: JSON.stringify({ 
+                        message: `add ${entryName}`, 
+                        content: btoa(unescape(encodeURIComponent(newContent))), 
+                        sha: sha || undefined 
+                    })
+                });
+                dbCache.push({ rawName: entryName, id, name: entryName, surname: '' });
+                return { success: true };
+            } catch (e) {
+                return { success: false, error: e.message };
+            }
+        }
+
+        async function getChannelMessages(channelId) {
+            if (!githubConfig) return [];
+            const { token, owner, repo } = githubConfig;
+            const path = `channel_${channelId}.txt`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            try {
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (res.status === 404) return [];
+                const data = await res.json();
+                const content = decodeURIComponent(escape(atob(data.content)));
+                return content.trim().split('\n').filter(l => l).map(line => {
+                    try { return JSON.parse(line); } catch { return null; }
+                }).filter(m => m);
+            } catch { return []; }
+        }
+
+        async function appendToChannelMessages(channelId, msgObj) {
+            if (!githubConfig) return;
+            const { token, owner, repo } = githubConfig;
+            const path = `channel_${channelId}.txt`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            let sha = null, currentContent = '';
+            try {
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    sha = data.sha;
+                    currentContent = decodeURIComponent(escape(atob(data.content)));
+                }
+            } catch (e) {}
+            const newLine = JSON.stringify(msgObj);
+            const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
+            await fetch(url, {
+                method: 'PUT',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ 
+                    message: `message in ${channelId}`, 
+                    content: btoa(unescape(encodeURIComponent(newContent))), 
+                    sha: sha || undefined 
+                })
             });
         }
-    }
 
-    window.onload = async function () {
-        const hasConfig = loadGitHubConfig();
-
-        if (hasConfig) {
-            document.getElementById('githubSetupCard').style.display = 'none';
-            if (loadOwnProfile()) {
-                document.getElementById('registerCard').style.display = 'none';
-                document.getElementById('mainInterface').style.display = 'block';
-                document.getElementById('myIdDisplay').innerText = myId;
-                // Загружаем последние чаты
-                loadRecentChats();
-            } else {
-                document.getElementById('registerCard').style.display = 'block';
-                document.getElementById('mainInterface').style.display = 'none';
-            }
-            await getDatabaseFromGitHub();
-            setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
-        } else {
-            document.getElementById('githubSetupCard').style.display = 'block';
-            document.getElementById('registerCard').style.display = 'block';
-            document.getElementById('mainInterface').style.display = 'none';
+        async function getPrivateMessages(peerId) {
+            if (!githubConfig || !myId) return [];
+            const ids = [myId, peerId].sort();
+            const chatId = `private_${ids[0]}_${ids[1]}`;
+            const { token, owner, repo } = githubConfig;
+            const path = `${chatId}.txt`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            try {
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (res.status === 404) return [];
+                const data = await res.json();
+                const content = decodeURIComponent(escape(atob(data.content)));
+                return content.trim().split('\n').filter(l => l).map(line => {
+                    try { return JSON.parse(line); } catch { return null; }
+                }).filter(m => m);
+            } catch { return []; }
         }
 
-        document.getElementById('globalGithubBtn').onclick = () => {
-            document.getElementById('githubSetupCard').style.display = 'block';
-        };
+        async function appendToPrivateMessages(peerId, msgObj) {
+            if (!githubConfig || !myId) return;
+            const ids = [myId, peerId].sort();
+            const chatId = `private_${ids[0]}_${ids[1]}`;
+            const { token, owner, repo } = githubConfig;
+            const path = `${chatId}.txt`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            let sha = null, currentContent = '';
+            try {
+                const res = await fetch(url, {
+                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    sha = data.sha;
+                    currentContent = decodeURIComponent(escape(atob(data.content)));
+                }
+            } catch (e) {}
+            const newLine = JSON.stringify(msgObj);
+            const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
+            await fetch(url, {
+                method: 'PUT',
+                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ 
+                    message: `private message`, 
+                    content: btoa(unescape(encodeURIComponent(newContent))), 
+                    sha: sha || undefined 
+                })
+            });
+        }
 
-        document.getElementById('closeSetupBtn').onclick = () => {
-            document.getElementById('githubSetupCard').style.display = 'none';
-        };
-
-        document.getElementById('showUserRegBtn').onclick = () => {
-            document.getElementById('userRegBlock').style.display = 'block';
-            document.getElementById('channelRegBlock').style.display = 'none';
-            document.getElementById('registrationError').style.display = 'none';
-        };
-        document.getElementById('showChannelRegBtn').onclick = () => {
-            document.getElementById('userRegBlock').style.display = 'none';
-            document.getElementById('channelRegBlock').style.display = 'block';
-            document.getElementById('registrationError').style.display = 'none';
-        };
-
-        document.getElementById('saveGitHubBtn').onclick = async function () {
-            if (saveGitHubConfig()) {
-                document.getElementById('githubSetupCard').style.display = 'none';
-                document.getElementById('registerCard').style.display = 'block';
-                document.getElementById('mainInterface').style.display = 'none';
-                await getDatabaseFromGitHub();
-                setInterval(async () => { await getDatabaseFromGitHub(); }, 30000);
+        function loadGitHubConfig() {
+            const stored = localStorage.getItem('halal_github_config');
+            if (stored) {
+                githubConfig = JSON.parse(stored);
+                document.getElementById('githubToken').value = githubConfig.token || '';
+                document.getElementById('githubOwner').value = githubConfig.owner || '';
+                document.getElementById('githubRepo').value = githubConfig.repo || '';
+                document.getElementById('githubPath').value = githubConfig.path || 'database.txt';
+                return true;
             }
-        };
+            return false;
+        }
 
-        document.getElementById('registerBtn').onclick = async function () {
-            if (!githubConfig) {
-                document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ сначала настрой GitHub';
+        function saveGitHubConfig() {
+            const token = document.getElementById('githubToken').value.trim();
+            const owner = document.getElementById('githubOwner').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            let path = document.getElementById('githubPath').value.trim() || 'database.txt';
+            if (!token || !owner || !repo) { 
+                document.getElementById('githubStatus').innerHTML = '<span style="color:#ffaaaa;">❌ заполни все поля</span>';
+                return false; 
+            }
+            githubConfig = { token, owner, repo, path };
+            localStorage.setItem('halal_github_config', JSON.stringify(githubConfig));
+            document.getElementById('githubStatus').innerHTML = '<span style="color:#aaffaa;">✅ настройки сохранены</span>';
+            return true;
+        }
+
+        function loadOwnProfile() {
+            const stored = localStorage.getItem('halal_my_profile');
+            if (stored) {
+                const p = JSON.parse(stored);
+                myId = p.id;
+                myName = p.name;
+                myEmail = p.email;
+                return true;
+            }
+            return false;
+        }
+
+        function updateSidebarUserInfo() {
+            const avatar = document.getElementById('avatarPlaceholder');
+            const userNameSpan = document.getElementById('sidebarUserName');
+            avatar.textContent = myName ? myName.charAt(0).toUpperCase() : 'H';
+            userNameSpan.innerHTML = `<span class="animated-emoji">👤</span> ${myName || 'halal'}`;
+        }
+
+        function loadChatsFromStorage() {
+            const stored = localStorage.getItem('halal_chats');
+            if (stored) {
+                chats = JSON.parse(stored);
+                renderChatsList();
+            }
+        }
+
+        function saveChatsToStorage() {
+            localStorage.setItem('halal_chats', JSON.stringify(chats));
+        }
+
+        function renderChatsList() {
+            const container = document.getElementById('chatsList');
+            container.innerHTML = '';
+            if (chats.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-secondary); text-align:center; padding:20px;">Нет чатов</div>';
                 return;
             }
-            const name = document.getElementById('firstName').value.trim();
-            const surname = document.getElementById('lastName').value.trim();
-            if (!name || !surname) { 
-                document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ введи имя и фамилию';
-                return; 
+            chats.forEach(chat => {
+                const div = document.createElement('div');
+                div.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
+                div.dataset.id = chat.id;
+                div.dataset.type = chat.type;
+                div.dataset.name = chat.name;
+                div.innerHTML = `
+                    <div class="chat-avatar">${chat.name.charAt(0).toUpperCase()}</div>
+                    <div class="chat-info">
+                        <div class="chat-name">${chat.name}</div>
+                        <div class="chat-preview">${chat.lastMessage || '...'}</div>
+                    </div>
+                `;
+                div.addEventListener('click', () => {
+                    enterChat(chat.id, chat.type, chat.name);
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function showSidebar() {
+            document.getElementById('sidebar').classList.remove('hide');
+            document.getElementById('chatPanel').classList.remove('show');
+        }
+
+        function showChat() {
+            document.getElementById('sidebar').classList.add('hide');
+            document.getElementById('chatPanel').classList.add('show');
+        }
+
+        function animateNewMessages() {
+            const container = document.getElementById('messagesContainer');
+            const messages = container.children;
+            const newCount = messages.length;
+            const diff = newCount - prevMessagesCount;
+            if (diff > 0) {
+                for (let i = newCount - diff; i < newCount; i++) {
+                    messages[i].classList.add('new');
+                    setTimeout(() => {
+                        messages[i].classList.remove('new');
+                    }, 600);
+                }
             }
-            const newId = generatePersonId();
-            const result = await appendToDatabase(`${name}_${surname}`, newId);
-            if (result.success) {
-                myId = newId; myName = name; mySurname = surname; myIsChannel = false;
-                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, surname, isChannel: false }));
-                document.getElementById('registerCard').style.display = 'none';
-                document.getElementById('mainInterface').style.display = 'block';
-                document.getElementById('myIdDisplay').innerText = myId;
-                await getDatabaseFromGitHub();
-                document.getElementById('registrationError').style.display = 'none';
-                loadRecentChats();
+            prevMessagesCount = newCount;
+        }
+
+        async function enterChat(chatId, type, peerInfo) {
+            document.getElementById('gamesContainer').classList.remove('active');
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('messageArea').style.display = 'flex';
+            document.getElementById('messagesContainer').style.display = 'flex';
+
+            currentChatId = chatId;
+            currentChatType = type;
+            currentPeerInfo = peerInfo;
+
+            document.getElementById('chatTitle').innerText = peerInfo;
+            document.getElementById('chatStatus').innerText = type === 'channel' ? '📢 канал' : '👤 личный чат';
+            document.getElementById('chatAvatar').innerText = peerInfo.charAt(0).toUpperCase();
+
+            renderChatsList();
+
+            document.getElementById('messagesContainer').innerHTML = '';
+            prevMessagesCount = 0;
+            if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
+            await loadMessages();
+            messagesUpdateInterval = setInterval(loadMessages, 3000);
+
+            showChat();
+        }
+
+        async function loadMessages() {
+            if (!currentChatId) return;
+            let msgs = [];
+            if (currentChatType === 'channel') {
+                msgs = await getChannelMessages(currentChatId);
             } else {
-                document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = `❌ ошибка: ${result.error}`;
+                msgs = await getPrivateMessages(currentChatId);
             }
-        };
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            msgs.forEach(m => {
+                const isOwn = m.senderId === myId;
+                const msgDiv = document.createElement('div');
+                msgDiv.classList.add('message');
+                if (isOwn) msgDiv.classList.add('own');
+                if (currentChatType === 'channel' && !isOwn) {
+                    const nameSpan = document.createElement('div');
+                    nameSpan.className = 'sender-name';
+                    nameSpan.innerText = m.senderName || 'Неизвестно';
+                    msgDiv.appendChild(nameSpan);
+                }
+                const textNode = document.createTextNode(m.text);
+                msgDiv.appendChild(textNode);
+                container.appendChild(msgDiv);
+            });
+            animateNewMessages();
+            container.scrollTop = container.scrollHeight;
+        }
 
-        document.getElementById('createChannelBtn').onclick = async function () {
-            if (!githubConfig) {
-                document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ сначала настрой GitHub';
-                return;
-            }
-            const chName = document.getElementById('channelName').value.trim();
-            if (!chName) { 
-                document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = '❌ введи название канала';
-                return; 
-            }
-            const newId = generateChannelId();
-            const result = await appendToDatabase(`channel_${chName}`, newId);
-            if (result.success) {
-                myId = newId; myName = chName; mySurname = ''; myIsChannel = true;
-                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: chName, surname: '', isChannel: true }));
-                document.getElementById('registerCard').style.display = 'none';
-                document.getElementById('mainInterface').style.display = 'block';
-                document.getElementById('myIdDisplay').innerText = myId;
-                await getDatabaseFromGitHub();
-                document.getElementById('registrationError').style.display = 'none';
-                loadRecentChats();
-            } else {
-                document.getElementById('registrationError').style.display = 'block';
-                document.getElementById('registrationError').innerText = `❌ ошибка: ${result.error}`;
-            }
-        };
-
-        document.getElementById('copyIdBtn').onclick = () => {
-            navigator.clipboard.writeText(myId);
-            alert('ID скопирован');
-        };
-
-        document.getElementById('searchBtn').onclick = async function () {
-            const searchId = document.getElementById('searchIdInput').value.trim();
-            if (!searchId) return;
-
+        async function addChatFromSearch(searchId) {
             const entry = dbCache.find(e => e.id === searchId);
-            const resDiv = document.getElementById('searchResult');
-            const errorDiv = document.getElementById('registrationError');
-            
-            if (!entry) {
-                resDiv.innerHTML = '<div class="search-info" style="border-color:#ff5555;"><span style="color:#ffaaaa;">❌ не найден</span></div>';
-                return;
+            if (!entry) return null;
+
+            let chatName = '';
+            let type = '';
+            if (entry.id.endsWith('_channel')) {
+                chatName = entry.rawName.replace('channel_', '');
+                type = 'channel';
+            } else {
+                const parts = entry.rawName.split('_');
+                chatName = parts[0] + ' ' + (parts[1] || '');
+                type = 'private';
             }
 
-            if (entry.id.endsWith('_channel')) {
-                resDiv.innerHTML = `<div class="search-info">
-                    <span style="font-size:1.4rem;">📢</span>
-                    <span style="color:#b4e0ff; font-weight:500;">${entry.rawName.replace('channel_','')}</span>
-                    <span style="color:#8899aa; margin-left:auto;">вход в канал...</span>
-                </div>`;
-                await enterChat(entry.id, 'channel', entry.rawName.replace('channel_',''));
+            if (!chats.find(c => c.id === entry.id)) {
+                chats.push({ id: entry.id, name: chatName, type, lastMessage: '' });
+                saveChatsToStorage();
+                renderChatsList();
+            }
+            return { id: entry.id, name: chatName, type };
+        }
+
+        function applyCustomization(theme, ownColor) {
+            document.body.classList.remove('light-theme', 'grey-theme', 'own-color-gold', 'own-color-blue', 'own-color-green');
+            if (theme === 'light') document.body.classList.add('light-theme');
+            else if (theme === 'grey') document.body.classList.add('grey-theme');
+            if (ownColor === 'gold') document.body.classList.add('own-color-gold');
+            else if (ownColor === 'blue') document.body.classList.add('own-color-blue');
+            else if (ownColor === 'green') document.body.classList.add('own-color-green');
+        }
+
+        function loadCustomization() {
+            const theme = localStorage.getItem('halal_theme') || 'dark';
+            const ownColor = localStorage.getItem('halal_own_color') || 'gold';
+            document.getElementById('themeSelect').value = theme;
+            document.getElementById('ownColorSelect').value = ownColor;
+            applyCustomization(theme, ownColor);
+        }
+
+        window.onload = async function () {
+            const modalGithub = document.getElementById('githubModal');
+            const modalRegister = document.getElementById('registerModal');
+            const modalCustomize = document.getElementById('customizeModal');
+            const hasConfig = loadGitHubConfig();
+
+            loadCustomization();
+
+            document.getElementById('userInfoBlock').addEventListener('click', () => {
+                modalCustomize.classList.add('active');
+            });
+
+            document.getElementById('closeCustomizeBtn').onclick = () => {
+                modalCustomize.classList.remove('active');
+            };
+
+            document.getElementById('saveCustomizeBtn').onclick = () => {
+                const theme = document.getElementById('themeSelect').value;
+                const ownColor = document.getElementById('ownColorSelect').value;
+                localStorage.setItem('halal_theme', theme);
+                localStorage.setItem('halal_own_color', ownColor);
+                applyCustomization(theme, ownColor);
+                modalCustomize.classList.remove('active');
+            };
+
+            if (!hasConfig) {
+                modalGithub.classList.add('active');
             } else {
-                if (!myId) {
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerText = '❌ ты не зарегистрирован';
+                if (!loadOwnProfile()) {
+                    modalRegister.classList.add('active');
+                } else {
+                    modalGithub.classList.remove('active');
+                    modalRegister.classList.remove('active');
+                    updateSidebarUserInfo();
+                    loadChatsFromStorage();
+                    await getDatabaseFromGitHub();
+                    dbUpdateInterval = setInterval(async () => {
+                        await getDatabaseFromGitHub();
+                    }, 3000);
+                }
+            }
+
+            document.getElementById('globalGithubBtn').onclick = () => {
+                modalGithub.classList.add('active');
+            };
+            document.getElementById('closeModalBtn').onclick = () => {
+                modalGithub.classList.remove('active');
+            };
+            document.getElementById('saveGitHubBtn').onclick = async function () {
+                if (saveGitHubConfig()) {
+                    modalGithub.classList.remove('active');
+                    if (!loadOwnProfile()) {
+                        modalRegister.classList.add('active');
+                    } else {
+                        await getDatabaseFromGitHub();
+                        if (dbUpdateInterval) clearInterval(dbUpdateInterval);
+                        dbUpdateInterval = setInterval(async () => {
+                            await getDatabaseFromGitHub();
+                        }, 3000);
+                    }
+                }
+            };
+
+            document.getElementById('tabRegister').onclick = () => {
+                document.getElementById('tabRegister').classList.add('active');
+                document.getElementById('tabLogin').classList.remove('active');
+                document.getElementById('registerBlock').style.display = 'block';
+                document.getElementById('loginBlock').style.display = 'none';
+                document.getElementById('authError').style.display = 'none';
+                document.getElementById('authSuccess').style.display = 'none';
+            };
+            document.getElementById('tabLogin').onclick = () => {
+                document.getElementById('tabLogin').classList.add('active');
+                document.getElementById('tabRegister').classList.remove('active');
+                document.getElementById('registerBlock').style.display = 'none';
+                document.getElementById('loginBlock').style.display = 'block';
+                document.getElementById('authError').style.display = 'none';
+                document.getElementById('authSuccess').style.display = 'none';
+            };
+
+            document.getElementById('registerBtn').onclick = async function () {
+                const name = document.getElementById('regName').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value.trim();
+                if (!name || !email || !password) {
+                    document.getElementById('authError').innerText = '❌ Заполните все поля';
+                    document.getElementById('authError').style.display = 'block';
                     return;
                 }
-                const nameParts = entry.rawName.split('_');
-                const firstName = nameParts[0] || '';
-                const lastName = nameParts[1] || '';
-                resDiv.innerHTML = `<div class="search-info">
-                    <span style="font-size:1.4rem;">👤</span>
-                    <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
-                    <span style="color:#8899aa; margin-left:auto;">вход в чат...</span>
-                </div>`;
-                await enterChat(entry.id, 'private', `${firstName} ${lastName}`);
-            }
-        };
-
-        // Клик по последним чатам
-        document.getElementById('recentChatsContainer').addEventListener('click', async function(e) {
-            const item = e.target.closest('.recent-chat-item');
-            if (!item) return;
-            const peerId = item.dataset.peerId;
-            if (!peerId) return;
-            // Ищем в кэше
-            const entry = dbCache.find(e => e.id === peerId);
-            if (entry) {
-                const nameParts = entry.rawName.split('_');
-                const firstName = nameParts[0] || '';
-                const lastName = nameParts[1] || '';
-                await enterChat(entry.id, 'private', `${firstName} ${lastName}`);
-                // Покажем в поиске
-                document.getElementById('searchResult').innerHTML = `<div class="search-info">
-                    <span style="font-size:1.4rem;">👤</span>
-                    <span style="color:#b4e0ff; font-weight:500;">${firstName} ${lastName}</span>
-                </div>`;
-            } else {
-                // если вдруг нет в кэше, но есть в recent
-                await enterChat(peerId, 'private', peerId);
-            }
-        });
-
-        document.getElementById('sendMsgBtn').onclick = async function () {
-            const msg = document.getElementById('messageInput').value.trim();
-            if (!msg || !currentChatId) {
-                alert('нет активного чата');
-                return;
-            }
-            const senderName = myIsChannel ? `📢 ${myName}` : `${myName} ${mySurname}`.trim() || myId;
-            const msgObj = { 
-                text: msg, 
-                senderId: myId,
-                senderName: senderName,
-                time: Date.now() 
+                if (users.find(u => u.email === email)) {
+                    document.getElementById('authError').innerText = '❌ Пользователь с таким email уже существует';
+                    document.getElementById('authError').style.display = 'block';
+                    return;
+                }
+                const newId = generatePersonId();
+                users.push({ name, email, password, id: newId });
+                localStorage.setItem('halal_users', JSON.stringify(users));
+                myId = newId;
+                myName = name;
+                myEmail = email;
+                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, email }));
+                modalRegister.classList.remove('active');
+                updateSidebarUserInfo();
+                loadChatsFromStorage();
+                await getDatabaseFromGitHub();
+                await appendToDatabase(name, newId);
+                if (dbUpdateInterval) clearInterval(dbUpdateInterval);
+                dbUpdateInterval = setInterval(async () => {
+                    await getDatabaseFromGitHub();
+                }, 3000);
             };
-            if (currentChatType === 'channel') {
-                await appendToChannelMessages(currentChatId, msgObj);
-            } else {
-                await appendToPrivateMessages(currentChatId, msgObj);
-                // Добавляем собеседника в последние чаты (при отправке сообщения)
-                const peerId = currentChatId;
-                const entry = dbCache.find(e => e.id === peerId);
-                const peerName = entry ? entry.rawName.replace('_',' ') : peerId;
-                updateRecentChats(peerId, peerName);
-            }
-            addMessageToChat(`${senderName}: ${msg}`, true);
-            document.getElementById('messageInput').value = '';
-            await loadMessages();
-        };
 
-        document.getElementById('messageInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) { 
-                e.preventDefault(); 
-                document.getElementById('sendMsgBtn').click(); 
-            }
-        });
-    };
-</script>
+            document.getElementById('loginBtn').onclick = async function () {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value.trim();
+                const user = users.find(u => u.email === email && u.password === password);
+                if (!user) {
+                    document.getElementById('authError').innerText = '❌ Неверный email или пароль';
+                    document.getElementById('authError').style.display = 'block';
+                    return;
+                }
+                myId = user.id;
+                myName = user.name;
+                myEmail = user.email;
+                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail }));
+                modalRegister.classList.remove('active');
+                updateSidebarUserInfo();
+                loadChatsFromStorage();
+                await getDatabaseFromGitHub();
+                if (dbUpdateInterval) clearInterval(dbUpdateInterval);
+                dbUpdateInterval = setInterval(async () => {
+                    await getDatabaseFromGitHub();
+                }, 3000);
+            };
+
+            document.getElementById('searchIdInput').addEventListener('keypress', async function (e) {
+                if (e.key === 'Enter') {
+                    const searchId = this.value.trim();
+                    if (!searchId) return;
+                    const chatInfo = await addChatFromSearch(searchId);
+                    if (chatInfo) {
+                        enterChat(chatInfo.id, chatInfo.type, chatInfo.name);
+                    } else {
+                        alert('ID не найден');
+                    }
+                    this.value = '';
+                }
+            });
+
+            document.getElementById('sendMsgBtn').onclick = async function () {
+                const msg = document.getElementById('messageInput').value.trim();
+                if (!msg || !currentChatId) {
+                    alert('Нет активного чата');
+                    return;
+                }
+                const senderName = myName || myId;
+                const msgObj = { 
+                    text: msg, 
+                    senderId: myId,
+                    senderName: senderName,
+                    time: Date.now() 
+                };
+                if (currentChatType === 'channel') {
+                    await appendToChannelMessages(currentChatId, msgObj);
+                } else {
+                    await appendToPrivateMessages(currentChatId, msgObj);
+                }
+                document.getElementById('messageInput').value = '';
+                const sendBtn = document.getElementById('sendMsgBtn');
+                sendBtn.classList.add('animate');
+                setTimeout(() => sendBtn.classList.remove('animate'), 300);
+                await loadMessages();
+            };
+
+            document.getElementById('messageInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) { 
+                    e.preventDefault(); 
+                    document.getElementById('sendMsgBtn').click(); 
+                }
+            });
+
+            document.getElementById('gamesButton').onclick = () => {
+                document.getElementById('gamesContainer').classList.add('active');
+                document.getElementById('chatHeader').style.display = 'none';
+                document.getElementById('messageArea').style.display = 'none';
+                document.getElementById('messagesContainer').style.display = 'none';
+            };
+            document.getElementById('backFromGamesBtn').onclick = () => {
+                document.getElementById('gamesContainer').classList.remove('active');
+                if (currentChatId) {
+                    document.getElementById('chatHeader').style.display = 'flex';
+                    document.getElementById('messageArea').style.display = 'flex';
+                    document.getElementById('messagesContainer').style.display = 'flex';
+                } else {
+                    document.getElementById('chatHeader').style.display = 'none';
+                    document.getElementById('messageArea').style.display = 'none';
+                    document.getElementById('messagesContainer').innerHTML = '<div style="color: var(--text-secondary); text-align:center; padding:40px;">👋 Начните общение</div>';
+                }
+            };
+
+            document.getElementById('backToChatsBtn').onclick = () => {
+                showSidebar();
+            };
+        };
+    </script>
 </body>
 </html>
