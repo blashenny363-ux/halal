@@ -1,3 +1,0 @@
-{"text":"pr nafik","senderId":"p_mlquvgir1b6q_person","senderName":"watch demo","time":1771350203716}
-{"text":"pr nafik","senderId":"p_mlquvgir1b6q_person","senderName":"watch demo","time":1771350204488}
-{"text":"privet","senderId":"p_mlquvgir1b6q_person","senderName":"watch demo","time":1771350212574}
