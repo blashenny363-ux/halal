@@ -1,1 +1,2 @@
 {"text":"Я нец","senderId":"p_mls666dys9sb_person","senderName":"Пидор","time":1771427498666}
+{"text":"дарова толсти","senderId":"p_mlr3v50jkw76_person","senderName":"питух","time":1771427509569}
