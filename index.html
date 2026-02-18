@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>halal — полная синхронизация</title>
+    <title>halal</title>
     <style>
         * {
             margin: 0;
@@ -1023,8 +1023,8 @@
                             const [name, userId] = parts;
                             if (userId === id) {
                                 return `${newName}|${id}`;
-                            }
                         }
+                    }
                     }
                     return line;
                 });
@@ -1256,6 +1256,14 @@
             prevMessagesCount = newCount;
         }
 
+        function ensureChatExists(peerId, peerName, type) {
+            if (type === 'private' && !chats.find(c => c.id === peerId)) {
+                chats.push({ id: peerId, name: peerName, type, lastMessage: '' });
+                saveChatsToStorage();
+                renderChatsList();
+            }
+        }
+
         async function enterChat(chatId, type, peerInfo) {
             document.getElementById('gamesContainer').classList.remove('active');
             document.getElementById('chatHeader').style.display = 'flex';
@@ -1290,6 +1298,18 @@
                 msgs = await getPrivateMessages(currentChatId);
             }
             const container = document.getElementById('messagesContainer');
+            const oldCount = container.children.length;
+            msgs.forEach(m => {
+                const isOwn = m.senderId === myId;
+                if (!isOwn && currentChatType === 'private') {
+                    const entry = dbCache.find(e => e.id === m.senderId);
+                    if (entry) {
+                        ensureChatExists(m.senderId, entry.name, 'private');
+                    } else {
+                        ensureChatExists(m.senderId, m.senderName || 'Неизвестно', 'private');
+                    }
+                }
+            });
             container.innerHTML = '';
             msgs.forEach(m => {
                 const isOwn = m.senderId === myId;
