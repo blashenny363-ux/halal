@@ -36,6 +36,7 @@
             --message-other-bg: #182533;
             --accent-color: #d4af37;
             --hover-bg: #2b3b4a;
+            --shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         body.light-theme {
@@ -51,6 +52,7 @@
             --message-other-bg: #ffffff;
             --accent-color: #d4af37;
             --hover-bg: #c0cbd8;
+            --shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         body.grey-theme {
@@ -66,6 +68,7 @@
             --message-other-bg: #3a3f44;
             --accent-color: #5865f2;
             --hover-bg: #40474f;
+            --shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         body.own-color-gold { --message-own-bg: #d4af37; }
@@ -90,18 +93,13 @@
         .app {
             position: relative;
             width: 100%;
-            max-width: 800px;
+            max-width: 480px;
             height: 100vh;
             background: var(--bg-primary);
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: var(--shadow);
             overflow: hidden;
             transition: background-color 0.3s;
-        }
-
-        @media (min-aspect-ratio: 1/1) {
-            .app {
-                max-width: 1000px;
-            }
+            margin: 0 auto;
         }
 
         .sidebar {
@@ -109,7 +107,6 @@
             top: 0;
             left: 0;
             width: 100%;
-            max-width: 360px;
             height: 100%;
             background: var(--bg-sidebar);
             display: flex;
@@ -153,23 +150,11 @@
             color: white;
             text-transform: uppercase;
             transition: transform 0.2s, background-color 0.3s;
+            box-shadow: var(--shadow);
         }
 
         .user-info:hover .avatar {
             transform: scale(1.1);
-        }
-
-        .animated-emoji {
-            display: inline-block;
-            animation: pulseRotate 2s infinite ease-in-out;
-        }
-
-        @keyframes pulseRotate {
-            0% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.2) rotate(5deg); }
-            50% { transform: scale(1) rotate(0deg); }
-            75% { transform: scale(1.1) rotate(-5deg); }
-            100% { transform: scale(1) rotate(0deg); }
         }
 
         .user-name {
@@ -227,7 +212,11 @@
             color: var(--text-primary);
             font-size: 15px;
             outline: none;
-            transition: background-color 0.3s, color 0.2s;
+            transition: background-color 0.3s, color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-box input:focus {
+            box-shadow: 0 0 0 2px var(--accent-color);
         }
 
         .search-box input::placeholder {
@@ -247,16 +236,23 @@
             gap: 12px;
             padding: 12px 20px;
             cursor: pointer;
-            transition: background 0.1s;
+            transition: background 0.1s, transform 0.1s;
             border-bottom: 1px solid var(--border-color);
+            position: relative;
         }
 
         .chat-item:hover {
             background: var(--hover-bg);
+            transform: translateX(5px);
         }
 
         .chat-item.active {
             background: var(--bg-input);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .chat-item.pinned {
+            background: rgba(255, 215, 0, 0.1);
         }
 
         .chat-avatar {
@@ -272,6 +268,7 @@
             color: #fff;
             flex-shrink: 0;
             transition: transform 0.2s, background-color 0.3s;
+            box-shadow: var(--shadow);
         }
 
         .chat-item:hover .chat-avatar {
@@ -302,6 +299,42 @@
             transition: color 0.2s;
         }
 
+        .chat-actions {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .chat-item:hover .chat-actions {
+            opacity: 1;
+        }
+
+        .chat-action-btn {
+            background: var(--bg-input);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .chat-action-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .pin-indicator {
+            color: gold;
+            margin-left: 5px;
+        }
+
         .games-btn-container {
             padding: 15px 20px;
             border-top: 1px solid var(--border-color);
@@ -322,11 +355,17 @@
             gap: 10px;
             width: 100%;
             cursor: pointer;
-            transition: background 0.15s, color 0.2s;
+            transition: background 0.15s, color 0.2s, transform 0.1s;
+            box-shadow: var(--shadow);
         }
 
         .games-btn:hover {
             background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .games-btn:active {
+            transform: translateY(0);
         }
 
         .chat-panel {
@@ -398,11 +437,12 @@
             animation: pulse 3s infinite;
             transition: background-color 0.3s;
             cursor: pointer;
+            box-shadow: var(--shadow);
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); background-color: var(--accent-color); filter: brightness(1.2); }
+            50% { transform: scale(1.05); background-color: var(--accent-color); filter: brightness(1.1); }
             100% { transform: scale(1); }
         }
 
@@ -466,6 +506,7 @@
             line-height: 1.4;
             word-wrap: break-word;
             transition: all 0.2s;
+            box-shadow: var(--shadow);
         }
 
         .message.own {
@@ -534,7 +575,7 @@
         }
 
         .message-input-area textarea:focus {
-            box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
         }
 
         .send-btn {
@@ -548,6 +589,7 @@
             justify-content: center;
             cursor: pointer;
             transition: background 0.15s, transform 0.1s, background-color 0.3s;
+            box-shadow: var(--shadow);
         }
 
         .send-btn:active {
@@ -638,7 +680,11 @@
             width: 100%;
             cursor: pointer;
             margin-top: 5px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .modal-content button:hover {
+            transform: translateY(-2px);
         }
 
         .modal-content button.small {
@@ -812,9 +858,7 @@
             <div class="sidebar-header">
                 <div class="user-info" id="userInfoBlock">
                     <div class="avatar" id="avatarPlaceholder">H</div>
-                    <span class="user-name" id="sidebarUserName">
-                        <span class="animated-emoji">🤖</span> halal
-                    </span>
+                    <span class="user-name" id="sidebarUserName">halal</span>
                 </div>
                 <div class="sidebar-actions">
                     <button class="icon-btn" id="globalGithubBtn" title="Настройки GitHub">
@@ -842,7 +886,7 @@
             <div class="chat-header" id="chatHeader" style="display: none;">
                 <div class="chat-header-left">
                     <button class="back-button" id="backToChatsBtn" title="Назад к списку чатов">←</button>
-                    <div class="chat-header-avatar" id="chatAvatar" title="Участники группы">👤</div>
+                    <div class="chat-header-avatar" id="chatAvatar">👤</div>
                     <div class="chat-header-info">
                         <h3 id="chatTitle">Выберите чат</h3>
                         <span id="chatStatus" class="badge"></span>
@@ -865,9 +909,9 @@
             <div class="iframe-container" id="gamesContainer">
                 <div class="iframe-header">
                     <button id="backFromGamesBtn">← Назад</button>
-                    <h3>halal</h3>
+                    <h3>halal games — Фрукты</h3>
                 </div>
-                <iframe src="https://blashenny363-ux.github.io/frukti/" title=""></iframe>
+                <iframe src="https://blashenny363-ux.github.io/frukti/" title="Игра Фрукты"></iframe>
             </div>
         </div>
 
@@ -1278,7 +1322,7 @@
                     currentContent = decodeURIComponent(escape(atob(data.content)));
                 }
             } catch (e) {}
-            if (currentContent.split('\n').includes(userId)) return; // уже есть
+            if (currentContent.split('\n').includes(userId)) return;
             const newContent = currentContent + (currentContent ? '\n' : '') + userId;
             await fetch(url, {
                 method: 'PUT',
@@ -1335,7 +1379,7 @@
             const avatar = document.getElementById('avatarPlaceholder');
             const userNameSpan = document.getElementById('sidebarUserName');
             avatar.textContent = myName ? myName.charAt(0).toUpperCase() : 'H';
-            userNameSpan.innerHTML = `<span class="animated-emoji">👤</span> ${myName || 'halal'}`;
+            userNameSpan.innerText = myName || 'halal';
         }
 
         function loadChatsFromStorage() {
@@ -1357,24 +1401,68 @@
                 container.innerHTML = '<div style="color: var(--text-secondary); text-align:center; padding:20px;">Нет чатов</div>';
                 return;
             }
-            chats.forEach(chat => {
+            const sorted = [...chats].sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return 0;
+            });
+            sorted.forEach(chat => {
                 const div = document.createElement('div');
-                div.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
+                div.className = `chat-item ${chat.id === currentChatId ? 'active' : ''} ${chat.pinned ? 'pinned' : ''}`;
                 div.dataset.id = chat.id;
                 div.dataset.type = chat.type;
                 div.dataset.name = chat.name;
                 div.innerHTML = `
-                    <div class="chat-avatar">${chat.name.charAt(0).toUpperCase()}</div>
+                    <div class="chat-avatar">${chat.type === 'group' ? '👥' : '👤'}</div>
                     <div class="chat-info">
-                        <div class="chat-name">${chat.name}</div>
+                        <div class="chat-name">
+                            ${chat.name}
+                            ${chat.pinned ? '<span class="pin-indicator">📌</span>' : ''}
+                        </div>
                         <div class="chat-preview">${chat.lastMessage || '...'}</div>
                     </div>
+                    <div class="chat-actions">
+                        <button class="chat-action-btn pin-btn" title="${chat.pinned ? 'Открепить' : 'Закрепить'}">${chat.pinned ? '📍' : '📌'}</button>
+                        <button class="chat-action-btn delete-btn" title="Удалить чат">🗑️</button>
+                    </div>
                 `;
+                div.querySelector('.pin-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    togglePinChat(chat.id);
+                });
+                div.querySelector('.delete-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteChat(chat.id);
+                });
                 div.addEventListener('click', () => {
                     enterChat(chat.id, chat.type, chat.name);
                 });
                 container.appendChild(div);
             });
+        }
+
+        function togglePinChat(chatId) {
+            const chat = chats.find(c => c.id === chatId);
+            if (chat) {
+                chat.pinned = !chat.pinned;
+                saveChatsToStorage();
+                renderChatsList();
+            }
+        }
+
+        function deleteChat(chatId) {
+            if (confirm('Удалить чат?')) {
+                chats = chats.filter(c => c.id !== chatId);
+                if (currentChatId === chatId) {
+                    currentChatId = null;
+                    document.getElementById('chatHeader').style.display = 'none';
+                    document.getElementById('messageArea').style.display = 'none';
+                    document.getElementById('messagesContainer').innerHTML = '<div style="color: var(--text-secondary); text-align:center; padding:40px;">👋 Начните общение</div>';
+                    document.getElementById('membersBtn').style.display = 'none';
+                }
+                saveChatsToStorage();
+                renderChatsList();
+            }
         }
 
         function showSidebar() {
@@ -1405,7 +1493,7 @@
 
         function ensureChatExists(peerId, peerName, type) {
             if (!chats.find(c => c.id === peerId)) {
-                chats.push({ id: peerId, name: peerName, type, lastMessage: '' });
+                chats.push({ id: peerId, name: peerName, type, lastMessage: '', pinned: false });
                 saveChatsToStorage();
                 renderChatsList();
             }
@@ -1423,7 +1511,7 @@
 
             document.getElementById('chatTitle').innerText = peerInfo;
             document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
-            document.getElementById('chatAvatar').innerText = peerInfo.charAt(0).toUpperCase();
+            document.getElementById('chatAvatar').innerText = type === 'group' ? '👥' : '👤';
 
             if (type === 'group') {
                 document.getElementById('membersBtn').style.display = 'flex';
@@ -1599,7 +1687,7 @@
                 const result = await appendToDatabase(`group_${groupName}`, newId);
                 if (result.success) {
                     dbCache.push({ rawName: `group_${groupName}`, name: groupName, email: '', password: '', id: newId, type: 'group' });
-                    chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '' });
+                    chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '', pinned: false });
                     saveChatsToStorage();
                     renderChatsList();
                     await addGroupMember(newId, myId);
