@@ -4,3 +4,4 @@
 {"text":"писька","senderId":"p_mlr3v50jkw76_person","senderName":"питух","time":1771411632108}
 {"text":"привет","senderId":"p_mlr3v50jkw76_person","senderName":"питух","time":1771432872480}
 {"text":"<script>alert( xss уязвимость):</script>","senderId":"p_mlr3v50jkw76_person","senderName":"питух","time":1771482235325}
+{"image":"https://raw.githubusercontent.com/blashenny363-ux/halal/main/files/image_1771519217724_1000218061.png","senderId":"p_mlr3v50jkw76_person","senderName":"питух","time":1771519219430}
