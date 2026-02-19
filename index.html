@@ -21,6 +21,34 @@
             min-height: 100vh;
             padding: 0;
             transition: background-color 0.3s, color 0.2s;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .snow-particle {
+            position: absolute;
+            color: #fff;
+            user-select: none;
+            pointer-events: none;
+            font-size: 0.8em;
+            animation: fall linear infinite;
+            opacity: 0.4;
+            will-change: transform;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh); }
         }
 
         :root {
@@ -35,8 +63,11 @@
             --message-own-bg: #d4af37;
             --message-other-bg: #182533;
             --accent-color: #d4af37;
+            --glow-color: #d4af37;
             --hover-bg: #2b3b4a;
             --shadow: 0 2px 5px rgba(0,0,0,0.3);
+            --glow: 0 0 15px var(--glow-color);
+            --glow-hover: 0 0 20px var(--glow-color);
         }
 
         body.light-theme {
@@ -51,6 +82,7 @@
             --message-own-bg: #d4af37;
             --message-other-bg: #ffffff;
             --accent-color: #d4af37;
+            --glow-color: #d4af37;
             --hover-bg: #c0cbd8;
             --shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -67,6 +99,7 @@
             --message-own-bg: #5865f2;
             --message-other-bg: #3a3f44;
             --accent-color: #5865f2;
+            --glow-color: #5865f2;
             --hover-bg: #40474f;
             --shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
@@ -90,6 +123,13 @@
         body.accent-color-purple { --accent-color: #9b59b6; }
         body.accent-color-orange { --accent-color: #f39c12; }
 
+        body.glow-color-gold { --glow-color: #d4af37; }
+        body.glow-color-blue { --glow-color: #2b5278; }
+        body.glow-color-green { --glow-color: #2e7d32; }
+        body.glow-color-red { --glow-color: #e53e3e; }
+        body.glow-color-purple { --glow-color: #9b59b6; }
+        body.glow-color-orange { --glow-color: #f39c12; }
+
         .app {
             position: relative;
             width: 100%;
@@ -100,6 +140,7 @@
             overflow: hidden;
             transition: background-color 0.3s;
             margin: 0 auto;
+            z-index: 1;
         }
 
         .sidebar {
@@ -149,12 +190,21 @@
             font-size: 18px;
             color: white;
             text-transform: uppercase;
-            transition: transform 0.2s, background-color 0.3s;
+            transition: transform 0.2s, background-color 0.3s, box-shadow 0.2s;
             box-shadow: var(--shadow);
+            object-fit: cover;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .user-info:hover .avatar {
             transform: scale(1.1);
+            box-shadow: var(--glow);
         }
 
         .user-name {
@@ -183,12 +233,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, color 0.2s;
+            transition: background 0.15s, color 0.2s, box-shadow 0.2s;
         }
 
         .icon-btn:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
+            box-shadow: var(--glow);
         }
 
         .icon-btn svg {
@@ -216,7 +267,7 @@
         }
 
         .search-box input:focus {
-            box-shadow: 0 0 0 2px var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color), var(--glow);
         }
 
         .search-box input::placeholder {
@@ -228,6 +279,8 @@
             flex: 1;
             overflow-y: auto;
             padding: 8px 0;
+            position: relative;
+            z-index: 3;
         }
 
         .chat-item {
@@ -236,7 +289,7 @@
             gap: 12px;
             padding: 12px 20px;
             cursor: pointer;
-            transition: background 0.1s, transform 0.1s;
+            transition: background 0.1s, transform 0.1s, box-shadow 0.2s;
             border-bottom: 1px solid var(--border-color);
             position: relative;
         }
@@ -244,6 +297,7 @@
         .chat-item:hover {
             background: var(--hover-bg);
             transform: translateX(5px);
+            box-shadow: var(--glow);
         }
 
         .chat-item.active {
@@ -267,12 +321,21 @@
             font-weight: 600;
             color: #fff;
             flex-shrink: 0;
-            transition: transform 0.2s, background-color 0.3s;
+            transition: transform 0.2s, background-color 0.3s, box-shadow 0.2s;
             box-shadow: var(--shadow);
+            object-fit: cover;
+        }
+
+        .chat-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .chat-item:hover .chat-avatar {
             transform: scale(1.05);
+            box-shadow: var(--glow);
         }
 
         .chat-info {
@@ -322,12 +385,13 @@
             cursor: pointer;
             color: var(--text-primary);
             font-size: 16px;
-            transition: background 0.15s, transform 0.1s;
+            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
         }
 
         .chat-action-btn:hover {
             background: var(--accent-color);
             transform: scale(1.1);
+            box-shadow: var(--glow-hover);
         }
 
         .pin-indicator {
@@ -340,6 +404,8 @@
             border-top: 1px solid var(--border-color);
             background: var(--bg-sidebar);
             transition: background-color 0.3s, border-color 0.3s;
+            position: relative;
+            z-index: 3;
         }
 
         .games-btn {
@@ -355,13 +421,14 @@
             gap: 10px;
             width: 100%;
             cursor: pointer;
-            transition: background 0.15s, color 0.2s, transform 0.1s;
+            transition: background 0.15s, color 0.2s, transform 0.1s, box-shadow 0.2s;
             box-shadow: var(--shadow);
         }
 
         .games-btn:hover {
             background: var(--accent-color);
             transform: translateY(-2px);
+            box-shadow: var(--glow-hover);
         }
 
         .games-btn:active {
@@ -415,12 +482,13 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: background 0.15s, color 0.2s;
+            transition: background 0.15s, color 0.2s, box-shadow 0.2s;
         }
 
         .back-button:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
+            box-shadow: var(--glow);
         }
 
         .chat-header-avatar {
@@ -435,15 +503,23 @@
             color: white;
             flex-shrink: 0;
             animation: pulse 3s infinite;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, box-shadow 0.2s;
             cursor: pointer;
             box-shadow: var(--shadow);
+            object-fit: cover;
+        }
+
+        .chat-header-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); background-color: var(--accent-color); filter: brightness(1.1); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); box-shadow: var(--shadow); }
+            50% { transform: scale(1.05); background-color: var(--accent-color); filter: brightness(1.1); box-shadow: var(--glow); }
+            100% { transform: scale(1); box-shadow: var(--shadow); }
         }
 
         .chat-header-info {
@@ -476,12 +552,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, color 0.2s;
+            transition: background 0.15s, color 0.2s, box-shadow 0.2s;
         }
 
         .members-btn:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
+            box-shadow: var(--glow);
         }
 
         .messages-container {
@@ -493,6 +570,8 @@
             gap: 10px;
             background: var(--bg-secondary);
             transition: background-color 0.3s;
+            position: relative;
+            z-index: 3;
         }
 
         .message {
@@ -550,14 +629,57 @@
             transition: color 0.2s;
         }
 
+        .message-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .message-image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+        }
+
         .message-input-area {
             padding: 15px 20px;
             background: var(--bg-header);
             border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: flex-end;
             transition: background-color 0.3s, border-color 0.3s;
+            position: relative;
+            z-index: 3;
+        }
+
+        .attach-btn {
+            background: var(--bg-input);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
+            flex-shrink: 0;
+        }
+
+        .attach-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .attach-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+            box-shadow: var(--glow-hover);
         }
 
         .message-input-area textarea {
@@ -575,7 +697,7 @@
         }
 
         .message-input-area textarea:focus {
-            box-shadow: 0 0 0 2px var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color), var(--glow);
         }
 
         .send-btn {
@@ -588,8 +710,9 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.15s, transform 0.1s, background-color 0.3s;
+            transition: background 0.15s, transform 0.1s, background-color 0.3s, box-shadow 0.2s;
             box-shadow: var(--shadow);
+            flex-shrink: 0;
         }
 
         .send-btn:active {
@@ -614,6 +737,7 @@
 
         .send-btn:hover {
             filter: brightness(1.2);
+            box-shadow: var(--glow-hover);
         }
 
         .modal {
@@ -646,6 +770,8 @@
             transition: background-color 0.3s, border-color 0.3s;
             max-height: 80vh;
             overflow-y: auto;
+            position: relative;
+            z-index: 1001;
         }
 
         @keyframes modalFadeIn {
@@ -670,6 +796,11 @@
             transition: background-color 0.3s, border-color 0.3s, color 0.2s;
         }
 
+        .modal-content input:focus, .modal-content select:focus {
+            box-shadow: 0 0 0 2px var(--accent-color), var(--glow);
+            outline: none;
+        }
+
         .modal-content button {
             background: var(--accent-color);
             border: none;
@@ -680,11 +811,12 @@
             width: 100%;
             cursor: pointer;
             margin-top: 5px;
-            transition: background-color 0.3s, transform 0.1s;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.2s;
         }
 
         .modal-content button:hover {
             transform: translateY(-2px);
+            box-shadow: var(--glow-hover);
         }
 
         .modal-content button.small {
@@ -707,12 +839,16 @@
             padding: 10px;
             color: var(--text-primary);
             cursor: pointer;
-            transition: background-color 0.3s, color 0.2s;
+            transition: background-color 0.3s, color 0.2s, box-shadow 0.2s;
         }
 
         .modal-tab.active {
             background: var(--accent-color);
             color: white;
+        }
+
+        .modal-tab:hover {
+            box-shadow: var(--glow);
         }
 
         .modal-close {
@@ -721,6 +857,10 @@
             cursor: pointer;
             color: var(--text-secondary);
             transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
         }
 
         .error-text {
@@ -746,7 +886,7 @@
             width: 100%;
             height: 100%;
             background: var(--bg-primary);
-            z-index: 10;
+            z-index: 20;
             display: none;
             flex-direction: column;
         }
@@ -770,16 +910,41 @@
             color: var(--text-primary);
             font-size: 16px;
             cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: background 0.15s, box-shadow 0.2s;
+        }
+
+        .iframe-header button:hover {
+            background: var(--hover-bg);
+            box-shadow: var(--glow);
         }
 
         .iframe-header h3 {
             color: var(--accent-color);
         }
 
+        .iframe-header a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin-left: auto;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--bg-input);
+            transition: background 0.15s, box-shadow 0.2s;
+        }
+
+        .iframe-header a:hover {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: var(--glow);
+        }
+
         iframe {
             width: 100%;
             flex: 1;
             border: none;
+            background: white;
         }
 
         .customize-options {
@@ -808,6 +973,44 @@
             margin-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
+        }
+
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .avatar-preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .snow-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .snow-toggle input[type="range"] {
+            flex: 1;
         }
 
         .create-group-btn {
@@ -849,15 +1052,27 @@
             justify-content: center;
             font-weight: 600;
             color: white;
+            object-fit: cover;
+        }
+
+        .members-list .avatar-small-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
     </style>
 </head>
 <body>
+    <div id="snow-container"></div>
     <div class="app" id="app">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-info" id="userInfoBlock">
-                    <div class="avatar" id="avatarPlaceholder">H</div>
+                    <div class="avatar" id="avatarPlaceholder">
+                        <img src="" class="avatar-img" id="avatarImg" style="display: none;">
+                        <span id="avatarText">H</span>
+                    </div>
                     <span class="user-name" id="sidebarUserName">halal</span>
                 </div>
                 <div class="sidebar-actions">
@@ -886,7 +1101,10 @@
             <div class="chat-header" id="chatHeader" style="display: none;">
                 <div class="chat-header-left">
                     <button class="back-button" id="backToChatsBtn" title="Назад к списку чатов">←</button>
-                    <div class="chat-header-avatar" id="chatAvatar">👤</div>
+                    <div class="chat-header-avatar" id="chatAvatar">
+                        <span>👤</span>
+                        <img src="" class="chat-header-avatar-img" id="chatAvatarImg" style="display: none;">
+                    </div>
                     <div class="chat-header-info">
                         <h3 id="chatTitle">Выберите чат</h3>
                         <span id="chatStatus" class="badge"></span>
@@ -900,18 +1118,25 @@
             </div>
 
             <div class="message-input-area" id="messageArea" style="display: none;">
+                <button class="attach-btn" id="attachBtn" title="Прикрепить фото">
+                    <svg viewBox="0 0 24 24" width="22" height="22">
+                        <path d="M16.5 6.75v10.58c0 2.09-1.53 3.95-3.61 4.15-2.39.23-4.39-1.64-4.39-4V6.75c0-1.49 1.01-2.68 2.48-2.91 1.82-.28 3.52 1.12 3.52 2.91v10.58c0 .69-.53 1.26-1.21 1.33-.77.08-1.42-.52-1.42-1.27V6.75h-1.5v10.58c0 1.63 1.32 2.98 2.96 2.98 1.64 0 2.96-1.35 2.96-2.98V6.75c0-2.31-1.68-4.25-3.98-4.48-2.53-.25-4.67 1.71-4.67 4.23v10.58c0 2.89 2.27 5.25 5.16 5.25 2.89 0 5.16-2.36 5.16-5.25V6.75h-1.5z" fill="currentColor"/>
+                    </svg>
+                </button>
                 <textarea id="messageInput" placeholder="Сообщение..." rows="1"></textarea>
                 <button class="send-btn" id="sendMsgBtn">
                     <svg viewBox="0 0 24 24"><path d="M2 21L23 12 2 3v7l15 2-15 2v7z"/></svg>
                 </button>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
             </div>
 
             <div class="iframe-container" id="gamesContainer">
                 <div class="iframe-header">
                     <button id="backFromGamesBtn">← Назад</button>
                     <h3>halal games — Фрукты</h3>
+                    <a href="https://blashenny363-ux.github.io/frukti/" target="_blank">Открыть в новом окне</a>
                 </div>
-                <iframe src="https://blashenny363-ux.github.io/frukti/" title="Игра Фрукты"></iframe>
+                <iframe src="https://blashenny363-ux.github.io/frukti/" title="Игра Фрукты" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
             </div>
         </div>
 
@@ -932,7 +1157,7 @@
 
         <div class="modal" id="registerModal">
             <div class="modal-content">
-                <h3>📱 Регистрация / Вход</h3>
+                <h3>Регистрация / Вход</h3>
                 <div class="modal-tabs">
                     <button class="modal-tab active" id="tabRegister">Регистрация</button>
                     <button class="modal-tab" id="tabLogin">Вход</button>
@@ -956,9 +1181,19 @@
         <div class="modal" id="customizeModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeCustomizeBtn">&times;</span>
-                <h3>🎨 Настройки профиля</h3>
+                <h3>Настройки профиля</h3>
                 
                 <div class="profile-section">
+                    <label>Аватар</label>
+                    <div class="avatar-upload">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <img src="" class="avatar-preview-img" id="avatarPreviewImg" style="display: none;">
+                            <span id="avatarPreviewText">H</span>
+                        </div>
+                        <button class="small" id="uploadAvatarBtn">Загрузить фото</button>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    </div>
+
                     <label>Ваше имя</label>
                     <input type="text" id="profileName" placeholder="Имя">
                     <button class="small" id="updateNameBtn">Обновить имя</button>
@@ -1007,9 +1242,37 @@
                             <option value="orange">Оранжевый</option>
                         </select>
                     </label>
+                    <label>Цвет свечения (glow):
+                        <select id="glowColorSelect">
+                            <option value="gold">Золотой</option>
+                            <option value="blue">Синий</option>
+                            <option value="green">Зелёный</option>
+                            <option value="red">Красный</option>
+                            <option value="purple">Фиолетовый</option>
+                            <option value="orange">Оранжевый</option>
+                        </select>
+                    </label>
+
+                    <h4>Снежинки</h4>
+                    <div class="snow-toggle">
+                        <span>Интенсивность</span>
+                        <input type="range" id="snowIntensity" min="0" max="20" value="8">
+                        <span id="snowIntensityValue">8</span>
+                    </div>
+                    <label>Цвет снежинок:
+                        <select id="snowColor">
+                            <option value="#ffffff">Белый</option>
+                            <option value="#d4af37">Золотой</option>
+                            <option value="#2b5278">Синий</option>
+                            <option value="#2e7d32">Зелёный</option>
+                            <option value="#e53e3e">Красный</option>
+                            <option value="#9b59b6">Фиолетовый</option>
+                            <option value="#f39c12">Оранжевый</option>
+                        </select>
+                    </label>
                 </div>
 
-                <button class="create-group-btn" id="createGroupBtn">➕ Создать группу</button>
+                <button class="create-group-btn" id="createGroupBtn">Создать группу</button>
                 <button id="saveCustomizeBtn">Сохранить настройки</button>
             </div>
         </div>
@@ -1017,7 +1280,7 @@
         <div class="modal" id="createGroupModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeGroupModalBtn">&times;</span>
-                <h3>👥 Создание группы</h3>
+                <h3>Создание группы</h3>
                 <input type="text" id="groupName" placeholder="Название группы">
                 <button id="createGroupConfirmBtn">Создать группу</button>
                 <div id="groupError" class="error-text" style="display: none;"></div>
@@ -1032,12 +1295,20 @@
                 </ul>
             </div>
         </div>
+
+        <div class="modal" id="imageModal">
+            <div class="modal-content" style="max-width: 500px; text-align: center;">
+                <span class="modal-close" id="closeImageBtn">&times;</span>
+                <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 12px;">
+            </div>
+        </div>
     </div>
 
     <script>
         let myId = null;
         let myName = null;
         let myEmail = null;
+        let myAvatar = null;
         let githubConfig = null;
         let dbCache = [];
         let currentChatId = null;
@@ -1048,6 +1319,10 @@
         let chats = [];
         let prevMessagesCount = 0;
         let users = JSON.parse(localStorage.getItem('halal_users')) || [];
+        let snowInterval = null;
+        let snowEnabled = false;
+        let snowColor = '#ffffff';
+        let snowIntensity = 8;
 
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
         function generateGroupId() { return 'g_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_group'; }
@@ -1073,12 +1348,15 @@
                 const lines = content.trim().split('\n').filter(l => l.trim());
                 const items = lines.map(line => {
                     const parts = line.split('|');
-                    if (parts.length === 4) {
+                    if (parts.length === 5) {
+                        const [name, email, password, avatar, id] = parts;
+                        return { rawName: name, name, email, password, avatar, id, type: id.endsWith('_group') ? 'group' : 'person' };
+                    } else if (parts.length === 4) {
                         const [name, email, password, id] = parts;
-                        return { rawName: name, name, email, password, id, type: id.endsWith('_group') ? 'group' : 'person' };
+                        return { rawName: name, name, email, password, avatar: '', id, type: id.endsWith('_group') ? 'group' : 'person' };
                     } else if (parts.length === 2) {
                         const [rawName, id] = parts;
-                        return { rawName, name: rawName, email: '', password: '', id, type: id.endsWith('_group') ? 'group' : 'person' };
+                        return { rawName, name: rawName, email: '', password: '', avatar: '', id, type: id.endsWith('_group') ? 'group' : 'person' };
                     } else {
                         return null;
                     }
@@ -1105,7 +1383,7 @@
             });
         }
 
-        async function appendToDatabase(entryName, id, email = '', password = '') {
+        async function appendToDatabase(entryName, id, email = '', password = '', avatar = '') {
             if (!githubConfig) return { success: false, error: 'GitHub не настроен' };
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -1124,7 +1402,7 @@
             if (id.endsWith('_group')) {
                 newLine = `${entryName}|${id}`;
             } else {
-                newLine = `${entryName}|${email}|${password}|${id}`;
+                newLine = `${entryName}|${email}|${password}|${avatar}|${id}`;
             }
             const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
             try {
@@ -1137,14 +1415,14 @@
                         sha: sha || undefined 
                     })
                 });
-                dbCache.push({ rawName: entryName, name: entryName, email, password, id, type: id.endsWith('_group') ? 'group' : 'person' });
+                dbCache.push({ rawName: entryName, name: entryName, email, password, avatar, id, type: id.endsWith('_group') ? 'group' : 'person' });
                 return { success: true };
             } catch (e) {
                 return { success: false, error: e.message };
             }
         }
 
-        async function updateNameInDatabase(oldName, newName, id) {
+        async function updateUserInDatabase(id, name, email, password, avatar) {
             if (!githubConfig) return false;
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -1160,16 +1438,12 @@
                 const newLines = lines.map(line => {
                     if (line.includes(id)) {
                         const parts = line.split('|');
-                        if (parts.length === 4) {
-                            const [name, email, password, userId] = parts;
-                            if (userId === id) {
-                                return `${newName}|${email}|${password}|${id}`;
-                            }
-                        } else if (parts.length === 2) {
-                            const [name, userId] = parts;
-                            if (userId === id) {
-                                return `${newName}|${id}`;
-                            }
+                        if (parts.length === 5 && parts[4] === id) {
+                            return `${name}|${email}|${password}|${avatar}|${id}`;
+                        } else if (parts.length === 4 && parts[3] === id) {
+                            return `${name}|${email}|${password}|${avatar}|${id}`;
+                        } else if (parts.length === 2 && parts[1] === id) {
+                            return `${name}|${email}|${password}|${avatar}|${id}`;
                         }
                     }
                     return line;
@@ -1179,17 +1453,55 @@
                     method: 'PUT',
                     headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
                     body: JSON.stringify({ 
-                        message: `update name for ${id}`, 
+                        message: `update user ${id}`, 
                         content: btoa(unescape(encodeURIComponent(newContent))), 
                         sha: sha 
                     })
                 });
                 const entry = dbCache.find(e => e.id === id);
-                if (entry) entry.name = newName;
+                if (entry) {
+                    entry.name = name;
+                    entry.email = email;
+                    entry.password = password;
+                    entry.avatar = avatar;
+                }
                 return true;
             } catch (e) {
                 return false;
             }
+        }
+
+        async function uploadFileToGitHub(file, fileName) {
+            if (!githubConfig) return null;
+            const { token, owner, repo } = githubConfig;
+            const path = `files/${fileName}`;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            
+            const reader = new FileReader();
+            return new Promise((resolve) => {
+                reader.onload = async function(e) {
+                    const content = e.target.result.split(',')[1];
+                    try {
+                        const res = await fetch(url, {
+                            method: 'PUT',
+                            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+                            body: JSON.stringify({ 
+                                message: `upload file ${fileName}`, 
+                                content: content
+                            })
+                        });
+                        if (res.ok) {
+                            const downloadUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`;
+                            resolve(downloadUrl);
+                        } else {
+                            resolve(null);
+                        }
+                    } catch {
+                        resolve(null);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         async function getGroupMessages(groupId) {
@@ -1370,16 +1682,44 @@
                 myId = p.id;
                 myName = p.name;
                 myEmail = p.email;
+                myAvatar = p.avatar || null;
                 return true;
             }
             return false;
         }
 
         function updateSidebarUserInfo() {
-            const avatar = document.getElementById('avatarPlaceholder');
+            const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+            const avatarImg = document.getElementById('avatarImg');
+            const avatarText = document.getElementById('avatarText');
             const userNameSpan = document.getElementById('sidebarUserName');
-            avatar.textContent = myName ? myName.charAt(0).toUpperCase() : 'H';
+            
+            if (myAvatar) {
+                avatarImg.src = myAvatar;
+                avatarImg.style.display = 'block';
+                avatarText.style.display = 'none';
+            } else {
+                avatarImg.style.display = 'none';
+                avatarText.style.display = 'block';
+                avatarText.innerText = myName ? myName.charAt(0).toUpperCase() : 'H';
+            }
             userNameSpan.innerText = myName || 'halal';
+        }
+
+        function updateAvatarPreview() {
+            const preview = document.getElementById('avatarPreview');
+            const previewImg = document.getElementById('avatarPreviewImg');
+            const previewText = document.getElementById('avatarPreviewText');
+            
+            if (myAvatar) {
+                previewImg.src = myAvatar;
+                previewImg.style.display = 'block';
+                previewText.style.display = 'none';
+            } else {
+                previewImg.style.display = 'none';
+                previewText.style.display = 'block';
+                previewText.innerText = myName ? myName.charAt(0).toUpperCase() : 'H';
+            }
         }
 
         function loadChatsFromStorage() {
@@ -1412,8 +1752,17 @@
                 div.dataset.id = chat.id;
                 div.dataset.type = chat.type;
                 div.dataset.name = chat.name;
+                
+                let avatarContent = '';
+                const entry = dbCache.find(e => e.id === chat.id);
+                if (entry && entry.avatar) {
+                    avatarContent = `<img src="${entry.avatar}" class="chat-avatar-img">`;
+                } else {
+                    avatarContent = chat.type === 'group' ? '👥' : '👤';
+                }
+                
                 div.innerHTML = `
-                    <div class="chat-avatar">${chat.type === 'group' ? '👥' : '👤'}</div>
+                    <div class="chat-avatar">${avatarContent}</div>
                     <div class="chat-info">
                         <div class="chat-name">
                             ${chat.name}
@@ -1511,7 +1860,19 @@
 
             document.getElementById('chatTitle').innerText = peerInfo;
             document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
-            document.getElementById('chatAvatar').innerText = type === 'group' ? '👥' : '👤';
+            
+            const chatAvatar = document.getElementById('chatAvatar');
+            const chatAvatarImg = document.getElementById('chatAvatarImg');
+            const entry = dbCache.find(e => e.id === chatId);
+            if (entry && entry.avatar) {
+                chatAvatarImg.src = entry.avatar;
+                chatAvatarImg.style.display = 'block';
+                chatAvatar.querySelector('span').style.display = 'none';
+            } else {
+                chatAvatarImg.style.display = 'none';
+                chatAvatar.querySelector('span').style.display = 'block';
+                chatAvatar.querySelector('span').innerText = type === 'group' ? '👥' : '👤';
+            }
 
             if (type === 'group') {
                 document.getElementById('membersBtn').style.display = 'flex';
@@ -1556,14 +1917,33 @@
                 const msgDiv = document.createElement('div');
                 msgDiv.classList.add('message');
                 if (isOwn) msgDiv.classList.add('own');
+                
+                const senderEntry = dbCache.find(e => e.id === m.senderId);
+                const senderName = senderEntry ? senderEntry.name : (m.senderName || 'Неизвестно');
+                
                 if (currentChatType === 'group' && !isOwn) {
                     const nameSpan = document.createElement('div');
                     nameSpan.className = 'sender-name';
-                    nameSpan.innerText = m.senderName || 'Неизвестно';
+                    nameSpan.innerText = senderName;
                     msgDiv.appendChild(nameSpan);
                 }
-                const textNode = document.createTextNode(m.text);
-                msgDiv.appendChild(textNode);
+                
+                if (m.image) {
+                    const img = document.createElement('img');
+                    img.src = m.image;
+                    img.className = 'message-image';
+                    img.addEventListener('click', () => {
+                        document.getElementById('fullImage').src = m.image;
+                        document.getElementById('imageModal').classList.add('active');
+                    });
+                    msgDiv.appendChild(img);
+                }
+                
+                if (m.text) {
+                    const textNode = document.createTextNode(m.text);
+                    msgDiv.appendChild(textNode);
+                }
+                
                 container.appendChild(msgDiv);
             });
             animateNewMessages();
@@ -1581,7 +1961,7 @@
             return { id: entry.id, name: chatName, type };
         }
 
-        function applyCustomization(theme, ownColor, otherColor, accentColor) {
+        function applyCustomization(theme, ownColor, otherColor, accentColor, glowColor) {
             document.body.classList.remove('light-theme', 'grey-theme');
             if (theme === 'light') document.body.classList.add('light-theme');
             else if (theme === 'grey') document.body.classList.add('grey-theme');
@@ -1594,6 +1974,9 @@
 
             document.body.classList.remove('accent-color-gold', 'accent-color-blue', 'accent-color-green', 'accent-color-red', 'accent-color-purple', 'accent-color-orange');
             if (accentColor) document.body.classList.add(`accent-color-${accentColor}`);
+
+            document.body.classList.remove('glow-color-gold', 'glow-color-blue', 'glow-color-green', 'glow-color-red', 'glow-color-purple', 'glow-color-orange');
+            if (glowColor) document.body.classList.add(`glow-color-${glowColor}`);
         }
 
         function loadCustomization() {
@@ -1601,11 +1984,60 @@
             const ownColor = localStorage.getItem('halal_own_color') || 'gold';
             const otherColor = localStorage.getItem('halal_other_color') || 'default';
             const accentColor = localStorage.getItem('halal_accent_color') || 'gold';
+            const glowColor = localStorage.getItem('halal_glow_color') || 'gold';
             document.getElementById('themeSelect').value = theme;
             document.getElementById('ownColorSelect').value = ownColor;
             document.getElementById('otherColorSelect').value = otherColor;
             document.getElementById('accentColorSelect').value = accentColor;
-            applyCustomization(theme, ownColor, otherColor, accentColor);
+            document.getElementById('glowColorSelect').value = glowColor;
+            applyCustomization(theme, ownColor, otherColor, accentColor, glowColor);
+            
+            const savedIntensity = localStorage.getItem('halal_snow_intensity') || '8';
+            const savedColor = localStorage.getItem('halal_snow_color') || '#ffffff';
+            document.getElementById('snowIntensity').value = savedIntensity;
+            document.getElementById('snowIntensityValue').innerText = savedIntensity;
+            document.getElementById('snowColor').value = savedColor;
+            
+            snowColor = savedColor;
+            snowIntensity = parseInt(savedIntensity);
+            updateSnowEffect();
+        }
+
+        function startSnow(intensity, color) {
+            if (snowInterval) clearInterval(snowInterval);
+            if (intensity <= 0) return;
+            
+            const container = document.getElementById('snow-container');
+            container.innerHTML = '';
+            
+            snowInterval = setInterval(() => {
+                if (document.hidden) return;
+                for (let i = 0; i < intensity; i++) {
+                    const snowflake = document.createElement('div');
+                    snowflake.className = 'snow-particle';
+                    snowflake.innerText = '●';
+                    snowflake.style.left = Math.random() * 100 + '%';
+                    snowflake.style.animationDuration = Math.random() * 8 + 8 + 's';
+                    snowflake.style.fontSize = Math.random() * 8 + 4 + 'px';
+                    snowflake.style.opacity = Math.random() * 0.3 + 0.2;
+                    snowflake.style.color = color;
+                    container.appendChild(snowflake);
+                    
+                    setTimeout(() => {
+                        snowflake.remove();
+                    }, 16000);
+                }
+            }, 400);
+        }
+
+        function updateSnowEffect() {
+            if (snowInterval) {
+                clearInterval(snowInterval);
+                snowInterval = null;
+            }
+            if (snowIntensity > 0) {
+                startSnow(snowIntensity, snowColor);
+            }
         }
 
         window.onload = async function () {
@@ -1614,6 +2046,7 @@
             const modalCustomize = document.getElementById('customizeModal');
             const modalCreateGroup = document.getElementById('createGroupModal');
             const modalMembers = document.getElementById('membersModal');
+            const modalImage = document.getElementById('imageModal');
             const hasConfig = loadGitHubConfig();
 
             loadCustomization();
@@ -1622,6 +2055,7 @@
                 if (myId) {
                     document.getElementById('profileName').value = myName || '';
                     document.getElementById('profileId').value = myId || '';
+                    updateAvatarPreview();
                     modalCustomize.classList.add('active');
                 } else {
                     alert('Сначала войдите в систему');
@@ -1639,6 +2073,34 @@
                 }
             };
 
+            document.getElementById('uploadAvatarBtn').onclick = () => {
+                document.getElementById('avatarInput').click();
+            };
+
+            document.getElementById('avatarInput').onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Файл слишком большой (макс 5MB)');
+                    return;
+                }
+                
+                const fileName = `avatar_${myId}_${Date.now()}.${file.name.split('.').pop()}`;
+                const url = await uploadFileToGitHub(file, fileName);
+                if (url) {
+                    myAvatar = url;
+                    const success = await updateUserInDatabase(myId, myName, myEmail, myEmail, url);
+                    if (success) {
+                        localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: url }));
+                        updateSidebarUserInfo();
+                        updateAvatarPreview();
+                        alert('Аватар обновлен');
+                    }
+                } else {
+                    alert('Ошибка загрузки');
+                }
+            };
+
             document.getElementById('updateNameBtn').onclick = async function () {
                 const newName = document.getElementById('profileName').value.trim();
                 if (!newName) {
@@ -1647,10 +2109,10 @@
                 }
                 const oldName = myName;
                 if (newName === oldName) return;
-                const success = await updateNameInDatabase(oldName, newName, myId);
+                const success = await updateUserInDatabase(myId, newName, myEmail, myEmail, myAvatar || '');
                 if (success) {
                     myName = newName;
-                    localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail }));
+                    localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: myAvatar }));
                     const userIndex = users.findIndex(u => u.id === myId);
                     if (userIndex !== -1) {
                         users[userIndex].name = newName;
@@ -1686,7 +2148,7 @@
                 const newId = generateGroupId();
                 const result = await appendToDatabase(`group_${groupName}`, newId);
                 if (result.success) {
-                    dbCache.push({ rawName: `group_${groupName}`, name: groupName, email: '', password: '', id: newId, type: 'group' });
+                    dbCache.push({ rawName: `group_${groupName}`, name: groupName, email: '', password: '', avatar: '', id: newId, type: 'group' });
                     chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '', pinned: false });
                     saveChatsToStorage();
                     renderChatsList();
@@ -1706,13 +2168,28 @@
                 const ownColor = document.getElementById('ownColorSelect').value;
                 const otherColor = document.getElementById('otherColorSelect').value;
                 const accentColor = document.getElementById('accentColorSelect').value;
+                const glowColor = document.getElementById('glowColorSelect').value;
                 localStorage.setItem('halal_theme', theme);
                 localStorage.setItem('halal_own_color', ownColor);
                 localStorage.setItem('halal_other_color', otherColor);
                 localStorage.setItem('halal_accent_color', accentColor);
-                applyCustomization(theme, ownColor, otherColor, accentColor);
+                localStorage.setItem('halal_glow_color', glowColor);
+                applyCustomization(theme, ownColor, otherColor, accentColor, glowColor);
+                
+                const intensity = parseInt(document.getElementById('snowIntensity').value);
+                const color = document.getElementById('snowColor').value;
+                localStorage.setItem('halal_snow_intensity', intensity);
+                localStorage.setItem('halal_snow_color', color);
+                snowIntensity = intensity;
+                snowColor = color;
+                updateSnowEffect();
+                
                 modalCustomize.classList.remove('active');
             };
+
+            document.getElementById('snowIntensity').addEventListener('input', function() {
+                document.getElementById('snowIntensityValue').innerText = this.value;
+            });
 
             document.getElementById('membersBtn').onclick = async function () {
                 if (!currentChatId || currentChatType !== 'group') return;
@@ -1720,9 +2197,15 @@
                 const list = document.getElementById('membersList');
                 list.innerHTML = '';
                 for (const memberId of members) {
-                    const entry = dbCache.find(e => e.id === memberId) || { name: 'Неизвестно' };
+                    const entry = dbCache.find(e => e.id === memberId) || { name: 'Неизвестно', avatar: null };
+                    let avatarHtml = '';
+                    if (entry.avatar) {
+                        avatarHtml = `<img src="${entry.avatar}" class="avatar-small-img">`;
+                    } else {
+                        avatarHtml = entry.name.charAt(0).toUpperCase();
+                    }
                     const li = document.createElement('li');
-                    li.innerHTML = `<div class="avatar-small">${entry.name.charAt(0).toUpperCase()}</div> ${entry.name} (${memberId})`;
+                    li.innerHTML = `<div class="avatar-small">${avatarHtml}</div> ${entry.name} (${memberId})`;
                     list.appendChild(li);
                 }
                 document.getElementById('membersModalTitle').innerText = `Участники группы ${currentPeerInfo}`;
@@ -1731,6 +2214,41 @@
 
             document.getElementById('closeMembersBtn').onclick = () => {
                 modalMembers.classList.remove('active');
+            };
+
+            document.getElementById('closeImageBtn').onclick = () => {
+                modalImage.classList.remove('active');
+            };
+
+            document.getElementById('attachBtn').onclick = () => {
+                document.getElementById('fileInput').click();
+            };
+
+            document.getElementById('fileInput').onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file || !currentChatId) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Файл слишком большой (макс 5MB)');
+                    return;
+                }
+                
+                const fileName = `image_${Date.now()}_${file.name}`;
+                const url = await uploadFileToGitHub(file, fileName);
+                if (url) {
+                    const senderName = myName || myId;
+                    const msgObj = { 
+                        image: url,
+                        senderId: myId,
+                        senderName: senderName,
+                        time: Date.now() 
+                    };
+                    if (currentChatType === 'group') {
+                        await appendToGroupMessages(currentChatId, msgObj);
+                    } else {
+                        await appendToPrivateMessages(currentChatId, msgObj);
+                    }
+                    await loadMessages();
+                }
             };
 
             if (!hasConfig) {
@@ -1814,7 +2332,7 @@
                 updateSidebarUserInfo();
                 loadChatsFromStorage();
                 await getDatabaseFromGitHub();
-                await appendToDatabase(name, newId, email, password);
+                await appendToDatabase(name, newId, email, password, '');
                 if (dbUpdateInterval) clearInterval(dbUpdateInterval);
                 dbUpdateInterval = setInterval(async () => {
                     await getDatabaseFromGitHub();
@@ -1828,7 +2346,7 @@
                 if (!user) {
                     const dbUser = dbCache.find(u => u.email === email && u.password === password);
                     if (dbUser) {
-                        user = { name: dbUser.name, email: dbUser.email, password: dbUser.password, id: dbUser.id };
+                        user = { name: dbUser.name, email: dbUser.email, password: dbUser.password, id: dbUser.id, avatar: dbUser.avatar };
                         if (!users.find(u => u.id === dbUser.id)) {
                             users.push(user);
                             localStorage.setItem('halal_users', JSON.stringify(users));
@@ -1843,7 +2361,8 @@
                 myId = user.id;
                 myName = user.name;
                 myEmail = user.email;
-                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail }));
+                myAvatar = user.avatar || null;
+                localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: myAvatar }));
                 modalRegister.classList.remove('active');
                 updateSidebarUserInfo();
                 loadChatsFromStorage();
