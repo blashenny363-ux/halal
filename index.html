@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>halal — современный мессенджер</title>
+    <title>halal</title>
     <style>
         * {
             margin: 0;
@@ -11,7 +11,6 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-
         body {
             background: #0b141a;
             color: #fff;
@@ -23,7 +22,6 @@
             transition: background-color 0.3s, color 0.2s;
             overflow-x: hidden;
         }
-
         :root {
             --bg-primary: #17212b;
             --bg-secondary: #0b141a;
@@ -39,13 +37,13 @@
             --gradient-start: #17212b;
             --gradient-end: #1e2b36;
             --hover-bg: #2b3b4a;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.15);
-            --border-radius: 12px;
-            --border-radius-small: 8px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25);
+            --border-radius-message: 20px;
+            --border-radius-item: 16px;
+            --transition: all 0.2s ease;
         }
-
-        /* Градиентные темы */
         body.gradient-blue {
             --gradient-start: #0f2027;
             --gradient-end: #203a43;
@@ -81,7 +79,6 @@
             --bg-sidebar: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             --bg-header: rgba(26, 31, 38, 0.8);
         }
-
         body.light-theme {
             --bg-primary: #f0f4fa;
             --bg-secondary: #e6ecf5;
@@ -95,10 +92,9 @@
             --message-other-bg: #ffffff;
             --accent-color: #d4af37;
             --hover-bg: #c0cbd8;
-            --shadow: 0 4px 6px rgba(0,0,0,0.05);
-            --shadow-hover: 0 8px 12px rgba(0,0,0,0.1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
         }
-
         body.grey-theme {
             --bg-primary: #2c2f33;
             --bg-secondary: #23272a;
@@ -112,43 +108,38 @@
             --message-other-bg: #3a3f44;
             --accent-color: #5865f2;
             --hover-bg: #40474f;
-            --shadow: 0 4px 6px rgba(0,0,0,0.2);
-            --shadow-hover: 0 8px 12px rgba(0,0,0,0.3);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
         }
-
         body.own-color-gold { --message-own-bg: #d4af37; }
         body.own-color-blue { --message-own-bg: #2b5278; }
         body.own-color-green { --message-own-bg: #2e7d32; }
         body.own-color-red { --message-own-bg: #e53e3e; }
         body.own-color-purple { --message-own-bg: #9b59b6; }
         body.own-color-orange { --message-own-bg: #f39c12; }
-
         body.other-color-default { --message-other-bg: #182533; }
         body.other-color-light { --message-other-bg: #2a3a4a; }
         body.other-color-dark { --message-other-bg: #10171e; }
         body.other-color-mid { --message-other-bg: #1e2b36; }
-
         body.accent-color-gold { --accent-color: #d4af37; }
         body.accent-color-blue { --accent-color: #2b5278; }
         body.accent-color-green { --accent-color: #2e7d32; }
         body.accent-color-red { --accent-color: #e53e3e; }
         body.accent-color-purple { --accent-color: #9b59b6; }
         body.accent-color-orange { --accent-color: #f39c12; }
-
         .app {
             position: relative;
             width: 100%;
             max-width: 480px;
             height: 100vh;
             background: var(--bg-primary);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
             transition: background 0.3s;
             margin: 0 auto;
             z-index: 1;
-            border-radius: var(--border-radius);
+            border-radius: 28px;
         }
-
         .sidebar {
             position: absolute;
             top: 0;
@@ -158,36 +149,33 @@
             background: var(--bg-sidebar);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             transform: translateX(0);
             z-index: 2;
+            backdrop-filter: blur(10px);
         }
-
         .sidebar.hide {
             transform: translateX(-100%);
         }
-
         .sidebar-header {
-            padding: 15px 20px;
+            padding: 18px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-header);
-            backdrop-filter: blur(10px);
-            transition: background-color 0.3s, border-color 0.3s;
+            backdrop-filter: blur(20px);
+            transition: var(--transition);
         }
-
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             cursor: pointer;
         }
-
         .avatar {
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
@@ -197,172 +185,164 @@
             font-size: 18px;
             color: white;
             text-transform: uppercase;
-            transition: transform 0.2s, background-color 0.3s, box-shadow 0.2s;
-            box-shadow: var(--shadow);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
             object-fit: cover;
             border: 2px solid transparent;
         }
-
         .avatar-img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
         }
-
         .user-info:hover .avatar {
             transform: scale(1.05);
             border-color: var(--accent-color);
+            box-shadow: var(--shadow-md);
         }
-
         .user-name {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 16px;
             color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 5px;
             transition: color 0.2s;
         }
-
         .sidebar-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
-
         .icon-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, color 0.2s, transform 0.1s;
+            transition: var(--transition);
         }
-
         .icon-btn:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
             transform: scale(1.1);
+            box-shadow: var(--shadow-sm);
         }
-
         .icon-btn svg {
             width: 22px;
             height: 22px;
             fill: currentColor;
         }
-
         .search-box {
-            padding: 10px 15px;
+            padding: 12px 16px;
             background: var(--bg-header);
-            transition: background-color 0.3s;
+            transition: var(--transition);
         }
-
         .search-box input {
             width: 100%;
             background: var(--bg-input);
             border: none;
             border-radius: 30px;
-            padding: 12px 20px;
+            padding: 14px 20px;
             color: var(--text-primary);
             font-size: 15px;
             outline: none;
-            transition: background-color 0.3s, color 0.2s, box-shadow 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
         }
-
         .search-box input:focus {
-            box-shadow: 0 0 0 2px var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color), inset 0 2px 6px rgba(0,0,0,0.1);
         }
-
         .search-box input::placeholder {
             color: var(--text-secondary);
             transition: color 0.2s;
         }
-
         .chats-list {
             flex: 1;
             overflow-y: auto;
             padding: 8px 0;
-            position: relative;
-            z-index: 3;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--bg-input);
         }
-
+        .chats-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chats-list::-webkit-scrollbar-track {
+            background: var(--bg-input);
+        }
+        .chats-list::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
         .chat-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             padding: 12px 20px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            transition: var(--transition);
             border-bottom: 1px solid var(--border-color);
             position: relative;
+            margin: 2px 8px;
+            border-radius: var(--border-radius-item);
         }
-
         .chat-item:hover {
             background: var(--hover-bg);
-            transform: translateX(5px);
-            box-shadow: var(--shadow-hover);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
         }
-
         .chat-item.active {
             background: var(--bg-input);
             border-left: 3px solid var(--accent-color);
+            box-shadow: var(--shadow-sm);
         }
-
         .chat-item.pinned {
-            background: rgba(255, 215, 0, 0.1);
+            background: rgba(255, 215, 0, 0.08);
         }
-
         .chat-avatar {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
             color: #fff;
             flex-shrink: 0;
-            transition: transform 0.2s, background-color 0.3s, box-shadow 0.2s;
-            box-shadow: var(--shadow);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
             object-fit: cover;
             border: 2px solid transparent;
         }
-
         .chat-avatar-img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
         }
-
         .chat-item:hover .chat-avatar {
             transform: scale(1.05);
             border-color: var(--accent-color);
+            box-shadow: var(--shadow-md);
         }
-
         .chat-info {
             flex: 1;
             min-width: 0;
         }
-
         .chat-name {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 16px;
             color: var(--text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             transition: color 0.2s;
+            margin-bottom: 4px;
         }
-
         .chat-preview {
             font-size: 13px;
             color: var(--text-secondary);
@@ -371,45 +351,41 @@
             text-overflow: ellipsis;
             transition: color 0.2s;
         }
-
         .chat-actions {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             opacity: 0;
             transition: opacity 0.2s;
         }
-
         .chat-item:hover .chat-actions {
             opacity: 1;
         }
-
         .chat-action-btn {
             background: var(--bg-input);
             border: none;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: var(--text-primary);
             font-size: 16px;
-            transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
-            box-shadow: var(--shadow);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
-
         .chat-action-btn:hover {
             background: var(--accent-color);
             transform: scale(1.1);
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow-md);
+            color: white;
         }
-
         .pin-indicator {
             color: gold;
             margin-left: 5px;
+            font-size: 14px;
         }
-
         .chat-panel {
             position: absolute;
             top: 0;
@@ -419,32 +395,28 @@
             background: var(--bg-secondary);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, background-color 0.3s;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             transform: translateX(100%);
             z-index: 4;
         }
-
         .chat-panel.show {
             transform: translateX(0);
         }
-
         .chat-header {
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: var(--bg-header);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: background-color 0.3s, border-color 0.3s;
-            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            backdrop-filter: blur(20px);
         }
-
         .chat-header-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
         }
-
         .back-button {
             background: transparent;
             border: none;
@@ -452,24 +424,22 @@
             font-size: 28px;
             line-height: 1;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: background 0.15s, color 0.2s, transform 0.1s;
+            transition: var(--transition);
         }
-
         .back-button:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
             transform: scale(1.1);
         }
-
         .chat-header-avatar {
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
@@ -478,113 +448,110 @@
             font-weight: 600;
             color: white;
             flex-shrink: 0;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: var(--transition);
             cursor: pointer;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
             object-fit: cover;
             border: 2px solid transparent;
         }
-
         .chat-header-avatar-img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
         }
-
         .chat-header-avatar:hover {
             transform: scale(1.05);
             border-color: var(--accent-color);
+            box-shadow: var(--shadow-md);
         }
-
         .chat-header-info {
             display: flex;
             flex-direction: column;
         }
-
         .chat-header-info h3 {
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-primary);
             transition: color 0.2s;
         }
-
         .chat-header-info span {
             font-size: 13px;
             color: var(--text-secondary);
             transition: color 0.2s;
         }
-
         .members-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             font-size: 24px;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, color 0.2s, transform 0.1s;
+            transition: var(--transition);
         }
-
         .members-btn:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
             transform: scale(1.1);
         }
-
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 25px;
+            padding: 20px 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             background: transparent;
-            transition: background-color 0.3s;
-            position: relative;
-            z-index: 4;
+            transition: var(--transition);
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--bg-input);
         }
-
+        .messages-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .messages-container::-webkit-scrollbar-track {
+            background: var(--bg-input);
+        }
+        .messages-container::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
         .message {
             max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 18px;
+            padding: 12px 16px;
+            border-radius: var(--border-radius-message);
             background: var(--message-other-bg);
             align-self: flex-start;
             color: var(--text-primary);
             font-size: 15px;
-            line-height: 1.4;
+            line-height: 1.5;
             word-wrap: break-word;
-            transition: all 0.2s;
-            box-shadow: var(--shadow);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
             position: relative;
+            animation: fadeInUp 0.3s ease;
         }
-
         .message.own {
             background: var(--message-own-bg);
             align-self: flex-end;
             border-bottom-right-radius: 6px;
+            color: #000;
         }
-
-        .message.new {
-            animation: messageGlow 0.4s ease-out;
-        }
-
-        @keyframes messageGlow {
-            0% {
-                opacity: 0.5;
-                transform: scale(0.95);
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
-            100% {
+            to {
                 opacity: 1;
-                transform: scale(1);
+                transform: translateY(0);
             }
         }
-
         .message .sender-name {
             font-size: 12px;
             color: var(--text-secondary);
@@ -592,120 +559,107 @@
             font-weight: 500;
             transition: color 0.2s;
         }
-
         .message-image {
             max-width: 100%;
             max-height: 200px;
             border-radius: 12px;
             cursor: pointer;
-            margin-top: 5px;
+            margin-top: 8px;
             transition: transform 0.2s;
+            box-shadow: var(--shadow-sm);
         }
-
         .message-image:hover {
             transform: scale(1.02);
         }
-
         .message-input-area {
-            padding: 15px 20px;
+            padding: 16px 20px;
             background: var(--bg-header);
             border-top: 1px solid var(--border-color);
             display: flex;
             gap: 10px;
             align-items: flex-end;
-            transition: background-color 0.3s, border-color 0.3s;
-            position: relative;
-            z-index: 4;
-            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            backdrop-filter: blur(20px);
         }
-
         .attach-btn {
             background: var(--bg-input);
             border: none;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: var(--text-primary);
-            transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+            transition: var(--transition);
             flex-shrink: 0;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
         }
-
         .attach-btn svg {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             fill: currentColor;
         }
-
         .attach-btn:hover {
             background: var(--accent-color);
             transform: scale(1.1);
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow-md);
+            color: white;
         }
-
         .message-input-area textarea {
             flex: 1;
             background: var(--bg-input);
             border: none;
-            border-radius: 25px;
+            border-radius: 28px;
             padding: 14px 20px;
             color: var(--text-primary);
             font-size: 15px;
             resize: none;
             max-height: 120px;
             outline: none;
-            transition: background-color 0.3s, color 0.2s, box-shadow 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+            line-height: 1.4;
         }
-
         .message-input-area textarea:focus {
-            box-shadow: 0 0 0 2px var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color), inset 0 2px 6px rgba(0,0,0,0.1);
         }
-
         .send-btn {
             background: var(--accent-color);
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.15s, transform 0.1s, background-color 0.3s, box-shadow 0.1s;
-            box-shadow: var(--shadow);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
             flex-shrink: 0;
         }
-
         .send-btn:active {
             transform: scale(0.95);
         }
-
         .send-btn.animate {
             animation: sendPop 0.2s ease;
         }
-
         @keyframes sendPop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
             100% { transform: scale(1); }
         }
-
         .send-btn svg {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             fill: #fff;
         }
-
         .send-btn:hover {
             filter: brightness(1.1);
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow-md);
+            transform: scale(1.05);
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -717,40 +671,35 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-
         .modal.active {
             display: flex;
         }
-
         .modal-content {
             background: var(--bg-primary);
-            border-radius: 20px;
+            border-radius: 32px;
             width: 90%;
             max-width: 400px;
-            padding: 25px;
+            padding: 28px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow-lg);
             animation: modalFadeIn 0.3s;
             color: var(--text-primary);
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: var(--transition);
             max-height: 80vh;
             overflow-y: auto;
-            position: relative;
-            z-index: 1001;
         }
-
         @keyframes modalFadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .modal-content h3 {
             margin-bottom: 20px;
             color: var(--accent-color);
-            transition: color 0.2s;
+            font-weight: 600;
+            font-size: 20px;
         }
-
         .modal-content input, .modal-content select, .modal-content textarea {
             width: 100%;
             background: var(--bg-input);
@@ -758,16 +707,15 @@
             border-radius: 30px;
             padding: 14px 18px;
             color: var(--text-primary);
-            margin-bottom: 15px;
-            transition: background-color 0.3s, border-color 0.3s, color 0.2s;
+            margin-bottom: 16px;
+            transition: var(--transition);
             resize: vertical;
+            font-size: 15px;
         }
-
         .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus {
             box-shadow: 0 0 0 2px var(--accent-color);
             outline: none;
         }
-
         .modal-content button {
             background: var(--accent-color);
             border: none;
@@ -777,195 +725,105 @@
             font-weight: 600;
             width: 100%;
             cursor: pointer;
-            margin-top: 5px;
-            transition: background-color 0.3s, transform 0.1s, box-shadow 0.1s;
-            box-shadow: var(--shadow);
+            margin-top: 8px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            font-size: 16px;
         }
-
         .modal-content button:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow-md);
         }
-
         .modal-content button.small {
-            padding: 8px;
+            padding: 10px;
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-
         .modal-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
-
         .modal-tab {
             flex: 1;
             background: var(--bg-input);
             border: none;
             border-radius: 30px;
-            padding: 10px;
+            padding: 12px;
             color: var(--text-primary);
             cursor: pointer;
-            transition: background-color 0.3s, color 0.2s, box-shadow 0.1s;
+            transition: var(--transition);
+            font-weight: 500;
         }
-
         .modal-tab.active {
             background: var(--accent-color);
             color: white;
+            box-shadow: var(--shadow-sm);
         }
-
         .modal-tab:hover {
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
         }
-
         .modal-close {
             float: right;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             color: var(--text-secondary);
             transition: color 0.2s;
+            line-height: 1;
         }
-
         .modal-close:hover {
             color: var(--text-primary);
         }
-
         .error-text {
             color: #ff8a8a;
             background: #2a1f1f;
-            padding: 10px;
-            border-radius: 12px;
-            margin-top: 10px;
+            padding: 12px;
+            border-radius: 16px;
+            margin-top: 12px;
+            font-size: 14px;
         }
-
         .success-text {
             color: #8aff8a;
             background: #1f2a1f;
-            padding: 10px;
-            border-radius: 12px;
-            margin-top: 10px;
+            padding: 12px;
+            border-radius: 16px;
+            margin-top: 12px;
+            font-size: 14px;
         }
-
         .customize-options {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin: 20px 0;
+            gap: 16px;
+            margin: 24px 0;
         }
-
         .customize-options label {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             color: var(--text-primary);
+            font-size: 15px;
         }
-
         .customize-options select {
             background: var(--bg-input);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 8px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            flex: 1;
         }
-
         .profile-section {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
+            padding-bottom: 24px;
         }
-
         .avatar-upload {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
-
         .avatar-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: white;
-            overflow: hidden;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .avatar-preview:hover {
-            border-color: var(--accent-color);
-        }
-
-        .avatar-preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .create-group-btn {
-            margin-top: 20px;
-            background: var(--accent-color);
-            border: none;
-            border-radius: 30px;
-            padding: 14px;
-            color: white;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .members-list {
-            list-style: none;
-            padding: 0;
-            margin: 15px 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .members-list li {
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .members-list .avatar-small {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            object-fit: cover;
-        }
-
-        .members-list .avatar-small-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .profile-view {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .profile-view-avatar {
             width: 100px;
             height: 100px;
             border-radius: 50%;
@@ -973,29 +831,119 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 36px;
+            color: white;
+            overflow: hidden;
+            border: 3px solid transparent;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
+        .avatar-preview:hover {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+        .avatar-preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .create-group-btn {
+            margin-top: 24px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 30px;
+            padding: 16px;
+            color: white;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .create-group-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .members-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .members-list li {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            border-radius: 12px;
+        }
+        .members-list li:hover {
+            background: var(--hover-bg);
+        }
+        .members-list .avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
             color: white;
             object-fit: cover;
-            border: 3px solid var(--accent-color);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
         }
-
+        .members-list .avatar-small-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .profile-view-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            object-fit: cover;
+            border: 4px solid var(--accent-color);
+            box-shadow: var(--shadow-md);
+        }
         .profile-view-name {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
         }
-
         .profile-view-bio {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-secondary);
             text-align: center;
             word-wrap: break-word;
             max-width: 100%;
+            line-height: 1.5;
         }
-
         .profile-view-id {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
+            background: var(--bg-input);
+            padding: 6px 12px;
+            border-radius: 30px;
         }
     </style>
 </head>
@@ -1047,7 +995,7 @@
 
             <div class="message-input-area" id="messageArea" style="display: none;">
                 <button class="attach-btn" id="attachBtn" title="Прикрепить фото">
-                    <svg viewBox="0 0 24 24" width="22" height="22">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
                         <path d="M16.5 6.75v10.58c0 2.09-1.53 3.95-3.61 4.15-2.39.23-4.39-1.64-4.39-4V6.75c0-1.49 1.01-2.68 2.48-2.91 1.82-.28 3.52 1.12 3.52 2.91v10.58c0 .69-.53 1.26-1.21 1.33-.77.08-1.42-.52-1.42-1.27V6.75h-1.5v10.58c0 1.63 1.32 2.98 2.96 2.98 1.64 0 2.96-1.35 2.96-2.98V6.75c0-2.31-1.68-4.25-3.98-4.48-2.53-.25-4.67 1.71-4.67 4.23v10.58c0 2.89 2.27 5.25 5.16 5.25 2.89 0 5.16-2.36 5.16-5.25V6.75h-1.5z" fill="currentColor"/>
                     </svg>
                 </button>
@@ -1216,7 +1164,7 @@
         <div class="modal" id="imageModal">
             <div class="modal-content" style="max-width: 500px; text-align: center;">
                 <span class="modal-close" id="closeImageBtn">&times;</span>
-                <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 12px;">
+                <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 20px;">
             </div>
         </div>
     </div>
@@ -1228,7 +1176,7 @@
         let myAvatar = null;
         let myBio = '';
         let githubConfig = null;
-        let dbCache = [];
+        let dbCache = { users: [], groups: [], groupMembers: [], messages: [] };
         let currentChatId = null;
         let currentChatType = null;
         let currentPeerInfo = '';
@@ -1241,8 +1189,8 @@
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
         function generateGroupId() { return 'g_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_group'; }
 
-        async function getDatabaseFromGitHub() {
-            if (!githubConfig) return [];
+        async function loadDatabase() {
+            if (!githubConfig) return;
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             try {
@@ -1251,7 +1199,8 @@
                 });
                 if (res.status === 404) {
                     await createEmptyDatabaseFile();
-                    return [];
+                    dbCache = { users: [], groups: [], groupMembers: [], messages: [] };
+                    return;
                 }
                 if (!res.ok) {
                     const err = await res.json();
@@ -1260,30 +1209,71 @@
                 const data = await res.json();
                 const content = decodeURIComponent(escape(atob(data.content)));
                 const lines = content.trim().split('\n').filter(l => l.trim());
-                const items = lines.map(line => {
+                const newCache = { users: [], groups: [], groupMembers: [], messages: [] };
+                lines.forEach(line => {
                     const parts = line.split('|');
-                    if (parts.length === 6) {
-                        const [name, email, password, avatar, bio, id] = parts;
-                        return { rawName: name, name, email, password, avatar, bio, id, type: id.endsWith('_group') ? 'group' : 'person' };
-                    } else if (parts.length === 5) {
-                        const [name, email, password, avatar, id] = parts;
-                        return { rawName: name, name, email, password, avatar, bio: '', id, type: id.endsWith('_group') ? 'group' : 'person' };
-                    } else if (parts.length === 4) {
-                        const [name, email, password, id] = parts;
-                        return { rawName: name, name, email, password, avatar: '', bio: '', id, type: id.endsWith('_group') ? 'group' : 'person' };
-                    } else if (parts.length === 2) {
-                        const [rawName, id] = parts;
-                        return { rawName, name: rawName, email: '', password: '', avatar: '', bio: '', id, type: id.endsWith('_group') ? 'group' : 'person' };
-                    } else {
-                        return null;
+                    if (parts.length < 2) return;
+                    const type = parts[0];
+                    if (type === 'USER' && parts.length === 7) {
+                        newCache.users.push({ name: parts[1], email: parts[2], password: parts[3], avatar: parts[4], bio: parts[5], id: parts[6] });
+                    } else if (type === 'GROUP' && parts.length === 3) {
+                        newCache.groups.push({ name: parts[1], id: parts[2] });
+                    } else if (type === 'GROUP_MEMBER' && parts.length === 3) {
+                        newCache.groupMembers.push({ groupId: parts[1], userId: parts[2] });
+                    } else if (type === 'MESSAGE' && parts.length === 6) {
+                        newCache.messages.push({ chatId: parts[1], senderId: parts[2], text: parts[3], image: parts[4], timestamp: parseInt(parts[5]) });
                     }
-                }).filter(i => i);
-                dbCache = items;
-                return items;
+                });
+                dbCache = newCache;
+                rebuildChatsFromMessages();
             } catch (e) {
                 document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
-                return [];
             }
+        }
+
+        function rebuildChatsFromMessages() {
+            const chatSet = new Set();
+            dbCache.messages.forEach(msg => {
+                if (msg.chatId.startsWith('private_')) {
+                    chatSet.add(msg.chatId);
+                } else {
+                    chatSet.add(msg.chatId);
+                }
+            });
+            dbCache.groupMembers.filter(gm => gm.userId === myId).forEach(gm => {
+                const group = dbCache.groups.find(g => g.id === gm.groupId);
+                if (group) chatSet.add(gm.groupId);
+            });
+            const newChats = [];
+            chatSet.forEach(chatId => {
+                let name = '';
+                let type = '';
+                if (chatId.startsWith('private_')) {
+                    type = 'private';
+                    const parts = chatId.split('_');
+                    const otherId = parts[1] === myId ? parts[2] : parts[1];
+                    const user = dbCache.users.find(u => u.id === otherId);
+                    name = user ? user.name : 'Неизвестно';
+                } else {
+                    type = 'group';
+                    const group = dbCache.groups.find(g => g.id === chatId);
+                    name = group ? group.name : 'Группа';
+                }
+                const existing = chats.find(c => c.id === chatId);
+                if (!existing) {
+                    newChats.push({ id: chatId, name, type, lastMessage: '', pinned: false });
+                } else {
+                    newChats.push(existing);
+                }
+            });
+            chats.forEach(chat => {
+                if (!newChats.find(c => c.id === chat.id)) {
+                    newChats.push(chat);
+                }
+            });
+            chats = newChats;
+            saveChatsToStorage();
+            renderChatsList();
         }
 
         async function createEmptyDatabaseFile() {
@@ -1293,15 +1283,12 @@
             await fetch(url, {
                 method: 'PUT',
                 headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ 
-                    message: 'init database', 
-                    content: btoa(unescape(encodeURIComponent(''))) 
-                })
+                body: JSON.stringify({ message: 'init database', content: btoa(unescape(encodeURIComponent(''))) })
             });
         }
 
-        async function appendToDatabase(entryName, id, email = '', password = '', avatar = '', bio = '') {
-            if (!githubConfig) return { success: false, error: 'GitHub не настроен' };
+        async function appendToDatabase(line) {
+            if (!githubConfig) return false;
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             let sha = null, currentContent = '';
@@ -1315,76 +1302,54 @@
                     currentContent = decodeURIComponent(escape(atob(data.content)));
                 }
             } catch (e) {}
-            let newLine;
-            if (id.endsWith('_group')) {
-                newLine = `${entryName}|${id}`;
-            } else {
-                newLine = `${entryName}|${email}|${password}|${avatar}|${bio}|${id}`;
-            }
-            const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
+            const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + line + '\n';
             try {
                 await fetch(url, {
                     method: 'PUT',
                     headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                    body: JSON.stringify({ 
-                        message: `add ${entryName}`, 
-                        content: btoa(unescape(encodeURIComponent(newContent))), 
-                        sha: sha || undefined 
-                    })
+                    body: JSON.stringify({ message: `update database`, content: btoa(unescape(encodeURIComponent(newContent))), sha: sha || undefined })
                 });
-                dbCache.push({ rawName: entryName, name: entryName, email, password, avatar, bio, id, type: id.endsWith('_group') ? 'group' : 'person' });
-                return { success: true };
+                return true;
             } catch (e) {
-                return { success: false, error: e.message };
+                return false;
             }
         }
 
         async function updateUserInDatabase(id, name, email, password, avatar, bio) {
-            if (!githubConfig) return false;
+            const userIndex = dbCache.users.findIndex(u => u.id === id);
+            if (userIndex !== -1) {
+                dbCache.users[userIndex] = { name, email, password, avatar, bio, id };
+            } else {
+                dbCache.users.push({ name, email, password, avatar, bio, id });
+            }
+            return await rewriteDatabase();
+        }
+
+        async function rewriteDatabase() {
+            const lines = [];
+            dbCache.users.forEach(u => lines.push(`USER|${u.name}|${u.email}|${u.password}|${u.avatar}|${u.bio}|${u.id}`));
+            dbCache.groups.forEach(g => lines.push(`GROUP|${g.name}|${g.id}`));
+            dbCache.groupMembers.forEach(gm => lines.push(`GROUP_MEMBER|${gm.groupId}|${gm.userId}`));
+            dbCache.messages.forEach(m => lines.push(`MESSAGE|${m.chatId}|${m.senderId}|${m.text}|${m.image}|${m.timestamp}`));
+            const newContent = lines.join('\n');
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            let sha = null;
             try {
                 const res = await fetch(url, {
                     headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
                 });
-                if (!res.ok) return false;
-                const data = await res.json();
-                const sha = data.sha;
-                let content = decodeURIComponent(escape(atob(data.content)));
-                const lines = content.split('\n');
-                const newLines = lines.map(line => {
-                    if (line.includes(id)) {
-                        const parts = line.split('|');
-                        if (parts.length === 6 && parts[5] === id) {
-                            return `${name}|${email}|${password}|${avatar}|${bio}|${id}`;
-                        } else if (parts.length === 5 && parts[4] === id) {
-                            return `${name}|${email}|${password}|${avatar}|${bio}|${id}`;
-                        } else if (parts.length === 4 && parts[3] === id) {
-                            return `${name}|${email}|${password}|${avatar}|${bio}|${id}`;
-                        } else if (parts.length === 2 && parts[1] === id) {
-                            return `${name}|${email}|${password}|${avatar}|${bio}|${id}`;
-                        }
-                    }
-                    return line;
-                });
-                const newContent = newLines.join('\n');
+                if (res.ok) {
+                    const data = await res.json();
+                    sha = data.sha;
+                }
+            } catch (e) {}
+            try {
                 await fetch(url, {
                     method: 'PUT',
                     headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                    body: JSON.stringify({ 
-                        message: `update user ${id}`, 
-                        content: btoa(unescape(encodeURIComponent(newContent))), 
-                        sha: sha 
-                    })
+                    body: JSON.stringify({ message: `update database`, content: btoa(unescape(encodeURIComponent(newContent))), sha: sha || undefined })
                 });
-                const entry = dbCache.find(e => e.id === id);
-                if (entry) {
-                    entry.name = name;
-                    entry.email = email;
-                    entry.password = password;
-                    entry.avatar = avatar;
-                    entry.bio = bio;
-                }
                 return true;
             } catch (e) {
                 return false;
@@ -1396,7 +1361,6 @@
             const { token, owner, repo } = githubConfig;
             const path = `files/${fileName}`;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            
             const reader = new FileReader();
             return new Promise((resolve) => {
                 reader.onload = async function(e) {
@@ -1405,10 +1369,7 @@
                         const res = await fetch(url, {
                             method: 'PUT',
                             headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                            body: JSON.stringify({ 
-                                message: `upload file ${fileName}`, 
-                                content: content
-                            })
+                            body: JSON.stringify({ message: `upload file ${fileName}`, content: content })
                         });
                         if (res.ok) {
                             const downloadUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`;
@@ -1424,147 +1385,16 @@
             });
         }
 
-        async function getGroupMessages(groupId) {
-            if (!githubConfig) return [];
-            const { token, owner, repo } = githubConfig;
-            const path = `files/group_${groupId}.txt`;
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            try {
-                const res = await fetch(url, {
-                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-                });
-                if (res.status === 404) return [];
-                const data = await res.json();
-                const content = decodeURIComponent(escape(atob(data.content)));
-                return content.trim().split('\n').filter(l => l).map(line => {
-                    try { return JSON.parse(line); } catch { return null; }
-                }).filter(m => m);
-            } catch { return []; }
+        function getMessagesForChat(chatId) {
+            return dbCache.messages.filter(m => m.chatId === chatId).sort((a,b) => a.timestamp - b.timestamp);
         }
 
-        async function appendToGroupMessages(groupId, msgObj) {
-            if (!githubConfig) return;
-            const { token, owner, repo } = githubConfig;
-            const path = `files/group_${groupId}.txt`;
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            let sha = null, currentContent = '';
-            try {
-                const res = await fetch(url, {
-                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    sha = data.sha;
-                    currentContent = decodeURIComponent(escape(atob(data.content)));
-                }
-            } catch (e) {}
-            const newLine = JSON.stringify(msgObj);
-            const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
-            await fetch(url, {
-                method: 'PUT',
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ 
-                    message: `message in group ${groupId}`, 
-                    content: btoa(unescape(encodeURIComponent(newContent))), 
-                    sha: sha || undefined 
-                })
-            });
-        }
-
-        async function getPrivateMessages(peerId) {
-            if (!githubConfig || !myId) return [];
-            const ids = [myId, peerId].sort();
-            const chatId = `private_${ids[0]}_${ids[1]}`;
-            const { token, owner, repo } = githubConfig;
-            const path = `files/${chatId}.txt`;
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            try {
-                const res = await fetch(url, {
-                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-                });
-                if (res.status === 404) return [];
-                const data = await res.json();
-                const content = decodeURIComponent(escape(atob(data.content)));
-                return content.trim().split('\n').filter(l => l).map(line => {
-                    try { return JSON.parse(line); } catch { return null; }
-                }).filter(m => m);
-            } catch { return []; }
-        }
-
-        async function appendToPrivateMessages(peerId, msgObj) {
-            if (!githubConfig || !myId) return;
-            const ids = [myId, peerId].sort();
-            const chatId = `private_${ids[0]}_${ids[1]}`;
-            const { token, owner, repo } = githubConfig;
-            const path = `files/${chatId}.txt`;
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            let sha = null, currentContent = '';
-            try {
-                const res = await fetch(url, {
-                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    sha = data.sha;
-                    currentContent = decodeURIComponent(escape(atob(data.content)));
-                }
-            } catch (e) {}
-            const newLine = JSON.stringify(msgObj);
-            const newContent = currentContent + (currentContent ? '\n' : '') + newLine;
-            await fetch(url, {
-                method: 'PUT',
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ 
-                    message: `private message`, 
-                    content: btoa(unescape(encodeURIComponent(newContent))), 
-                    sha: sha || undefined 
-                })
-            });
-        }
-
-        async function getGroupMembers(groupId) {
-            if (!githubConfig) return [];
-            const { token, owner, repo } = githubConfig;
-            const path = `files/group_members_${groupId}.txt`;
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            try {
-                const res = await fetch(url, {
-                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-                });
-                if (res.status === 404) return [];
-                const data = await res.json();
-                const content = decodeURIComponent(escape(atob(data.content)));
-                return content.trim().split('\n').filter(l => l.trim());
-            } catch { return []; }
-        }
-
-        async function addGroupMember(groupId, userId) {
-            if (!githubConfig) return;
-            const { token, owner, repo } = githubConfig;
-            const path = `files/group_members_${groupId}.txt`;
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            let sha = null, currentContent = '';
-            try {
-                const res = await fetch(url, {
-                    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    sha = data.sha;
-                    currentContent = decodeURIComponent(escape(atob(data.content)));
-                }
-            } catch (e) {}
-            if (currentContent.split('\n').includes(userId)) return;
-            const newContent = currentContent + (currentContent ? '\n' : '') + userId;
-            await fetch(url, {
-                method: 'PUT',
-                headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-                body: JSON.stringify({ 
-                    message: `add member ${userId} to group ${groupId}`, 
-                    content: btoa(unescape(encodeURIComponent(newContent))), 
-                    sha: sha || undefined 
-                })
-            });
+        async function addMessage(chatId, senderId, text, image) {
+            const msg = { chatId, senderId, text: text || '', image: image || '', timestamp: Date.now() };
+            dbCache.messages.push(msg);
+            const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${msg.timestamp}`;
+            await appendToDatabase(line);
+            rebuildChatsFromMessages();
         }
 
         function loadGitHubConfig() {
@@ -1614,7 +1444,6 @@
             const avatarImg = document.getElementById('avatarImg');
             const avatarText = document.getElementById('avatarText');
             const userNameSpan = document.getElementById('sidebarUserName');
-            
             if (myAvatar) {
                 avatarImg.src = myAvatar;
                 avatarImg.style.display = 'block';
@@ -1631,7 +1460,6 @@
             const preview = document.getElementById('avatarPreview');
             const previewImg = document.getElementById('avatarPreviewImg');
             const previewText = document.getElementById('avatarPreviewText');
-            
             if (myAvatar) {
                 previewImg.src = myAvatar;
                 previewImg.style.display = 'block';
@@ -1673,15 +1501,18 @@
                 div.dataset.id = chat.id;
                 div.dataset.type = chat.type;
                 div.dataset.name = chat.name;
-                
                 let avatarContent = '';
-                const entry = dbCache.find(e => e.id === chat.id);
-                if (entry && entry.avatar) {
-                    avatarContent = `<img src="${entry.avatar}" class="chat-avatar-img">`;
+                if (chat.type === 'private') {
+                    const otherId = chat.id.split('_')[1] === myId ? chat.id.split('_')[2] : chat.id.split('_')[1];
+                    const user = dbCache.users.find(u => u.id === otherId);
+                    if (user && user.avatar) {
+                        avatarContent = `<img src="${user.avatar}" class="chat-avatar-img">`;
+                    } else {
+                        avatarContent = '👤';
+                    }
                 } else {
-                    avatarContent = chat.type === 'group' ? '👥' : '👤';
+                    avatarContent = '👥';
                 }
-                
                 div.innerHTML = `
                     <div class="chat-avatar" data-userid="${chat.id}">${avatarContent}</div>
                     <div class="chat-info">
@@ -1707,7 +1538,8 @@
                 div.querySelector('.chat-avatar').addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (chat.type !== 'group') {
-                        showUserProfile(chat.id);
+                        const otherId = chat.id.split('_')[1] === myId ? chat.id.split('_')[2] : chat.id.split('_')[1];
+                        showUserProfile(otherId);
                     }
                 });
                 div.addEventListener('click', () => {
@@ -1718,7 +1550,7 @@
         }
 
         function showUserProfile(userId) {
-            const entry = dbCache.find(e => e.id === userId);
+            const entry = dbCache.users.find(u => u.id === userId);
             if (!entry) return;
             document.getElementById('profileViewAvatar').innerHTML = entry.avatar ? `<img src="${entry.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` : (entry.name ? entry.name.charAt(0).toUpperCase() : '👤');
             document.getElementById('profileViewName').innerText = entry.name || 'Пользователь';
@@ -1789,81 +1621,63 @@
             document.getElementById('chatHeader').style.display = 'flex';
             document.getElementById('messageArea').style.display = 'flex';
             document.getElementById('messagesContainer').style.display = 'flex';
-
             currentChatId = chatId;
             currentChatType = type;
             currentPeerInfo = peerInfo;
-
             document.getElementById('chatTitle').innerText = peerInfo;
             document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
-            
             const chatAvatar = document.getElementById('chatAvatar');
             const chatAvatarImg = document.getElementById('chatAvatarImg');
-            const entry = dbCache.find(e => e.id === chatId);
-            if (entry && entry.avatar) {
-                chatAvatarImg.src = entry.avatar;
-                chatAvatarImg.style.display = 'block';
-                chatAvatar.querySelector('span').style.display = 'none';
+            if (type === 'private') {
+                const otherId = chatId.split('_')[1] === myId ? chatId.split('_')[2] : chatId.split('_')[1];
+                const user = dbCache.users.find(u => u.id === otherId);
+                if (user && user.avatar) {
+                    chatAvatarImg.src = user.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👤';
+                }
             } else {
                 chatAvatarImg.style.display = 'none';
                 chatAvatar.querySelector('span').style.display = 'block';
-                chatAvatar.querySelector('span').innerText = type === 'group' ? '👥' : '👤';
+                chatAvatar.querySelector('span').innerText = '👥';
             }
-
             if (type === 'group') {
                 document.getElementById('membersBtn').style.display = 'flex';
             } else {
                 document.getElementById('membersBtn').style.display = 'none';
             }
-
             renderChatsList();
-
             document.getElementById('messagesContainer').innerHTML = '';
             prevMessagesCount = 0;
             if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
             await loadMessages();
-            messagesUpdateInterval = setInterval(loadMessages, 3000);
-
+            messagesUpdateInterval = setInterval(loadMessages, 1000);
             showChat();
         }
 
         async function loadMessages() {
             if (!currentChatId) return;
-            let msgs = [];
-            if (currentChatType === 'group') {
-                msgs = await getGroupMessages(currentChatId);
-            } else {
-                msgs = await getPrivateMessages(currentChatId);
-            }
+            await loadDatabase();
+            const msgs = getMessagesForChat(currentChatId);
             const container = document.getElementById('messagesContainer');
-            msgs.forEach(m => {
-                const isOwn = m.senderId === myId;
-                if (!isOwn && currentChatType === 'private') {
-                    const entry = dbCache.find(e => e.id === m.senderId);
-                    if (entry) {
-                        ensureChatExists(m.senderId, entry.name, 'private');
-                    } else {
-                        ensureChatExists(m.senderId, m.senderName || 'Неизвестно', 'private');
-                    }
-                }
-            });
             container.innerHTML = '';
             msgs.forEach(m => {
                 const isOwn = m.senderId === myId;
                 const msgDiv = document.createElement('div');
                 msgDiv.classList.add('message');
                 if (isOwn) msgDiv.classList.add('own');
-                
-                const senderEntry = dbCache.find(e => e.id === m.senderId);
-                const senderName = senderEntry ? senderEntry.name : (m.senderName || 'Неизвестно');
-                
+                const sender = dbCache.users.find(u => u.id === m.senderId);
+                const senderName = sender ? sender.name : 'Неизвестно';
                 if (currentChatType === 'group' && !isOwn) {
                     const nameSpan = document.createElement('div');
                     nameSpan.className = 'sender-name';
                     nameSpan.innerText = senderName;
                     msgDiv.appendChild(nameSpan);
                 }
-                
                 if (m.image) {
                     const img = document.createElement('img');
                     img.src = m.image;
@@ -1874,12 +1688,10 @@
                     });
                     msgDiv.appendChild(img);
                 }
-                
                 if (m.text) {
                     const textNode = document.createTextNode(m.text);
                     msgDiv.appendChild(textNode);
                 }
-                
                 container.appendChild(msgDiv);
             });
             animateNewMessages();
@@ -1887,32 +1699,32 @@
         }
 
         async function addChatFromSearch(searchId) {
-            const entry = dbCache.find(e => e.id === searchId);
-            if (!entry) return null;
-
-            let chatName = entry.name;
-            let type = entry.type === 'group' ? 'group' : 'private';
-
-            ensureChatExists(entry.id, chatName, type);
-            return { id: entry.id, name: chatName, type };
+            let user = dbCache.users.find(u => u.id === searchId);
+            if (user) {
+                const chatId = `private_${[myId, user.id].sort().join('_')}`;
+                ensureChatExists(chatId, user.name, 'private');
+                return { id: chatId, name: user.name, type: 'private' };
+            }
+            let group = dbCache.groups.find(g => g.id === searchId);
+            if (group) {
+                ensureChatExists(group.id, group.name, 'group');
+                return { id: group.id, name: group.name, type: 'group' };
+            }
+            return null;
         }
 
         function applyCustomization(theme, gradient, ownColor, otherColor, accentColor) {
             document.body.classList.remove('light-theme', 'grey-theme');
             if (theme === 'light') document.body.classList.add('light-theme');
             else if (theme === 'grey') document.body.classList.add('grey-theme');
-
             document.body.classList.remove('gradient-blue', 'gradient-green', 'gradient-purple', 'gradient-orange', 'gradient-dark');
             if (gradient !== 'none') {
                 document.body.classList.add(`gradient-${gradient}`);
             }
-
             document.body.classList.remove('own-color-gold', 'own-color-blue', 'own-color-green', 'own-color-red', 'own-color-purple', 'own-color-orange');
             if (ownColor) document.body.classList.add(`own-color-${ownColor}`);
-
             document.body.classList.remove('other-color-default', 'other-color-light', 'other-color-dark', 'other-color-mid');
             if (otherColor) document.body.classList.add(`other-color-${otherColor}`);
-
             document.body.classList.remove('accent-color-gold', 'accent-color-blue', 'accent-color-green', 'accent-color-red', 'accent-color-purple', 'accent-color-orange');
             if (accentColor) document.body.classList.add(`accent-color-${accentColor}`);
         }
@@ -1940,7 +1752,6 @@
             const modalImage = document.getElementById('imageModal');
             const modalProfile = document.getElementById('profileModal');
             const hasConfig = loadGitHubConfig();
-
             loadCustomization();
 
             document.getElementById('userInfoBlock').addEventListener('click', () => {
@@ -1977,7 +1788,6 @@
                     alert('Файл слишком большой (макс 5MB)');
                     return;
                 }
-                
                 const fileName = `avatar_${myId}_${Date.now()}.${file.name.split('.').pop()}`;
                 const url = await uploadFileToGitHub(file, fileName);
                 if (url) {
@@ -2051,19 +1861,21 @@
                     return;
                 }
                 const newId = generateGroupId();
-                const result = await appendToDatabase(`group_${groupName}`, newId);
-                if (result.success) {
-                    dbCache.push({ rawName: `group_${groupName}`, name: groupName, email: '', password: '', avatar: '', bio: '', id: newId, type: 'group' });
+                dbCache.groups.push({ name: groupName, id: newId });
+                const line = `GROUP|${groupName}|${newId}`;
+                const ok = await appendToDatabase(line);
+                if (ok) {
+                    dbCache.groupMembers.push({ groupId: newId, userId: myId });
+                    await appendToDatabase(`GROUP_MEMBER|${newId}|${myId}`);
                     chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '', pinned: false });
                     saveChatsToStorage();
                     renderChatsList();
-                    await addGroupMember(newId, myId);
                     modalCreateGroup.classList.remove('active');
                     document.getElementById('groupName').value = '';
                     document.getElementById('groupError').style.display = 'none';
                     alert('Группа создана! ID: ' + newId);
                 } else {
-                    document.getElementById('groupError').innerText = `Ошибка: ${result.error}`;
+                    document.getElementById('groupError').innerText = 'Ошибка создания группы';
                     document.getElementById('groupError').style.display = 'block';
                 }
             };
@@ -2085,19 +1897,19 @@
 
             document.getElementById('membersBtn').onclick = async function () {
                 if (!currentChatId || currentChatType !== 'group') return;
-                const members = await getGroupMembers(currentChatId);
+                const members = dbCache.groupMembers.filter(gm => gm.groupId === currentChatId).map(gm => gm.userId);
                 const list = document.getElementById('membersList');
                 list.innerHTML = '';
                 for (const memberId of members) {
-                    const entry = dbCache.find(e => e.id === memberId) || { name: 'Неизвестно', avatar: null };
+                    const user = dbCache.users.find(u => u.id === memberId) || { name: 'Неизвестно', avatar: null };
                     let avatarHtml = '';
-                    if (entry.avatar) {
-                        avatarHtml = `<img src="${entry.avatar}" class="avatar-small-img">`;
+                    if (user.avatar) {
+                        avatarHtml = `<img src="${user.avatar}" class="avatar-small-img">`;
                     } else {
-                        avatarHtml = entry.name.charAt(0).toUpperCase();
+                        avatarHtml = user.name.charAt(0).toUpperCase();
                     }
                     const li = document.createElement('li');
-                    li.innerHTML = `<div class="avatar-small">${avatarHtml}</div> ${entry.name} (${memberId})`;
+                    li.innerHTML = `<div class="avatar-small">${avatarHtml}</div> ${user.name} (${memberId})`;
                     list.appendChild(li);
                 }
                 document.getElementById('membersModalTitle').innerText = `Участники группы ${currentPeerInfo}`;
@@ -2127,22 +1939,10 @@
                     alert('Файл слишком большой (макс 5MB)');
                     return;
                 }
-                
                 const fileName = `image_${Date.now()}_${file.name}`;
                 const url = await uploadFileToGitHub(file, fileName);
                 if (url) {
-                    const senderName = myName || myId;
-                    const msgObj = { 
-                        image: url,
-                        senderId: myId,
-                        senderName: senderName,
-                        time: Date.now() 
-                    };
-                    if (currentChatType === 'group') {
-                        await appendToGroupMessages(currentChatId, msgObj);
-                    } else {
-                        await appendToPrivateMessages(currentChatId, msgObj);
-                    }
+                    await addMessage(currentChatId, myId, '', url);
                     await loadMessages();
                 }
             };
@@ -2156,11 +1956,12 @@
                     modalGithub.classList.remove('active');
                     modalRegister.classList.remove('active');
                     updateSidebarUserInfo();
+                    await loadDatabase();
                     loadChatsFromStorage();
-                    await getDatabaseFromGitHub();
+                    rebuildChatsFromMessages();
                     dbUpdateInterval = setInterval(async () => {
-                        await getDatabaseFromGitHub();
-                    }, 3000);
+                        await loadDatabase();
+                    }, 2000);
                 }
             }
 
@@ -2176,11 +1977,11 @@
                     if (!loadOwnProfile()) {
                         modalRegister.classList.add('active');
                     } else {
-                        await getDatabaseFromGitHub();
+                        await loadDatabase();
                         if (dbUpdateInterval) clearInterval(dbUpdateInterval);
                         dbUpdateInterval = setInterval(async () => {
-                            await getDatabaseFromGitHub();
-                        }, 3000);
+                            await loadDatabase();
+                        }, 2000);
                     }
                 }
             };
@@ -2211,7 +2012,7 @@
                     document.getElementById('authError').style.display = 'block';
                     return;
                 }
-                const existing = users.find(u => u.email === email) || dbCache.find(u => u.email === email);
+                const existing = users.find(u => u.email === email) || dbCache.users.find(u => u.email === email);
                 if (existing) {
                     document.getElementById('authError').innerText = '❌ Пользователь с таким email уже существует';
                     document.getElementById('authError').style.display = 'block';
@@ -2225,15 +2026,16 @@
                 myEmail = email;
                 myBio = '';
                 localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, email, bio: '' }));
+                const line = `USER|${name}|${email}|${password}|||${newId}`;
+                await appendToDatabase(line);
+                dbCache.users.push({ name, email, password, avatar: '', bio: '', id: newId });
                 modalRegister.classList.remove('active');
                 updateSidebarUserInfo();
                 loadChatsFromStorage();
-                await getDatabaseFromGitHub();
-                await appendToDatabase(name, newId, email, password, '', '');
                 if (dbUpdateInterval) clearInterval(dbUpdateInterval);
                 dbUpdateInterval = setInterval(async () => {
-                    await getDatabaseFromGitHub();
-                }, 3000);
+                    await loadDatabase();
+                }, 2000);
             };
 
             document.getElementById('loginBtn').onclick = async function () {
@@ -2241,7 +2043,7 @@
                 const password = document.getElementById('loginPassword').value.trim();
                 let user = users.find(u => u.email === email && u.password === password);
                 if (!user) {
-                    const dbUser = dbCache.find(u => u.email === email && u.password === password);
+                    const dbUser = dbCache.users.find(u => u.email === email && u.password === password);
                     if (dbUser) {
                         user = { name: dbUser.name, email: dbUser.email, password: dbUser.password, id: dbUser.id, avatar: dbUser.avatar, bio: dbUser.bio };
                         if (!users.find(u => u.id === dbUser.id)) {
@@ -2263,12 +2065,13 @@
                 localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: myAvatar, bio: myBio }));
                 modalRegister.classList.remove('active');
                 updateSidebarUserInfo();
+                await loadDatabase();
                 loadChatsFromStorage();
-                await getDatabaseFromGitHub();
+                rebuildChatsFromMessages();
                 if (dbUpdateInterval) clearInterval(dbUpdateInterval);
                 dbUpdateInterval = setInterval(async () => {
-                    await getDatabaseFromGitHub();
-                }, 3000);
+                    await loadDatabase();
+                }, 2000);
             };
 
             document.getElementById('searchIdInput').addEventListener('keypress', async function (e) {
@@ -2287,21 +2090,16 @@
 
             document.getElementById('sendMsgBtn').onclick = async function () {
                 const msg = document.getElementById('messageInput').value.trim();
-                if (!msg || !currentChatId) {
+                if (!msg && !document.getElementById('fileInput').files.length) {
+                    alert('Нет активного чата или пустое сообщение');
+                    return;
+                }
+                if (!currentChatId) {
                     alert('Нет активного чата');
                     return;
                 }
-                const senderName = myName || myId;
-                const msgObj = { 
-                    text: msg, 
-                    senderId: myId,
-                    senderName: senderName,
-                    time: Date.now() 
-                };
-                if (currentChatType === 'group') {
-                    await appendToGroupMessages(currentChatId, msgObj);
-                } else {
-                    await appendToPrivateMessages(currentChatId, msgObj);
+                if (msg) {
+                    await addMessage(currentChatId, myId, msg, '');
                 }
                 document.getElementById('messageInput').value = '';
                 const sendBtn = document.getElementById('sendMsgBtn');
