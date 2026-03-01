@@ -2,3 +2,4 @@
 GROUP|овла|g_mm81dblmwuhj_group
 GROUP_MEMBER|g_mm81dblmwuhj_group|p_mlquvgir1b6q_person
 GROUP_MEMBER|g_mm81dckrgt8j_group|p_mlquvgir1b6q_person
+MESSAGE|g_mm81dblmwuhj_group|p_mlquvgir1b6q_person|лалал|||[]|1772386867477
