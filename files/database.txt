@@ -1,1 +1,2 @@
 {"type":"user","name":"безмятежний","email":"blashenny363@gmail.com","password":"SaD1SaD1","avatar":"","bio":"","id":"p_mm870cpmp7gq_person"}
+{"type":"user","name":"bot","email":"bot@gmail.com","password":"bot","avatar":"","bio":"","id":"p_mm872je6m96e_person"}
