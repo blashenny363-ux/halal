@@ -1269,6 +1269,33 @@
             </div>
         </div>
 
+        <div class="modal" id="groupSettingsModal">
+            <div class="modal-content">
+                <span class="modal-close" id="closeGroupSettingsBtn">&times;</span>
+                <h3>Настройки группы</h3>
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="groupAvatarPreview">
+                        <img src="" class="avatar-preview-img" id="groupAvatarPreviewImg" style="display: none;">
+                        <span id="groupAvatarPreviewText">👥</span>
+                    </div>
+                    <button class="small" id="uploadGroupAvatarBtn">Загрузить аватар</button>
+                    <input type="file" id="groupAvatarInput" accept="image/*" style="display: none;">
+                </div>
+                <label>Цвет фона чата</label>
+                <select id="groupBgColor">
+                    <option value="default">Стандартный</option>
+                    <option value="#17212b">Тёмно-синий</option>
+                    <option value="#1e2b36">Тёмно-серый</option>
+                    <option value="#2b5278">Синий</option>
+                    <option value="#2e7d32">Зелёный</option>
+                    <option value="#e53e3e">Красный</option>
+                    <option value="#9b59b6">Фиолетовый</option>
+                    <option value="#f39c12">Оранжевый</option>
+                </select>
+                <button id="saveGroupSettingsBtn">Сохранить</button>
+            </div>
+        </div>
+
         <div class="modal" id="createGroupModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeGroupModalBtn">&times;</span>
@@ -1317,6 +1344,7 @@
     </div>
 
     <script>
+        // Упрощённое хранение в JSON
         let myId = null;
         let myName = null;
         let myEmail = null;
@@ -1333,7 +1361,6 @@
         let prevMessagesCount = 0;
         let users = JSON.parse(localStorage.getItem('halal_users')) || [];
         let longPressTimer = null;
-        let currentMessageElement = null;
         let currentMessageData = null;
 
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
@@ -1361,18 +1388,18 @@
                 const lines = content.trim().split('\n').filter(l => l.trim());
                 const newCache = { users: [], groups: [], groupMembers: [], messages: [] };
                 lines.forEach(line => {
-                    const parts = line.split('|');
-                    if (parts.length < 2) return;
-                    const type = parts[0];
-                    if (type === 'USER' && parts.length === 7) {
-                        newCache.users.push({ name: parts[1], email: parts[2], password: parts[3], avatar: parts[4], bio: parts[5], id: parts[6] });
-                    } else if (type === 'GROUP' && parts.length === 3) {
-                        newCache.groups.push({ name: parts[1], id: parts[2] });
-                    } else if (type === 'GROUP_MEMBER' && parts.length === 3) {
-                        newCache.groupMembers.push({ groupId: parts[1], userId: parts[2] });
-                    } else if (type === 'MESSAGE' && parts.length === 7) {
-                        newCache.messages.push({ chatId: parts[1], senderId: parts[2], text: parts[3], image: parts[4], file: parts[5], reactions: parts[6] ? JSON.parse(parts[6]) : [], timestamp: parseInt(parts[7]) });
-                    }
+                    try {
+                        const obj = JSON.parse(line);
+                        if (obj.type === 'user') {
+                            newCache.users.push(obj);
+                        } else if (obj.type === 'group') {
+                            newCache.groups.push(obj);
+                        } else if (obj.type === 'groupMember') {
+                            newCache.groupMembers.push(obj);
+                        } else if (obj.type === 'message') {
+                            newCache.messages.push(obj);
+                        }
+                    } catch (e) {}
                 });
                 dbCache = newCache;
                 rebuildChatsFromMessages();
@@ -1416,11 +1443,6 @@
                     newChats.push(existing);
                 }
             });
-            chats.forEach(chat => {
-                if (!newChats.find(c => c.id === chat.id)) {
-                    newChats.push(chat);
-                }
-            });
             chats = newChats;
             saveChatsToStorage();
             renderChatsList();
@@ -1437,7 +1459,7 @@
             });
         }
 
-        async function appendToDatabase(line) {
+        async function appendToDatabase(obj) {
             if (!githubConfig) return false;
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -1452,7 +1474,8 @@
                     currentContent = decodeURIComponent(escape(atob(data.content)));
                 }
             } catch (e) {}
-            const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + line + '\n';
+            const newLine = JSON.stringify(obj);
+            const newContent = currentContent + (currentContent.endsWith('\n') || !currentContent ? '' : '\n') + newLine + '\n';
             try {
                 await fetch(url, {
                     method: 'PUT',
@@ -1465,25 +1488,12 @@
             }
         }
 
-        async function updateUserInDatabase(id, name, email, password, avatar, bio) {
-            const userIndex = dbCache.users.findIndex(u => u.id === id);
-            if (userIndex !== -1) {
-                dbCache.users[userIndex] = { name, email, password, avatar, bio, id };
-            } else {
-                dbCache.users.push({ name, email, password, avatar, bio, id });
-            }
-            return await rewriteDatabase();
-        }
-
         async function rewriteDatabase() {
             const lines = [];
-            dbCache.users.forEach(u => lines.push(`USER|${u.name}|${u.email}|${u.password}|${u.avatar}|${u.bio}|${u.id}`));
-            dbCache.groups.forEach(g => lines.push(`GROUP|${g.name}|${g.id}`));
-            dbCache.groupMembers.forEach(gm => lines.push(`GROUP_MEMBER|${gm.groupId}|${gm.userId}`));
-            dbCache.messages.forEach(m => {
-                const reactionsStr = JSON.stringify(m.reactions || []);
-                lines.push(`MESSAGE|${m.chatId}|${m.senderId}|${m.text || ''}|${m.image || ''}|${m.file || ''}|${reactionsStr}|${m.timestamp}`);
-            });
+            dbCache.users.forEach(u => lines.push(JSON.stringify({ type: 'user', ...u })));
+            dbCache.groups.forEach(g => lines.push(JSON.stringify({ type: 'group', ...g })));
+            dbCache.groupMembers.forEach(gm => lines.push(JSON.stringify({ type: 'groupMember', ...gm })));
+            dbCache.messages.forEach(m => lines.push(JSON.stringify({ type: 'message', ...m })));
             const newContent = lines.join('\n');
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -1543,12 +1553,20 @@
         }
 
         async function addMessage(chatId, senderId, text, image, file) {
-            const msg = { chatId, senderId, text: text || '', image: image || '', file: file || '', reactions: [], timestamp: Date.now() };
+            const msg = {
+                type: 'message',
+                chatId,
+                senderId,
+                text: text || '',
+                image: image || '',
+                file: file || '',
+                reactions: [],
+                timestamp: Date.now()
+            };
             dbCache.messages.push(msg);
-            const reactionsStr = JSON.stringify([]);
-            const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}`;
-            await appendToDatabase(line);
+            await appendToDatabase(msg);
             rebuildChatsFromMessages();
+            renderMessages();
         }
 
         async function addReaction(chatId, messageTimestamp, emoji) {
@@ -1562,7 +1580,7 @@
                 msg.reactions.push({ userId: myId, emoji });
             }
             await rewriteDatabase();
-            loadMessages();
+            renderMessages();
         }
 
         function loadGitHubConfig() {
@@ -1679,7 +1697,12 @@
                         avatarContent = '👤';
                     }
                 } else {
-                    avatarContent = '👥';
+                    const group = dbCache.groups.find(g => g.id === chat.id);
+                    if (group && group.avatar) {
+                        avatarContent = `<img src="${group.avatar}" class="chat-avatar-img">`;
+                    } else {
+                        avatarContent = '👥';
+                    }
                 }
                 div.innerHTML = `
                     <div class="chat-avatar" data-userid="${chat.id}">${avatarContent}</div>
@@ -1708,6 +1731,8 @@
                     if (chat.type !== 'group') {
                         const otherId = chat.id.split('_')[1] === myId ? chat.id.split('_')[2] : chat.id.split('_')[1];
                         showUserProfile(otherId);
+                    } else {
+                        showGroupSettings(chat.id);
                     }
                 });
                 div.addEventListener('click', () => {
@@ -1725,6 +1750,17 @@
             document.getElementById('profileViewBio').innerText = entry.bio || 'Описание отсутствует';
             document.getElementById('profileViewId').innerText = entry.id;
             document.getElementById('profileModal').classList.add('active');
+        }
+
+        function showGroupSettings(groupId) {
+            const group = dbCache.groups.find(g => g.id === groupId);
+            if (!group) return;
+            document.getElementById('groupAvatarPreviewImg').src = group.avatar || '';
+            document.getElementById('groupAvatarPreviewImg').style.display = group.avatar ? 'block' : 'none';
+            document.getElementById('groupAvatarPreviewText').style.display = group.avatar ? 'none' : 'block';
+            document.getElementById('groupBgColor').value = group.bgColor || 'default';
+            document.getElementById('groupSettingsModal').dataset.groupId = groupId;
+            document.getElementById('groupSettingsModal').classList.add('active');
         }
 
         function togglePinChat(chatId) {
@@ -1761,75 +1797,8 @@
             document.getElementById('chatPanel').classList.add('show');
         }
 
-        function animateNewMessages() {
-            const container = document.getElementById('messagesContainer');
-            const messages = container.children;
-            const newCount = messages.length;
-            const diff = newCount - prevMessagesCount;
-            if (diff > 0) {
-                for (let i = newCount - diff; i < newCount; i++) {
-                    messages[i].classList.add('new');
-                    setTimeout(() => {
-                        messages[i].classList.remove('new');
-                    }, 400);
-                }
-            }
-            prevMessagesCount = newCount;
-        }
-
-        function ensureChatExists(peerId, peerName, type) {
-            if (!chats.find(c => c.id === peerId)) {
-                chats.push({ id: peerId, name: peerName, type, lastMessage: '', pinned: false });
-                saveChatsToStorage();
-                renderChatsList();
-            }
-        }
-
-        async function enterChat(chatId, type, peerInfo) {
-            document.getElementById('chatHeader').style.display = 'flex';
-            document.getElementById('messageArea').style.display = 'flex';
-            document.getElementById('messagesContainer').style.display = 'flex';
-            currentChatId = chatId;
-            currentChatType = type;
-            currentPeerInfo = peerInfo;
-            document.getElementById('chatTitle').innerText = peerInfo;
-            document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
-            const chatAvatar = document.getElementById('chatAvatar');
-            const chatAvatarImg = document.getElementById('chatAvatarImg');
-            if (type === 'private') {
-                const otherId = chatId.split('_')[1] === myId ? chatId.split('_')[2] : chatId.split('_')[1];
-                const user = dbCache.users.find(u => u.id === otherId);
-                if (user && user.avatar) {
-                    chatAvatarImg.src = user.avatar;
-                    chatAvatarImg.style.display = 'block';
-                    chatAvatar.querySelector('span').style.display = 'none';
-                } else {
-                    chatAvatarImg.style.display = 'none';
-                    chatAvatar.querySelector('span').style.display = 'block';
-                    chatAvatar.querySelector('span').innerText = '👤';
-                }
-            } else {
-                chatAvatarImg.style.display = 'none';
-                chatAvatar.querySelector('span').style.display = 'block';
-                chatAvatar.querySelector('span').innerText = '👥';
-            }
-            if (type === 'group') {
-                document.getElementById('membersBtn').style.display = 'flex';
-            } else {
-                document.getElementById('membersBtn').style.display = 'none';
-            }
-            renderChatsList();
-            document.getElementById('messagesContainer').innerHTML = '';
-            prevMessagesCount = 0;
-            if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
-            await loadMessages();
-            messagesUpdateInterval = setInterval(loadMessages, 1000);
-            showChat();
-        }
-
-        async function loadMessages() {
+        function renderMessages() {
             if (!currentChatId) return;
-            await loadDatabase();
             const msgs = getMessagesForChat(currentChatId);
             const container = document.getElementById('messagesContainer');
             container.innerHTML = '';
@@ -1892,11 +1861,15 @@
             });
             animateNewMessages();
             container.scrollTop = container.scrollHeight;
+            attachLongPress();
+        }
 
+        function attachLongPress() {
             document.querySelectorAll('.message-wrapper').forEach(w => {
                 w.addEventListener('touchstart', (e) => {
                     longPressTimer = setTimeout(() => {
                         const timestamp = w.dataset.timestamp;
+                        const msgs = getMessagesForChat(currentChatId);
                         const msg = msgs.find(m => m.timestamp == timestamp);
                         if (msg && msg.senderId !== myId) {
                             currentMessageData = msg;
@@ -1927,6 +1900,82 @@
             });
         }
 
+        function animateNewMessages() {
+            const container = document.getElementById('messagesContainer');
+            const messages = container.children;
+            const newCount = messages.length;
+            const diff = newCount - prevMessagesCount;
+            if (diff > 0) {
+                for (let i = newCount - diff; i < newCount; i++) {
+                    messages[i].classList.add('new');
+                    setTimeout(() => {
+                        messages[i].classList.remove('new');
+                    }, 400);
+                }
+            }
+            prevMessagesCount = newCount;
+        }
+
+        async function loadMessages() {
+            if (!currentChatId) return;
+            await loadDatabase();
+            renderMessages();
+        }
+
+        async function enterChat(chatId, type, peerInfo) {
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('messageArea').style.display = 'flex';
+            document.getElementById('messagesContainer').style.display = 'flex';
+            currentChatId = chatId;
+            currentChatType = type;
+            currentPeerInfo = peerInfo;
+            document.getElementById('chatTitle').innerText = peerInfo;
+            document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
+            const chatAvatar = document.getElementById('chatAvatar');
+            const chatAvatarImg = document.getElementById('chatAvatarImg');
+            if (type === 'private') {
+                const otherId = chatId.split('_')[1] === myId ? chatId.split('_')[2] : chatId.split('_')[1];
+                const user = dbCache.users.find(u => u.id === otherId);
+                if (user && user.avatar) {
+                    chatAvatarImg.src = user.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👤';
+                }
+            } else {
+                const group = dbCache.groups.find(g => g.id === chatId);
+                if (group && group.avatar) {
+                    chatAvatarImg.src = group.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👥';
+                }
+                if (group && group.bgColor && group.bgColor !== 'default') {
+                    document.getElementById('messagesContainer').style.backgroundColor = group.bgColor;
+                } else {
+                    document.getElementById('messagesContainer').style.backgroundColor = '';
+                }
+            }
+            if (type === 'group') {
+                document.getElementById('membersBtn').style.display = 'flex';
+            } else {
+                document.getElementById('membersBtn').style.display = 'none';
+            }
+            renderChatsList();
+            document.getElementById('messagesContainer').innerHTML = '';
+            prevMessagesCount = 0;
+            if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
+            await loadMessages();
+            messagesUpdateInterval = setInterval(loadMessages, 3000);
+            showChat();
+        }
+
         async function addChatFromSearch(searchId) {
             let user = dbCache.users.find(u => u.id === searchId);
             if (user) {
@@ -1940,6 +1989,14 @@
                 return { id: group.id, name: group.name, type: 'group' };
             }
             return null;
+        }
+
+        function ensureChatExists(peerId, peerName, type) {
+            if (!chats.find(c => c.id === peerId)) {
+                chats.push({ id: peerId, name: peerName, type, lastMessage: '', pinned: false });
+                saveChatsToStorage();
+                renderChatsList();
+            }
         }
 
         function applyCustomization(theme, gradient, ownColor, otherColor, accentColor) {
@@ -1980,6 +2037,7 @@
             const modalMembers = document.getElementById('membersModal');
             const modalImage = document.getElementById('imageModal');
             const modalProfile = document.getElementById('profileModal');
+            const modalGroupSettings = document.getElementById('groupSettingsModal');
             const hasConfig = loadGitHubConfig();
             loadCustomization();
 
@@ -2021,7 +2079,11 @@
                 const url = await uploadFileToGitHub(file, fileName);
                 if (url) {
                     myAvatar = url;
-                    const success = await updateUserInDatabase(myId, myName, myEmail, myEmail, url, myBio);
+                    const user = dbCache.users.find(u => u.id === myId);
+                    if (user) {
+                        user.avatar = url;
+                    }
+                    const success = await rewriteDatabase();
                     if (success) {
                         localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: url, bio: myBio }));
                         updateSidebarUserInfo();
@@ -2041,7 +2103,11 @@
                 }
                 const oldName = myName;
                 if (newName === oldName) return;
-                const success = await updateUserInDatabase(myId, newName, myEmail, myEmail, myAvatar || '', myBio);
+                const user = dbCache.users.find(u => u.id === myId);
+                if (user) {
+                    user.name = newName;
+                }
+                const success = await rewriteDatabase();
                 if (success) {
                     myName = newName;
                     localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: myAvatar, bio: myBio }));
@@ -2059,7 +2125,11 @@
 
             document.getElementById('updateBioBtn').onclick = async function () {
                 const newBio = document.getElementById('profileBio').value.trim();
-                const success = await updateUserInDatabase(myId, myName, myEmail, myEmail, myAvatar || '', newBio);
+                const user = dbCache.users.find(u => u.id === myId);
+                if (user) {
+                    user.bio = newBio;
+                }
+                const success = await rewriteDatabase();
                 if (success) {
                     myBio = newBio;
                     localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: myAvatar, bio: myBio }));
@@ -2090,12 +2160,23 @@
                     return;
                 }
                 const newId = generateGroupId();
-                dbCache.groups.push({ name: groupName, id: newId });
-                const line = `GROUP|${groupName}|${newId}`;
-                const ok = await appendToDatabase(line);
+                const groupObj = {
+                    type: 'group',
+                    name: groupName,
+                    avatar: '',
+                    bgColor: 'default',
+                    id: newId
+                };
+                dbCache.groups.push(groupObj);
+                const ok = await appendToDatabase(groupObj);
                 if (ok) {
-                    dbCache.groupMembers.push({ groupId: newId, userId: myId });
-                    await appendToDatabase(`GROUP_MEMBER|${newId}|${myId}`);
+                    const memberObj = {
+                        type: 'groupMember',
+                        groupId: newId,
+                        userId: myId
+                    };
+                    dbCache.groupMembers.push(memberObj);
+                    await appendToDatabase(memberObj);
                     chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '', pinned: false });
                     saveChatsToStorage();
                     renderChatsList();
@@ -2149,6 +2230,63 @@
                 modalMembers.classList.remove('active');
             };
 
+            document.getElementById('closeGroupSettingsBtn').onclick = () => {
+                modalGroupSettings.classList.remove('active');
+            };
+
+            document.getElementById('uploadGroupAvatarBtn').onclick = () => {
+                document.getElementById('groupAvatarInput').click();
+            };
+
+            document.getElementById('groupAvatarInput').onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file || !modalGroupSettings.dataset.groupId) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Файл слишком большой (макс 5MB)');
+                    return;
+                }
+                const fileName = `group_avatar_${modalGroupSettings.dataset.groupId}_${Date.now()}.${file.name.split('.').pop()}`;
+                const url = await uploadFileToGitHub(file, fileName);
+                if (url) {
+                    const groupId = modalGroupSettings.dataset.groupId;
+                    const group = dbCache.groups.find(g => g.id === groupId);
+                    if (group) {
+                        group.avatar = url;
+                        await rewriteDatabase();
+                        document.getElementById('groupAvatarPreviewImg').src = url;
+                        document.getElementById('groupAvatarPreviewImg').style.display = 'block';
+                        document.getElementById('groupAvatarPreviewText').style.display = 'none';
+                        renderChatsList();
+                        if (currentChatId === groupId) {
+                            const chatAvatar = document.getElementById('chatAvatar');
+                            const chatAvatarImg = document.getElementById('chatAvatarImg');
+                            chatAvatarImg.src = url;
+                            chatAvatarImg.style.display = 'block';
+                            chatAvatar.querySelector('span').style.display = 'none';
+                        }
+                        alert('Аватар группы обновлен');
+                    }
+                }
+            };
+
+            document.getElementById('saveGroupSettingsBtn').onclick = async function() {
+                const groupId = modalGroupSettings.dataset.groupId;
+                const group = dbCache.groups.find(g => g.id === groupId);
+                if (!group) return;
+                const bgColor = document.getElementById('groupBgColor').value;
+                group.bgColor = bgColor;
+                await rewriteDatabase();
+                if (currentChatId === groupId) {
+                    if (bgColor === 'default') {
+                        document.getElementById('messagesContainer').style.backgroundColor = '';
+                    } else {
+                        document.getElementById('messagesContainer').style.backgroundColor = bgColor;
+                    }
+                }
+                modalGroupSettings.classList.remove('active');
+                alert('Настройки группы сохранены');
+            };
+
             document.getElementById('closeProfileBtn').onclick = () => {
                 modalProfile.classList.remove('active');
             };
@@ -2182,7 +2320,6 @@
                 const url = await uploadFileToGitHub(file, fileName);
                 if (url) {
                     await addMessage(currentChatId, myId, '', url, '');
-                    await loadMessages();
                 }
             };
 
@@ -2197,7 +2334,6 @@
                 const url = await uploadFileToGitHub(file, fileName);
                 if (url) {
                     await addMessage(currentChatId, myId, '', '', url);
-                    await loadMessages();
                 }
             };
 
@@ -2296,9 +2432,17 @@
                 myEmail = email;
                 myBio = '';
                 localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name, email, bio: '' }));
-                const line = `USER|${name}|${email}|${password}|||${newId}`;
-                await appendToDatabase(line);
-                dbCache.users.push({ name, email, password, avatar: '', bio: '', id: newId });
+                const userObj = {
+                    type: 'user',
+                    name,
+                    email,
+                    password,
+                    avatar: '',
+                    bio: '',
+                    id: newId
+                };
+                dbCache.users.push(userObj);
+                await appendToDatabase(userObj);
                 modalRegister.classList.remove('active');
                 updateSidebarUserInfo();
                 loadChatsFromStorage();
@@ -2374,7 +2518,6 @@
                 const sendBtn = document.getElementById('sendMsgBtn');
                 sendBtn.classList.add('animate');
                 setTimeout(() => sendBtn.classList.remove('animate'), 200);
-                await loadMessages();
             };
 
             document.getElementById('messageInput').addEventListener('keypress', function (e) {
