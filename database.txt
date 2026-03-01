@@ -1,1 +1,2 @@
 GROUP|тест|g_mm856hidb2mz_group
+GROUP_MEMBER|g_mm856hidb2mz_group|p_mm1ogid4ahqz_person
