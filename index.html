@@ -521,36 +521,34 @@
             background: var(--accent-color);
             border-radius: 4px;
         }
-        .message {
+        .message-wrapper {
+            position: relative;
             max-width: 80%;
+            align-self: flex-start;
+        }
+        .message-wrapper.own {
+            align-self: flex-end;
+        }
+        .message {
             padding: 12px 16px;
             border-radius: var(--border-radius-message);
             background: var(--message-other-bg);
-            align-self: flex-start;
             color: var(--text-primary);
             font-size: 15px;
             line-height: 1.5;
             word-wrap: break-word;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
-            position: relative;
             animation: fadeInUp 0.3s ease;
         }
         .message.own {
             background: var(--message-own-bg);
-            align-self: flex-end;
             border-bottom-right-radius: 6px;
             color: #000;
         }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .message .sender-name {
             font-size: 12px;
@@ -571,6 +569,44 @@
         .message-image:hover {
             transform: scale(1.02);
         }
+        .message-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-input);
+            padding: 10px;
+            border-radius: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .message-file:hover {
+            background: var(--hover-bg);
+        }
+        .reactions {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .reaction {
+            background: var(--bg-input);
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .reaction:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        .reaction-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
         .message-input-area {
             padding: 16px 20px;
             background: var(--bg-header);
@@ -580,6 +616,7 @@
             align-items: flex-end;
             transition: var(--transition);
             backdrop-filter: blur(20px);
+            position: relative;
         }
         .attach-btn {
             background: var(--bg-input);
@@ -605,6 +642,43 @@
             background: var(--accent-color);
             transform: scale(1.1);
             box-shadow: var(--shadow-md);
+            color: white;
+        }
+        .attach-menu {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: var(--bg-header);
+            border-radius: 30px;
+            padding: 8px;
+            display: flex;
+            gap: 8px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            transform-origin: bottom left;
+            z-index: 10;
+        }
+        .attach-menu.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .attach-menu-item {
+            background: var(--bg-input);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .attach-menu-item:hover {
+            background: var(--accent-color);
             color: white;
         }
         .message-input-area textarea {
@@ -796,6 +870,16 @@
             gap: 16px;
             margin: 24px 0;
         }
+        .customize-section {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+        .customize-section h4 {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
         .customize-options label {
             display: flex;
             align-items: center;
@@ -945,6 +1029,57 @@
             padding: 6px 12px;
             border-radius: 30px;
         }
+        .reaction-menu {
+            position: absolute;
+            background: var(--bg-header);
+            border-radius: 30px;
+            padding: 8px;
+            display: flex;
+            gap: 8px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .reaction-menu.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .reaction-menu-item {
+            background: var(--bg-input);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .reaction-menu-item:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+        .download-btn {
+            background: var(--bg-input);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -994,16 +1129,21 @@
             </div>
 
             <div class="message-input-area" id="messageArea" style="display: none;">
-                <button class="attach-btn" id="attachBtn" title="Прикрепить фото">
+                <button class="attach-btn" id="attachBtn" title="Прикрепить">
                     <svg viewBox="0 0 24 24" width="24" height="24">
                         <path d="M16.5 6.75v10.58c0 2.09-1.53 3.95-3.61 4.15-2.39.23-4.39-1.64-4.39-4V6.75c0-1.49 1.01-2.68 2.48-2.91 1.82-.28 3.52 1.12 3.52 2.91v10.58c0 .69-.53 1.26-1.21 1.33-.77.08-1.42-.52-1.42-1.27V6.75h-1.5v10.58c0 1.63 1.32 2.98 2.96 2.98 1.64 0 2.96-1.35 2.96-2.98V6.75c0-2.31-1.68-4.25-3.98-4.48-2.53-.25-4.67 1.71-4.67 4.23v10.58c0 2.89 2.27 5.25 5.16 5.25 2.89 0 5.16-2.36 5.16-5.25V6.75h-1.5z" fill="currentColor"/>
                     </svg>
                 </button>
+                <div class="attach-menu" id="attachMenu">
+                    <button class="attach-menu-item" id="attachPhotoBtn">📷 Фото</button>
+                    <button class="attach-menu-item" id="attachFileBtn">📎 Файл</button>
+                </div>
                 <textarea id="messageInput" placeholder="Сообщение..." rows="1"></textarea>
                 <button class="send-btn" id="sendMsgBtn">
                     <svg viewBox="0 0 24 24"><path d="M2 21L23 12 2 3v7l15 2-15 2v7z"/></svg>
                 </button>
                 <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <input type="file" id="anyFileInput" accept="*/*" style="display: none;">
             </div>
         </div>
 
@@ -1048,10 +1188,10 @@
         <div class="modal" id="customizeModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeCustomizeBtn">&times;</span>
-                <h3>Настройки профиля</h3>
+                <h3>Настройки</h3>
                 
                 <div class="profile-section">
-                    <label>Аватар</label>
+                    <h4>Профиль</h4>
                     <div class="avatar-upload">
                         <div class="avatar-preview" id="avatarPreview">
                             <img src="" class="avatar-preview-img" id="avatarPreviewImg" style="display: none;">
@@ -1060,73 +1200,72 @@
                         <button class="small" id="uploadAvatarBtn">Загрузить фото</button>
                         <input type="file" id="avatarInput" accept="image/*" style="display: none;">
                     </div>
-
-                    <label>Ваше имя</label>
+                    <label>Имя</label>
                     <input type="text" id="profileName" placeholder="Имя">
-                    <button class="small" id="updateNameBtn">Обновить имя</button>
-
-                    <label>Описание профиля</label>
+                    <button class="small" id="updateNameBtn">Обновить</button>
+                    <label>Описание</label>
                     <textarea id="profileBio" placeholder="Расскажите о себе..." rows="3"></textarea>
-                    <button class="small" id="updateBioBtn">Обновить описание</button>
-                    
+                    <button class="small" id="updateBioBtn">Обновить</button>
                     <label>Ваш ID</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px;">
                         <input type="text" id="profileId" readonly value="">
                         <button class="small" id="copyIdBtn">Копировать</button>
                     </div>
                 </div>
 
-                <h4>Цветовые настройки</h4>
-                <div class="customize-options">
-                    <label>Тема:
-                        <select id="themeSelect">
-                            <option value="dark">Тёмная</option>
-                            <option value="light">Светлая</option>
-                            <option value="grey">Серая</option>
-                        </select>
-                    </label>
-                    <label>Градиент фона:
-                        <select id="gradientSelect">
-                            <option value="none">Нет (однотонный)</option>
-                            <option value="blue">Синий градиент</option>
-                            <option value="green">Зелёный градиент</option>
-                            <option value="purple">Фиолетовый градиент</option>
-                            <option value="orange">Оранжевый градиент</option>
-                            <option value="dark">Тёмный градиент</option>
-                        </select>
-                    </label>
-                    <label>Цвет моих сообщений:
-                        <select id="ownColorSelect">
-                            <option value="gold">Золотой</option>
-                            <option value="blue">Синий</option>
-                            <option value="green">Зелёный</option>
-                            <option value="red">Красный</option>
-                            <option value="purple">Фиолетовый</option>
-                            <option value="orange">Оранжевый</option>
-                        </select>
-                    </label>
-                    <label>Цвет сообщений собеседника:
-                        <select id="otherColorSelect">
-                            <option value="default">Стандартный (тёмный)</option>
-                            <option value="light">Светло-серый</option>
-                            <option value="dark">Тёмно-серый</option>
-                            <option value="mid">Средний</option>
-                        </select>
-                    </label>
-                    <label>Акцентный цвет (кнопки, аватар):
-                        <select id="accentColorSelect">
-                            <option value="gold">Золотой</option>
-                            <option value="blue">Синий</option>
-                            <option value="green">Зелёный</option>
-                            <option value="red">Красный</option>
-                            <option value="purple">Фиолетовый</option>
-                            <option value="orange">Оранжевый</option>
-                        </select>
-                    </label>
+                <div class="customize-section">
+                    <h4>Оформление</h4>
+                    <div class="customize-options">
+                        <label>Тема:
+                            <select id="themeSelect">
+                                <option value="dark">Тёмная</option>
+                                <option value="light">Светлая</option>
+                                <option value="grey">Серая</option>
+                            </select>
+                        </label>
+                        <label>Градиент фона:
+                            <select id="gradientSelect">
+                                <option value="none">Нет</option>
+                                <option value="blue">Синий</option>
+                                <option value="green">Зелёный</option>
+                                <option value="purple">Фиолетовый</option>
+                                <option value="orange">Оранжевый</option>
+                                <option value="dark">Тёмный</option>
+                            </select>
+                        </label>
+                        <label>Мои сообщения:
+                            <select id="ownColorSelect">
+                                <option value="gold">Золотой</option>
+                                <option value="blue">Синий</option>
+                                <option value="green">Зелёный</option>
+                                <option value="red">Красный</option>
+                                <option value="purple">Фиолетовый</option>
+                                <option value="orange">Оранжевый</option>
+                            </select>
+                        </label>
+                        <label>Сообщения собеседника:
+                            <select id="otherColorSelect">
+                                <option value="default">Стандартный</option>
+                                <option value="light">Светлый</option>
+                                <option value="dark">Тёмный</option>
+                                <option value="mid">Средний</option>
+                            </select>
+                        </label>
+                        <label>Акцентный цвет:
+                            <select id="accentColorSelect">
+                                <option value="gold">Золотой</option>
+                                <option value="blue">Синий</option>
+                                <option value="green">Зелёный</option>
+                                <option value="red">Красный</option>
+                                <option value="purple">Фиолетовый</option>
+                                <option value="orange">Оранжевый</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
 
                 <button class="create-group-btn" id="createGroupBtn">Создать группу</button>
-                <button id="saveCustomizeBtn">Сохранить настройки</button>
+                <button id="saveCustomizeBtn">Сохранить</button>
             </div>
         </div>
 
@@ -1135,7 +1274,7 @@
                 <span class="modal-close" id="closeGroupModalBtn">&times;</span>
                 <h3>Создание группы</h3>
                 <input type="text" id="groupName" placeholder="Название группы">
-                <button id="createGroupConfirmBtn">Создать группу</button>
+                <button id="createGroupConfirmBtn">Создать</button>
                 <div id="groupError" class="error-text" style="display: none;"></div>
             </div>
         </div>
@@ -1167,6 +1306,14 @@
                 <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 20px;">
             </div>
         </div>
+
+        <div class="reaction-menu" id="reactionMenu">
+            <button class="reaction-menu-item" data-reaction="❤️">❤️</button>
+            <button class="reaction-menu-item" data-reaction="👍">👍</button>
+            <button class="reaction-menu-item" data-reaction="👎">👎</button>
+            <button class="reaction-menu-item" data-reaction="👌">👌</button>
+            <button class="download-btn" id="downloadMediaBtn" style="display: none;">📥 Скачать</button>
+        </div>
     </div>
 
     <script>
@@ -1185,6 +1332,9 @@
         let chats = [];
         let prevMessagesCount = 0;
         let users = JSON.parse(localStorage.getItem('halal_users')) || [];
+        let longPressTimer = null;
+        let currentMessageElement = null;
+        let currentMessageData = null;
 
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
         function generateGroupId() { return 'g_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_group'; }
@@ -1220,8 +1370,8 @@
                         newCache.groups.push({ name: parts[1], id: parts[2] });
                     } else if (type === 'GROUP_MEMBER' && parts.length === 3) {
                         newCache.groupMembers.push({ groupId: parts[1], userId: parts[2] });
-                    } else if (type === 'MESSAGE' && parts.length === 6) {
-                        newCache.messages.push({ chatId: parts[1], senderId: parts[2], text: parts[3], image: parts[4], timestamp: parseInt(parts[5]) });
+                    } else if (type === 'MESSAGE' && parts.length === 7) {
+                        newCache.messages.push({ chatId: parts[1], senderId: parts[2], text: parts[3], image: parts[4], file: parts[5], reactions: parts[6] ? JSON.parse(parts[6]) : [], timestamp: parseInt(parts[7]) });
                     }
                 });
                 dbCache = newCache;
@@ -1330,7 +1480,10 @@
             dbCache.users.forEach(u => lines.push(`USER|${u.name}|${u.email}|${u.password}|${u.avatar}|${u.bio}|${u.id}`));
             dbCache.groups.forEach(g => lines.push(`GROUP|${g.name}|${g.id}`));
             dbCache.groupMembers.forEach(gm => lines.push(`GROUP_MEMBER|${gm.groupId}|${gm.userId}`));
-            dbCache.messages.forEach(m => lines.push(`MESSAGE|${m.chatId}|${m.senderId}|${m.text}|${m.image}|${m.timestamp}`));
+            dbCache.messages.forEach(m => {
+                const reactionsStr = JSON.stringify(m.reactions || []);
+                lines.push(`MESSAGE|${m.chatId}|${m.senderId}|${m.text || ''}|${m.image || ''}|${m.file || ''}|${reactionsStr}|${m.timestamp}`);
+            });
             const newContent = lines.join('\n');
             const { token, owner, repo, path } = githubConfig;
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -1389,12 +1542,27 @@
             return dbCache.messages.filter(m => m.chatId === chatId).sort((a,b) => a.timestamp - b.timestamp);
         }
 
-        async function addMessage(chatId, senderId, text, image) {
-            const msg = { chatId, senderId, text: text || '', image: image || '', timestamp: Date.now() };
+        async function addMessage(chatId, senderId, text, image, file) {
+            const msg = { chatId, senderId, text: text || '', image: image || '', file: file || '', reactions: [], timestamp: Date.now() };
             dbCache.messages.push(msg);
-            const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${msg.timestamp}`;
+            const reactionsStr = JSON.stringify([]);
+            const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}`;
             await appendToDatabase(line);
             rebuildChatsFromMessages();
+        }
+
+        async function addReaction(chatId, messageTimestamp, emoji) {
+            const msg = dbCache.messages.find(m => m.chatId === chatId && m.timestamp === messageTimestamp);
+            if (!msg) return;
+            if (!msg.reactions) msg.reactions = [];
+            const existing = msg.reactions.find(r => r.userId === myId && r.emoji === emoji);
+            if (existing) {
+                msg.reactions = msg.reactions.filter(r => !(r.userId === myId && r.emoji === emoji));
+            } else {
+                msg.reactions.push({ userId: myId, emoji });
+            }
+            await rewriteDatabase();
+            loadMessages();
         }
 
         function loadGitHubConfig() {
@@ -1667,9 +1835,11 @@
             container.innerHTML = '';
             msgs.forEach(m => {
                 const isOwn = m.senderId === myId;
+                const wrapper = document.createElement('div');
+                wrapper.className = `message-wrapper ${isOwn ? 'own' : ''}`;
+                wrapper.dataset.timestamp = m.timestamp;
                 const msgDiv = document.createElement('div');
-                msgDiv.classList.add('message');
-                if (isOwn) msgDiv.classList.add('own');
+                msgDiv.className = `message ${isOwn ? 'own' : ''}`;
                 const sender = dbCache.users.find(u => u.id === m.senderId);
                 const senderName = sender ? sender.name : 'Неизвестно';
                 if (currentChatType === 'group' && !isOwn) {
@@ -1688,14 +1858,73 @@
                     });
                     msgDiv.appendChild(img);
                 }
+                if (m.file) {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'message-file';
+                    fileDiv.innerHTML = `📎 <span>${m.file.split('/').pop()}</span>`;
+                    fileDiv.addEventListener('click', () => {
+                        window.open(m.file, '_blank');
+                    });
+                    msgDiv.appendChild(fileDiv);
+                }
                 if (m.text) {
                     const textNode = document.createTextNode(m.text);
                     msgDiv.appendChild(textNode);
                 }
-                container.appendChild(msgDiv);
+                wrapper.appendChild(msgDiv);
+                if (m.reactions && m.reactions.length > 0) {
+                    const reactionsDiv = document.createElement('div');
+                    reactionsDiv.className = 'reactions';
+                    const grouped = {};
+                    m.reactions.forEach(r => {
+                        if (!grouped[r.emoji]) grouped[r.emoji] = 0;
+                        grouped[r.emoji]++;
+                    });
+                    Object.entries(grouped).forEach(([emoji, count]) => {
+                        const react = document.createElement('span');
+                        react.className = 'reaction';
+                        react.innerHTML = `${emoji} <span class="reaction-count">${count}</span>`;
+                        reactionsDiv.appendChild(react);
+                    });
+                    wrapper.appendChild(reactionsDiv);
+                }
+                container.appendChild(wrapper);
             });
             animateNewMessages();
             container.scrollTop = container.scrollHeight;
+
+            document.querySelectorAll('.message-wrapper').forEach(w => {
+                w.addEventListener('touchstart', (e) => {
+                    longPressTimer = setTimeout(() => {
+                        const timestamp = w.dataset.timestamp;
+                        const msg = msgs.find(m => m.timestamp == timestamp);
+                        if (msg && msg.senderId !== myId) {
+                            currentMessageData = msg;
+                            const menu = document.getElementById('reactionMenu');
+                            const rect = w.getBoundingClientRect();
+                            menu.style.top = rect.top + 'px';
+                            menu.style.left = rect.left + 'px';
+                            menu.classList.add('active');
+                            const downloadBtn = document.getElementById('downloadMediaBtn');
+                            if (msg.image || msg.file) {
+                                downloadBtn.style.display = 'flex';
+                                downloadBtn.onclick = () => {
+                                    window.open(msg.image || msg.file, '_blank');
+                                    menu.classList.remove('active');
+                                };
+                            } else {
+                                downloadBtn.style.display = 'none';
+                            }
+                        }
+                    }, 500);
+                });
+                w.addEventListener('touchend', () => {
+                    clearTimeout(longPressTimer);
+                });
+                w.addEventListener('touchmove', () => {
+                    clearTimeout(longPressTimer);
+                });
+            });
         }
 
         async function addChatFromSearch(searchId) {
@@ -1929,7 +2158,17 @@
             };
 
             document.getElementById('attachBtn').onclick = () => {
+                document.getElementById('attachMenu').classList.toggle('active');
+            };
+
+            document.getElementById('attachPhotoBtn').onclick = () => {
                 document.getElementById('fileInput').click();
+                document.getElementById('attachMenu').classList.remove('active');
+            };
+
+            document.getElementById('attachFileBtn').onclick = () => {
+                document.getElementById('anyFileInput').click();
+                document.getElementById('attachMenu').classList.remove('active');
             };
 
             document.getElementById('fileInput').onchange = async function(e) {
@@ -1942,10 +2181,41 @@
                 const fileName = `image_${Date.now()}_${file.name}`;
                 const url = await uploadFileToGitHub(file, fileName);
                 if (url) {
-                    await addMessage(currentChatId, myId, '', url);
+                    await addMessage(currentChatId, myId, '', url, '');
                     await loadMessages();
                 }
             };
+
+            document.getElementById('anyFileInput').onchange = async function(e) {
+                const file = e.target.files[0];
+                if (!file || !currentChatId) return;
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Файл слишком большой (макс 10MB)');
+                    return;
+                }
+                const fileName = `file_${Date.now()}_${file.name}`;
+                const url = await uploadFileToGitHub(file, fileName);
+                if (url) {
+                    await addMessage(currentChatId, myId, '', '', url);
+                    await loadMessages();
+                }
+            };
+
+            document.querySelectorAll('.reaction-menu-item').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const emoji = btn.dataset.reaction;
+                    if (currentMessageData) {
+                        await addReaction(currentChatId, currentMessageData.timestamp, emoji);
+                        document.getElementById('reactionMenu').classList.remove('active');
+                    }
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.reaction-menu') && !e.target.closest('.message-wrapper')) {
+                    document.getElementById('reactionMenu').classList.remove('active');
+                }
+            });
 
             if (!hasConfig) {
                 modalGithub.classList.add('active');
@@ -2090,8 +2360,7 @@
 
             document.getElementById('sendMsgBtn').onclick = async function () {
                 const msg = document.getElementById('messageInput').value.trim();
-                if (!msg && !document.getElementById('fileInput').files.length) {
-                    alert('Нет активного чата или пустое сообщение');
+                if (!msg && !document.getElementById('fileInput').files.length && !document.getElementById('anyFileInput').files.length) {
                     return;
                 }
                 if (!currentChatId) {
@@ -2099,7 +2368,7 @@
                     return;
                 }
                 if (msg) {
-                    await addMessage(currentChatId, myId, msg, '');
+                    await addMessage(currentChatId, myId, msg, '', '');
                 }
                 document.getElementById('messageInput').value = '';
                 const sendBtn = document.getElementById('sendMsgBtn');
