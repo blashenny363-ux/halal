@@ -3,3 +3,4 @@ GROUP_MEMBER|g_mm856hidb2mz_group|p_mm1ogid4ahqz_person
 MESSAGE|g_mm856hidb2mz_group|p_mm1ogid4ahqz_person|тест|||[]|1772393420123
 MESSAGE|g_mm856hidb2mz_group|p_mm1ogid4ahqz_person|тесттест|||[]|1772393578548
 USER|bot|bot@gmail.com|botbot|||p_mm86auoyczbk_person
+USER|безмятежний|blashenny363@gmail.com|SaD1SaD1|||p_mm86dz9ppdqa_person
