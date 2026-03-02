@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>halal</title>
     <style>
-        /* ========== СТИЛИ (максимально упрощены, но красивы) ========== */
         * {
             margin: 0;
             padding: 0;
@@ -20,7 +19,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 0;
-            transition: background-color 0.4s ease, color 0.3s ease;
+            transition: background-color 0.3s ease;
             overflow-x: hidden;
         }
         :root {
@@ -32,17 +31,16 @@
             --text-primary: #fff;
             --text-secondary: #8e9fad;
             --border-color: #0f1a22;
-            --message-own-bg: #d4af37;
+            --message-own-bg: #2e7d32;
             --message-other-bg: #182533;
-            --accent-color: #d4af37;
+            --accent-color: #2e7d32;
             --hover-bg: #2b3b4a;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-            --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.45);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
             --border-radius-message: 18px;
-            --border-radius-item: 18px;
-            --transition: all 0.25s ease;
-            --glow: 0 0 15px var(--accent-color);
+            --border-radius-item: 16px;
+            --transition: all 0.2s ease;
         }
         body.light-theme {
             --bg-primary: #f0f4fa;
@@ -53,10 +51,12 @@
             --text-primary: #1a2634;
             --text-secondary: #4a5a6e;
             --border-color: #b0c4de;
-            --message-own-bg: #d4af37;
+            --message-own-bg: #2e7d32;
             --message-other-bg: #ffffff;
-            --accent-color: #d4af37;
+            --accent-color: #2e7d32;
             --hover-bg: #c0cbd8;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
         }
         body.grey-theme {
             --bg-primary: #2c2f33;
@@ -67,10 +67,12 @@
             --text-primary: #fff;
             --text-secondary: #99aab5;
             --border-color: #202225;
-            --message-own-bg: #5865f2;
+            --message-own-bg: #2e7d32;
             --message-other-bg: #3a3f44;
-            --accent-color: #5865f2;
+            --accent-color: #2e7d32;
             --hover-bg: #40474f;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
         }
         body.own-color-gold { --message-own-bg: #d4af37; }
         body.own-color-blue { --message-own-bg: #2b5278; }
@@ -89,7 +91,6 @@
         body.accent-color-purple { --accent-color: #9b59b6; }
         body.accent-color-orange { --accent-color: #f39c12; }
 
-        /* Скроллбары */
         .chats-list::-webkit-scrollbar,
         .messages-container::-webkit-scrollbar,
         .members-list::-webkit-scrollbar {
@@ -106,10 +107,8 @@
         .members-list::-webkit-scrollbar-thumb {
             background: var(--accent-color);
             border-radius: 4px;
-            box-shadow: var(--glow);
         }
 
-        /* Основной контейнер */
         .app {
             position: relative;
             width: 100%;
@@ -118,14 +117,11 @@
             background: var(--bg-primary);
             box-shadow: var(--shadow-lg);
             overflow: hidden;
-            transition: background 0.4s ease;
+            transition: background 0.3s ease;
             margin: 0 auto;
             z-index: 1;
-            border-radius: 36px;
-            backdrop-filter: blur(2px);
+            border-radius: 28px;
         }
-
-        /* Левая панель (список чатов) */
         .sidebar {
             position: absolute;
             top: 0;
@@ -138,37 +134,37 @@
             transition: transform 0.3s ease;
             transform: translateX(0);
             z-index: 2;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
         }
         .sidebar.hide {
             transform: translateX(-100%);
         }
         .sidebar-header {
-            padding: 20px 20px;
+            padding: 18px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-header);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
             transition: var(--transition);
         }
         .user-info {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             cursor: pointer;
         }
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 20px;
+            font-size: 18px;
             color: white;
             text-transform: uppercase;
             transition: var(--transition);
@@ -183,27 +179,25 @@
             object-fit: cover;
         }
         .user-info:hover .avatar {
-            transform: scale(1.08);
-            border-color: var(--accent-color);
-            box-shadow: var(--glow);
+            transform: scale(1.05);
         }
         .user-name {
             font-weight: 600;
-            font-size: 18px;
+            font-size: 17px;
             color: var(--text-primary);
             transition: color 0.2s;
         }
         .sidebar-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         .icon-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -213,12 +207,10 @@
         .icon-btn:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
-            transform: scale(1.12);
-            box-shadow: var(--glow);
         }
         .icon-btn svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             fill: currentColor;
         }
         .search-box {
@@ -231,15 +223,15 @@
             background: var(--bg-input);
             border: none;
             border-radius: 40px;
-            padding: 16px 20px;
+            padding: 14px 20px;
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: 15px;
             outline: none;
             transition: var(--transition);
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
         }
         .search-box input:focus {
-            box-shadow: 0 0 0 2px var(--accent-color), inset 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 0 0 2px var(--accent-color), inset 0 2px 6px rgba(0,0,0,0.2);
         }
         .search-box input::placeholder {
             color: var(--text-secondary);
@@ -248,42 +240,40 @@
         .chats-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 0;
+            padding: 6px 0;
         }
         .chat-item {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             padding: 12px 20px;
             cursor: pointer;
             transition: var(--transition);
             border-bottom: 1px solid var(--border-color);
             position: relative;
-            margin: 4px 12px;
+            margin: 2px 10px;
             border-radius: var(--border-radius-item);
         }
         .chat-item:hover {
             background: var(--hover-bg);
             transform: translateX(4px);
-            box-shadow: var(--shadow-sm);
         }
         .chat-item.active {
             background: var(--bg-input);
             border-left: 4px solid var(--accent-color);
-            box-shadow: var(--shadow-sm);
         }
         .chat-item.pinned {
-            background: rgba(255, 215, 0, 0.12);
+            background: rgba(255, 215, 0, 0.1);
         }
         .chat-avatar {
-            width: 56px;
-            height: 56px;
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             color: #fff;
             flex-shrink: 0;
@@ -299,9 +289,7 @@
             object-fit: cover;
         }
         .chat-item:hover .chat-avatar {
-            transform: scale(1.08);
-            border-color: var(--accent-color);
-            box-shadow: var(--glow);
+            transform: scale(1.05);
         }
         .chat-info {
             flex: 1;
@@ -309,16 +297,16 @@
         }
         .chat-name {
             font-weight: 600;
-            font-size: 17px;
+            font-size: 16px;
             color: var(--text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             transition: color 0.2s;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         .chat-preview {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
@@ -327,7 +315,7 @@
         }
         .chat-actions {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -338,30 +326,27 @@
             background: var(--bg-input);
             border: none;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: var(--text-primary);
-            font-size: 18px;
+            font-size: 16px;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
         }
         .chat-action-btn:hover {
             background: var(--accent-color);
-            transform: scale(1.15);
-            box-shadow: var(--glow);
             color: white;
         }
         .pin-indicator {
             color: gold;
-            margin-left: 6px;
-            font-size: 15px;
+            margin-left: 5px;
+            font-size: 14px;
         }
 
-        /* Правая панель (чат) */
         .chat-panel {
             position: absolute;
             top: 0;
@@ -379,29 +364,29 @@
             transform: translateX(0);
         }
         .chat-header {
-            padding: 14px 20px;
+            padding: 12px 20px;
             background: var(--bg-header);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             transition: var(--transition);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
         }
         .chat-header-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
         .back-button {
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            font-size: 30px;
+            font-size: 28px;
             line-height: 1;
             cursor: pointer;
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -411,11 +396,10 @@
         .back-button:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
-            transform: scale(1.15);
         }
         .chat-header-avatar {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
@@ -437,22 +421,20 @@
             object-fit: cover;
         }
         .chat-header-avatar:hover {
-            transform: scale(1.08);
-            border-color: var(--accent-color);
-            box-shadow: var(--glow);
+            transform: scale(1.05);
         }
         .chat-header-info {
             display: flex;
             flex-direction: column;
         }
         .chat-header-info h3 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             color: var(--text-primary);
             transition: color 0.2s;
         }
         .chat-header-info span {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             transition: color 0.2s;
         }
@@ -460,10 +442,10 @@
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            font-size: 26px;
+            font-size: 24px;
             cursor: pointer;
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -473,17 +455,15 @@
         .members-btn:hover {
             background: var(--hover-bg);
             color: var(--text-primary);
-            transform: scale(1.15);
         }
 
-        /* Сообщения */
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 16px;
+            padding: 18px 14px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             background: transparent;
             transition: var(--transition);
         }
@@ -491,39 +471,39 @@
             position: relative;
             max-width: 80%;
             align-self: flex-start;
-            animation: slideIn 0.25s ease-out;
+            animation: slideIn 0.2s ease-out;
         }
         .message-wrapper.own {
             align-self: flex-end;
         }
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .message {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: var(--border-radius-message);
             background: var(--message-other-bg);
             color: var(--text-primary);
             font-size: 15px;
-            line-height: 1.6;
+            line-height: 1.5;
             word-wrap: break-word;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
         }
         .message.own {
             background: var(--message-own-bg);
-            color: #000;
+            color: #fff;
         }
         .message .sender-name {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-weight: 500;
         }
         .message-image {
             max-width: 100%;
-            max-height: 220px;
+            max-height: 200px;
             border-radius: 12px;
             cursor: pointer;
             margin-top: 6px;
@@ -536,9 +516,9 @@
         .message-file {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             background: var(--bg-input);
-            padding: 10px 12px;
+            padding: 8px 12px;
             border-radius: 12px;
             margin-top: 6px;
             cursor: pointer;
@@ -561,15 +541,15 @@
         }
         .reactions {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 6px;
+            margin-top: 6px;
             flex-wrap: wrap;
         }
         .reaction {
             background: var(--bg-input);
-            border-radius: 24px;
-            padding: 4px 10px;
-            font-size: 14px;
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-size: 13px;
             display: flex;
             align-items: center;
             gap: 4px;
@@ -579,31 +559,29 @@
         .reaction:hover {
             background: var(--accent-color);
             color: white;
-            box-shadow: var(--glow);
         }
         .reaction-count {
             font-size: 12px;
             color: var(--text-secondary);
         }
 
-        /* Поле ввода */
         .message-input-area {
-            padding: 16px 20px;
+            padding: 14px 18px;
             background: var(--bg-header);
             border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: flex-end;
             transition: var(--transition);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(8px);
             position: relative;
         }
         .attach-btn {
             background: var(--bg-input);
             border: none;
             border-radius: 50%;
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -614,27 +592,25 @@
             box-shadow: var(--shadow-sm);
         }
         .attach-btn svg {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             fill: currentColor;
         }
         .attach-btn:hover {
             background: var(--accent-color);
-            transform: scale(1.12);
-            box-shadow: var(--glow);
             color: white;
         }
         .attach-menu {
             position: absolute;
-            bottom: 80px;
-            left: 20px;
+            bottom: 72px;
+            left: 18px;
             background: var(--bg-header);
-            border-radius: 40px;
-            padding: 10px;
+            border-radius: 30px;
+            padding: 8px;
             display: flex;
-            gap: 10px;
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(20px);
+            gap: 8px;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(8px);
             transform: scale(0);
             opacity: 0;
             transition: transform 0.2s ease, opacity 0.2s ease;
@@ -648,45 +624,44 @@
         .attach-menu-item {
             background: var(--bg-input);
             border: none;
-            border-radius: 40px;
-            padding: 12px 24px;
+            border-radius: 30px;
+            padding: 10px 20px;
             color: var(--text-primary);
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 15px;
         }
         .attach-menu-item:hover {
             background: var(--accent-color);
             color: white;
-            transform: scale(1.05);
         }
         .message-input-area textarea {
             flex: 1;
             background: var(--bg-input);
             border: none;
-            border-radius: 32px;
-            padding: 16px 22px;
+            border-radius: 28px;
+            padding: 14px 20px;
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: 15px;
             resize: none;
-            max-height: 120px;
+            max-height: 100px;
             outline: none;
             transition: var(--transition);
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
-            line-height: 1.5;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+            line-height: 1.4;
         }
         .message-input-area textarea:focus {
-            box-shadow: 0 0 0 2px var(--accent-color), inset 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 0 0 2px var(--accent-color), inset 0 2px 6px rgba(0,0,0,0.2);
         }
         .send-btn {
             background: var(--accent-color);
             border: none;
             border-radius: 50%;
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -696,20 +671,17 @@
             flex-shrink: 0;
         }
         .send-btn:active {
-            transform: scale(0.92);
+            transform: scale(0.95);
         }
         .send-btn svg {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             fill: #fff;
         }
         .send-btn:hover {
-            filter: brightness(1.15);
-            box-shadow: var(--glow);
-            transform: scale(1.08);
+            filter: brightness(1.1);
         }
 
-        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -721,35 +693,35 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(8px);
         }
         .modal.active {
             display: flex;
         }
         .modal-content {
             background: var(--bg-primary);
-            border-radius: 40px;
+            border-radius: 32px;
             width: 90%;
-            max-width: 420px;
-            padding: 30px;
+            max-width: 400px;
+            padding: 24px;
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow-lg);
-            animation: modalFadeIn 0.3s;
+            animation: modalFadeIn 0.2s;
             color: var(--text-primary);
             transition: var(--transition);
             max-height: 80vh;
             overflow-y: auto;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
         }
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-30px); }
+            from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .modal-content h3 {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: var(--accent-color);
             font-weight: 600;
-            font-size: 24px;
+            font-size: 22px;
         }
         .modal-content input,
         .modal-content select,
@@ -757,13 +729,13 @@
             width: 100%;
             background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 40px;
-            padding: 16px 20px;
+            border-radius: 30px;
+            padding: 14px 18px;
             color: var(--text-primary);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             transition: var(--transition);
             resize: vertical;
-            font-size: 16px;
+            font-size: 15px;
         }
         .modal-content input:focus,
         .modal-content select:focus,
@@ -774,54 +746,50 @@
         .modal-content button {
             background: var(--accent-color);
             border: none;
-            border-radius: 40px;
-            padding: 16px;
+            border-radius: 30px;
+            padding: 14px;
             color: white;
             font-weight: 600;
             width: 100%;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
-            font-size: 17px;
+            font-size: 16px;
         }
         .modal-content button:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--glow);
+            filter: brightness(1.1);
+            transform: translateY(-2px);
         }
         .modal-content button.small {
-            padding: 12px;
+            padding: 10px;
             margin-top: 0;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
         .modal-tabs {
             display: flex;
-            gap: 12px;
-            margin-bottom: 28px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .modal-tab {
             flex: 1;
             background: var(--bg-input);
             border: none;
-            border-radius: 40px;
-            padding: 14px;
+            border-radius: 30px;
+            padding: 12px;
             color: var(--text-primary);
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
-            font-size: 16px;
+            font-size: 15px;
         }
         .modal-tab.active {
             background: var(--accent-color);
             color: white;
-            box-shadow: var(--shadow-sm);
-        }
-        .modal-tab:hover {
-            box-shadow: var(--glow);
         }
         .modal-close {
             float: right;
-            font-size: 30px;
+            font-size: 28px;
             cursor: pointer;
             color: var(--text-secondary);
             transition: color 0.2s;
@@ -833,83 +801,82 @@
         .error-text {
             color: #ff8a8a;
             background: #2a1f1f;
-            padding: 14px;
-            border-radius: 20px;
-            margin-top: 12px;
-            font-size: 15px;
+            padding: 12px;
+            border-radius: 16px;
+            margin-top: 10px;
+            font-size: 14px;
         }
         .success-text {
             color: #8aff8a;
             background: #1f2a1f;
-            padding: 14px;
-            border-radius: 20px;
-            margin-top: 12px;
-            font-size: 15px;
+            padding: 12px;
+            border-radius: 16px;
+            margin-top: 10px;
+            font-size: 14px;
         }
 
-        /* Кастомизация */
         .customize-options {
             display: flex;
             flex-direction: column;
-            gap: 18px;
-            margin: 24px 0;
+            gap: 16px;
+            margin: 20px 0;
         }
         .customize-section {
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 18px;
-            margin-bottom: 18px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
         }
         .customize-section h4 {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             color: var(--text-secondary);
             font-weight: 500;
-            font-size: 18px;
+            font-size: 17px;
         }
         .customize-options label {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: 15px;
         }
         .customize-options select {
             background: var(--bg-input);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 16px;
+            padding: 8px;
+            border-radius: 10px;
             flex: 1;
         }
         .profile-section {
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 28px;
+            padding-bottom: 20px;
         }
         .avatar-upload {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
+            gap: 12px;
+            margin-bottom: 18px;
         }
         .avatar-preview {
-            width: 110px;
-            height: 110px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 36px;
             color: white;
             overflow: hidden;
-            border: 4px solid transparent;
+            border: 3px solid transparent;
             transition: var(--transition);
             box-shadow: var(--shadow-md);
         }
         .avatar-preview:hover {
             border-color: var(--accent-color);
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
         .avatar-preview-img {
             width: 100%;
@@ -917,46 +884,46 @@
             object-fit: cover;
         }
         .create-group-btn {
-            margin-top: 28px;
+            margin-top: 20px;
             background: var(--accent-color);
             border: none;
-            border-radius: 40px;
-            padding: 18px;
+            border-radius: 30px;
+            padding: 16px;
             color: white;
             font-weight: 600;
             width: 100%;
             cursor: pointer;
-            font-size: 17px;
+            font-size: 16px;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
         }
         .create-group-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--glow);
+            filter: brightness(1.1);
+            transform: translateY(-2px);
         }
         .members-list {
             list-style: none;
             padding: 0;
-            margin: 16px 0;
-            max-height: 300px;
+            margin: 14px 0;
+            max-height: 280px;
             overflow-y: auto;
         }
         .members-list li {
-            padding: 14px;
+            padding: 12px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             transition: var(--transition);
-            border-radius: 16px;
+            border-radius: 12px;
         }
         .members-list li:hover {
             background: var(--hover-bg);
         }
         .members-list .avatar-small {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
@@ -977,53 +944,52 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 18px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 18px;
         }
         .profile-view-avatar {
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 52px;
+            font-size: 48px;
             color: white;
             object-fit: cover;
             border: 4px solid var(--accent-color);
             box-shadow: var(--shadow-md);
         }
         .profile-view-name {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
         }
         .profile-view-bio {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--text-secondary);
             text-align: center;
             word-wrap: break-word;
             max-width: 100%;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .profile-view-id {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             background: var(--bg-input);
-            padding: 8px 16px;
-            border-radius: 40px;
+            padding: 6px 14px;
+            border-radius: 30px;
         }
 
-        /* Меню реакций */
         .reaction-menu {
             position: absolute;
             background: var(--bg-header);
-            border-radius: 50px;
-            padding: 10px;
+            border-radius: 40px;
+            padding: 8px;
             display: flex;
-            gap: 10px;
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(20px);
+            gap: 8px;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(8px);
             z-index: 100;
             transform: scale(0);
             opacity: 0;
@@ -1037,43 +1003,40 @@
             background: var(--bg-input);
             border: none;
             border-radius: 50%;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
             transition: var(--transition);
         }
         .reaction-menu-item:hover {
             background: var(--accent-color);
-            transform: scale(1.15);
-            box-shadow: var(--glow);
+            color: white;
         }
         .download-btn {
             background: var(--bg-input);
             border: none;
-            border-radius: 40px;
-            padding: 12px 20px;
+            border-radius: 30px;
+            padding: 10px 18px;
             color: var(--text-primary);
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 15px;
         }
         .download-btn:hover {
             background: var(--accent-color);
             color: white;
-            box-shadow: var(--glow);
         }
     </style>
 </head>
 <body>
     <div class="app" id="app">
-        <!-- Левая панель (список чатов) -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-info" id="userInfoBlock">
@@ -1095,7 +1058,6 @@
             <div class="chats-list" id="chatsList"></div>
         </div>
 
-        <!-- Правая панель (окно чата) -->
         <div class="chat-panel" id="chatPanel">
             <div class="chat-header" id="chatHeader" style="display: none;">
                 <div class="chat-header-left">
@@ -1131,7 +1093,6 @@
             </div>
         </div>
 
-        <!-- Модальные окна -->
         <div class="modal" id="githubModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeModalBtn">&times;</span>
@@ -1208,9 +1169,9 @@
                         </label>
                         <label>Цвет моих сообщений:
                             <select id="ownColorSelect">
+                                <option value="green">Зелёный</option>
                                 <option value="gold">Золотой</option>
                                 <option value="blue">Синий</option>
-                                <option value="green">Зелёный</option>
                                 <option value="red">Красный</option>
                                 <option value="purple">Фиолетовый</option>
                                 <option value="orange">Оранжевый</option>
@@ -1226,9 +1187,9 @@
                         </label>
                         <label>Акцентный цвет:
                             <select id="accentColorSelect">
+                                <option value="green">Зелёный</option>
                                 <option value="gold">Золотой</option>
                                 <option value="blue">Синий</option>
-                                <option value="green">Зелёный</option>
                                 <option value="red">Красный</option>
                                 <option value="purple">Фиолетовый</option>
                                 <option value="orange">Оранжевый</option>
@@ -1301,7 +1262,7 @@
         <div class="modal" id="imageModal">
             <div class="modal-content" style="max-width: 500px; text-align: center;">
                 <span class="modal-close" id="closeImageBtn">&times;</span>
-                <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 20px;">
+                <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 16px;">
             </div>
         </div>
 
@@ -1315,7 +1276,6 @@
     </div>
 
     <script>
-        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
         let myId = null;
         let myName = null;
         let myEmail = null;
@@ -1324,21 +1284,19 @@
         let githubConfig = null;
         let dbCache = { users: [], groups: [], groupMembers: [], messages: [] };
         let currentChatId = null;
-        let currentChatType = null; // 'private' или 'group'
+        let currentChatType = null;
         let currentPeerInfo = '';
         let messagesUpdateInterval = null;
         let dbUpdateInterval = null;
-        let chats = []; // список чатов для левой панели
+        let chats = [];
         let users = JSON.parse(localStorage.getItem('halal_users')) || [];
         let longPressTimer = null;
         let currentMessageData = null;
         let displayedMessageTimestamps = new Set();
 
-        // ========== ГЕНЕРАЦИЯ ID ==========
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
         function generateGroupId() { return 'g_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_group'; }
 
-        // ========== РАБОТА С БАЗОЙ ДАННЫХ (GitHub) ==========
         async function loadDatabase() {
             if (!githubConfig) return;
             const { token, owner, repo, path } = githubConfig;
@@ -1406,10 +1364,8 @@
             }
         }
 
-        // Перестроить список чатов на основе всех данных (пользователи, группы, сообщения)
         function rebuildChatsFromAllData() {
             const newChats = [];
-            // 1. Личные чаты из сообщений
             const privateChatIds = new Set();
             dbCache.messages.forEach(msg => {
                 if (msg.chatId.startsWith('private_')) {
@@ -1423,8 +1379,6 @@
                 const name = user ? user.name : 'Неизвестно';
                 newChats.push({ id: chatId, name, type: 'private', lastMessage: '', pinned: false });
             });
-
-            // 2. Группы, в которых я участник
             const myGroupIds = dbCache.groupMembers.filter(gm => gm.userId === myId).map(gm => gm.groupId);
             myGroupIds.forEach(groupId => {
                 const group = dbCache.groups.find(g => g.id === groupId);
@@ -1432,14 +1386,10 @@
                     newChats.push({ id: groupId, name: group.name, type: 'group', lastMessage: '', pinned: false });
                 }
             });
-
-            // 3. Сохраняем закрепления из старого chats (если есть)
             const pinnedMap = new Map();
             chats.forEach(chat => {
                 if (chat.pinned) pinnedMap.set(chat.id, true);
             });
-
-            // Объединяем, убираем дубликаты
             const uniqueChats = [];
             const seen = new Set();
             newChats.forEach(chat => {
@@ -1527,7 +1477,6 @@
             }
         }
 
-        // ========== ЗАГРУЗКА ФАЙЛОВ ==========
         async function uploadFileToGitHub(file, fileName) {
             if (!githubConfig) return null;
             const { token, owner, repo } = githubConfig;
@@ -1557,7 +1506,6 @@
             });
         }
 
-        // ========== СООБЩЕНИЯ ==========
         function getMessagesForChat(chatId) {
             return dbCache.messages.filter(m => m.chatId === chatId).sort((a,b) => a.timestamp - b.timestamp);
         }
@@ -1737,7 +1685,6 @@
             attachLongPressToElement(newWrapper);
         }
 
-        // ========== СТАТУСЫ ПРОЧТЕНИЯ ==========
         async function markMessagesAsRead() {
             if (!currentChatId || currentChatType !== 'private') return;
             let changed = false;
@@ -1766,7 +1713,6 @@
             });
         }
 
-        // ========== УПРАВЛЕНИЕ ЧАТАМИ ==========
         function togglePinChat(chatId) {
             const chat = chats.find(c => c.id === chatId);
             if (chat) {
@@ -1886,7 +1832,6 @@
             }
         }
 
-        // ========== ОБНОВЛЕНИЕ АВАТАРОК ==========
         function updateChatHeaderAvatar() {
             if (!currentChatId) return;
             const chatAvatar = document.getElementById('chatAvatar');
@@ -1917,7 +1862,6 @@
             }
         }
 
-        // ========== ЗАГРУЗКА/СОХРАНЕНИЕ КОНФИГУРАЦИИ ==========
         function loadGitHubConfig() {
             const stored = localStorage.getItem('halal_github_config');
             if (stored) {
@@ -2077,7 +2021,6 @@
             });
         }
 
-        // ========== ПРОСМОТР ПРОФИЛЯ ==========
         function showUserProfile(userId) {
             const entry = dbCache.users.find(u => u.id === userId);
             if (!entry) return;
@@ -2099,27 +2042,23 @@
             document.getElementById('groupSettingsModal').classList.add('active');
         }
 
-        // ========== КАСТОМИЗАЦИЯ ==========
         function applyCustomization(theme, ownColor, otherColor, accentColor) {
             document.body.classList.remove('light-theme', 'grey-theme');
             if (theme === 'light') document.body.classList.add('light-theme');
             else if (theme === 'grey') document.body.classList.add('grey-theme');
-
             document.body.classList.remove('own-color-gold', 'own-color-blue', 'own-color-green', 'own-color-red', 'own-color-purple', 'own-color-orange');
             if (ownColor) document.body.classList.add(`own-color-${ownColor}`);
-
             document.body.classList.remove('other-color-default', 'other-color-light', 'other-color-dark', 'other-color-mid');
             if (otherColor) document.body.classList.add(`other-color-${otherColor}`);
-
             document.body.classList.remove('accent-color-gold', 'accent-color-blue', 'accent-color-green', 'accent-color-red', 'accent-color-purple', 'accent-color-orange');
             if (accentColor) document.body.classList.add(`accent-color-${accentColor}`);
         }
 
         function loadCustomization() {
             const theme = localStorage.getItem('halal_theme') || 'dark';
-            const ownColor = localStorage.getItem('halal_own_color') || 'gold';
+            const ownColor = localStorage.getItem('halal_own_color') || 'green';
             const otherColor = localStorage.getItem('halal_other_color') || 'default';
-            const accentColor = localStorage.getItem('halal_accent_color') || 'gold';
+            const accentColor = localStorage.getItem('halal_accent_color') || 'green';
             document.getElementById('themeSelect').value = theme;
             document.getElementById('ownColorSelect').value = ownColor;
             document.getElementById('otherColorSelect').value = otherColor;
@@ -2127,7 +2066,6 @@
             applyCustomization(theme, ownColor, otherColor, accentColor);
         }
 
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         window.onload = async function () {
             const modalGithub = document.getElementById('githubModal');
             const modalRegister = document.getElementById('registerModal');
@@ -2140,7 +2078,6 @@
             const hasConfig = loadGitHubConfig();
             loadCustomization();
 
-            // Клик по аватару открывает настройки
             document.getElementById('userInfoBlock').addEventListener('click', () => {
                 if (myId) {
                     document.getElementById('profileName').value = myName || '';
@@ -2164,7 +2101,6 @@
                 }
             };
 
-            // Загрузка аватара
             document.getElementById('uploadAvatarBtn').onclick = () => {
                 document.getElementById('avatarInput').click();
             };
@@ -2198,7 +2134,6 @@
                 }
             };
 
-            // Обновление имени
             document.getElementById('updateNameBtn').onclick = async function () {
                 const newName = document.getElementById('profileName').value.trim();
                 if (!newName) {
@@ -2222,7 +2157,6 @@
                 }
             };
 
-            // Обновление био
             document.getElementById('updateBioBtn').onclick = async function () {
                 const newBio = document.getElementById('profileBio').value.trim();
                 const user = dbCache.users.find(u => u.id === myId);
@@ -2237,7 +2171,6 @@
                 }
             };
 
-            // Создание группы
             document.getElementById('createGroupBtn').onclick = () => {
                 if (!myId) {
                     alert('Сначала войдите в систему');
@@ -2266,7 +2199,6 @@
                     const memberLine = `GROUP_MEMBER|${newId}|${myId}`;
                     dbCache.groupMembers.push({ groupId: newId, userId: myId });
                     await appendToDatabase(memberLine);
-                    // Добавляем в список чатов
                     chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '', pinned: false });
                     saveChatsToStorage();
                     renderChatsList();
@@ -2280,7 +2212,6 @@
                 }
             };
 
-            // Сохранение настроек кастомизации
             document.getElementById('saveCustomizeBtn').onclick = () => {
                 const theme = document.getElementById('themeSelect').value;
                 const ownColor = document.getElementById('ownColorSelect').value;
@@ -2294,7 +2225,6 @@
                 modalCustomize.classList.remove('active');
             };
 
-            // Кнопка "Участники группы"
             document.getElementById('membersBtn').onclick = async function () {
                 if (!currentChatId || currentChatType !== 'group') return;
                 const members = dbCache.groupMembers.filter(gm => gm.groupId === currentChatId).map(gm => gm.userId);
@@ -2320,7 +2250,6 @@
                 modalMembers.classList.remove('active');
             };
 
-            // Настройки группы
             document.getElementById('closeGroupSettingsBtn').onclick = () => {
                 modalGroupSettings.classList.remove('active');
             };
@@ -2378,26 +2307,28 @@
                 alert('Настройки группы сохранены');
             };
 
-            // Закрытие модалок
             document.getElementById('closeProfileBtn').onclick = () => {
                 modalProfile.classList.remove('active');
             };
+
             document.getElementById('closeImageBtn').onclick = () => {
                 modalImage.classList.remove('active');
             };
 
-            // Прикрепление файлов
             document.getElementById('attachBtn').onclick = () => {
                 document.getElementById('attachMenu').classList.toggle('active');
             };
+
             document.getElementById('attachPhotoBtn').onclick = () => {
                 document.getElementById('fileInput').click();
                 document.getElementById('attachMenu').classList.remove('active');
             };
+
             document.getElementById('attachFileBtn').onclick = () => {
                 document.getElementById('anyFileInput').click();
                 document.getElementById('attachMenu').classList.remove('active');
             };
+
             document.getElementById('fileInput').onchange = async function(e) {
                 const file = e.target.files[0];
                 if (!file || !currentChatId) return;
@@ -2411,6 +2342,7 @@
                     await addMessage(currentChatId, myId, '', url, '');
                 }
             };
+
             document.getElementById('anyFileInput').onchange = async function(e) {
                 const file = e.target.files[0];
                 if (!file || !currentChatId) return;
@@ -2425,7 +2357,6 @@
                 }
             };
 
-            // Реакции
             document.querySelectorAll('.reaction-menu-item').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const emoji = btn.dataset.reaction;
@@ -2435,13 +2366,13 @@
                     }
                 });
             });
+
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.reaction-menu') && !e.target.closest('.message-wrapper')) {
                     document.getElementById('reactionMenu').classList.remove('active');
                 }
             });
 
-            // GitHub настройки
             if (!hasConfig) {
                 modalGithub.classList.add('active');
             } else {
@@ -2481,7 +2412,6 @@
                 }
             };
 
-            // Регистрация / Вход
             document.getElementById('tabRegister').onclick = () => {
                 document.getElementById('tabRegister').classList.add('active');
                 document.getElementById('tabLogin').classList.remove('active');
@@ -2570,7 +2500,6 @@
                 }, 2000);
             };
 
-            // Поиск по ID
             document.getElementById('searchIdInput').addEventListener('keypress', async function (e) {
                 if (e.key === 'Enter') {
                     const searchId = this.value.trim();
@@ -2585,7 +2514,6 @@
                 }
             });
 
-            // Отправка сообщения
             document.getElementById('sendMsgBtn').onclick = async function () {
                 const msg = document.getElementById('messageInput').value.trim();
                 if (!msg && !document.getElementById('fileInput').files.length && !document.getElementById('anyFileInput').files.length) {
@@ -2608,7 +2536,6 @@
                 }
             });
 
-            // Кнопка назад
             document.getElementById('backToChatsBtn').onclick = () => {
                 showSidebar();
             };
