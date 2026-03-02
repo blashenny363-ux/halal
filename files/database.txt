@@ -1,5 +1,5 @@
 USER|bot|bot@gmail.com|bot|||p_mm8vrfvd70yr_person
 GROUP|тест||default|g_mm8vrrfps87o_group
-GROUP|тест||#2e7d32|g_mm8x0epn6p7t_group
+GROUP|тест||#17212b|g_mm8x0epn6p7t_group
 GROUP_MEMBER|g_mm8x0epn6p7t_group|p_mm8vrfvd70yr_person
 MESSAGE|g_mm8x0epn6p7t_group|p_mm8vrfvd70yr_person|хуец|||[]|1772441981471
