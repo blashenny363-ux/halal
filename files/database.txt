@@ -4,3 +4,4 @@ GROUP_MEMBER|g_mm9cfr86xpb0_group|p_mm9cff0vcn1l_person
 MESSAGE|g_mm9cfr86xpb0_group|p_mm9cff0vcn1l_person|хуй|||[]|1772465920091|0
 MESSAGE|g_mm9cfr86xpb0_group|p_mm9cff0vcn1l_person||https://raw.githubusercontent.com/blashenny363-ux/halal/main/files/image_1772466106371_Screenshot_20260220_095229_Google Play Store.png||[]|1772466109114|0
 USER|бот|bot@gmail.com|bot|||p_mm9j970r8grm_person
+GROUP|тест||default|g_mm9j9g3ddj5s_group
