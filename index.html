@@ -1385,7 +1385,7 @@
                 });
                 dbCache = newCache;
                 rebuildChatsFromMessages();
-                if (currentChatId) renderMessages();
+                if (currentChatId) updateMessages(); // обновляем только новые сообщения, без полной перерисовки
             } catch (e) {
                 document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
             }
@@ -1413,7 +1413,7 @@
                     const parts = chatId.split('_');
                     const otherId = parts[1] === myId ? parts[2] : parts[1];
                     const user = dbCache.users.find(u => u.id === otherId);
-                    name = user ? user.name : getSenderName(otherId); // используем getSenderName для поиска
+                    name = user ? user.name : getSenderName(otherId);
                 } else {
                     type = 'group';
                     const group = dbCache.groups.find(g => g.id === chatId);
@@ -1537,7 +1537,6 @@
             return dbCache.messages.filter(m => m.chatId === chatId).sort((a,b) => a.timestamp - b.timestamp);
         }
 
-        // Функция для получения имени отправителя с fallback
         function getSenderName(senderId) {
             let sender = dbCache.users.find(u => u.id === senderId);
             if (sender) return sender.name;
@@ -1563,6 +1562,7 @@
 
         function appendMessageToDOM(msg) {
             if (!currentChatId || msg.chatId !== currentChatId) return;
+            if (displayedMessageTimestamps.has(msg.timestamp)) return; // уже есть
             const container = document.getElementById('messagesContainer');
             const isOwn = msg.senderId === myId;
             const wrapper = createMessageElement(msg, isOwn);
@@ -1917,6 +1917,16 @@
                 attachLongPressToElement(wrapper);
             });
             container.scrollTop = container.scrollHeight;
+        }
+
+        function updateMessages() {
+            if (!currentChatId) return;
+            const msgs = getMessagesForChat(currentChatId);
+            msgs.forEach(msg => {
+                if (!displayedMessageTimestamps.has(msg.timestamp)) {
+                    appendMessageToDOM(msg);
+                }
+            });
         }
 
         async function loadMessages() {
