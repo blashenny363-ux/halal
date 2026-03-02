@@ -37,13 +37,13 @@
             --gradient-start: #17212b;
             --gradient-end: #1e2b36;
             --hover-bg: #2b3b4a;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+            --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.45);
             --border-radius-message: 24px;
             --border-radius-item: 18px;
             --transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
-            --glow: 0 0 12px var(--accent-color);
+            --glow: 0 0 15px var(--accent-color);
         }
         body.gradient-blue {
             --gradient-start: #0f2027;
@@ -93,9 +93,9 @@
             --message-other-bg: #ffffff;
             --accent-color: #d4af37;
             --hover-bg: #c0cbd8;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
-            --glow: 0 0 12px rgba(212, 175, 55, 0.4);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.15);
+            --glow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
         body.grey-theme {
             --bg-primary: #2c2f33;
@@ -112,7 +112,7 @@
             --hover-bg: #40474f;
             --shadow-sm: 0 4px 12px rgba(0,0,0,0.4);
             --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
-            --glow: 0 0 12px rgba(88, 101, 242, 0.6);
+            --glow: 0 0 15px rgba(88, 101, 242, 0.6);
         }
         body.own-color-gold { --message-own-bg: #d4af37; }
         body.own-color-blue { --message-own-bg: #2b5278; }
@@ -141,7 +141,7 @@
             transition: background 0.4s ease;
             margin: 0 auto;
             z-index: 1;
-            border-radius: 32px;
+            border-radius: 36px;
             backdrop-filter: blur(2px);
         }
         .chats-list::-webkit-scrollbar,
@@ -718,14 +718,6 @@
         }
         .send-btn:active {
             transform: scale(0.92);
-        }
-        .send-btn.animate {
-            animation: sendPop 0.2s ease;
-        }
-        @keyframes sendPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
         }
         .send-btn svg {
             width: 28px;
@@ -1550,9 +1542,11 @@
             dbCache.messages.push(msg);
             const reactionsStr = JSON.stringify([]);
             const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}`;
-            await appendToDatabase(line);
-            rebuildChatsFromMessages();
-            appendMessageToDOM(msg);
+            const success = await appendToDatabase(line);
+            if (success) {
+                rebuildChatsFromMessages();
+                appendMessageToDOM(msg);
+            }
         }
 
         function appendMessageToDOM(msg) {
@@ -2497,9 +2491,6 @@
                     await addMessage(currentChatId, myId, msg, '', '');
                 }
                 document.getElementById('messageInput').value = '';
-                const sendBtn = document.getElementById('sendMsgBtn');
-                sendBtn.classList.add('animate');
-                setTimeout(() => sendBtn.classList.remove('animate'), 200);
             };
 
             document.getElementById('messageInput').addEventListener('keypress', function (e) {
