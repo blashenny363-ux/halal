@@ -40,7 +40,7 @@
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
             --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.45);
-            --border-radius-message: 24px;
+            --border-radius-message: 18px;
             --border-radius-item: 18px;
             --transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
             --glow: 0 0 15px var(--accent-color);
@@ -534,7 +534,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .message {
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-radius: var(--border-radius-message);
             background: var(--message-other-bg);
             color: var(--text-primary);
@@ -543,11 +543,9 @@
             word-wrap: break-word;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
-            border-bottom-left-radius: 6px;
         }
         .message.own {
             background: var(--message-own-bg);
-            border-bottom-right-radius: 6px;
             color: #000;
         }
         .message .sender-name {
@@ -560,9 +558,9 @@
         .message-image {
             max-width: 100%;
             max-height: 220px;
-            border-radius: 16px;
+            border-radius: 12px;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 6px;
             transition: transform 0.2s;
             box-shadow: var(--shadow-sm);
         }
@@ -574,13 +572,26 @@
             align-items: center;
             gap: 12px;
             background: var(--bg-input);
-            padding: 12px;
-            border-radius: 16px;
-            margin-top: 8px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-top: 6px;
             cursor: pointer;
         }
         .message-file:hover {
             background: var(--hover-bg);
+        }
+        .message-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .message-status {
+            font-size: 14px;
+            line-height: 1;
         }
         .reactions {
             display: flex;
@@ -591,11 +602,11 @@
         .reaction {
             background: var(--bg-input);
             border-radius: 24px;
-            padding: 6px 12px;
+            padding: 4px 10px;
             font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             cursor: pointer;
             transition: var(--transition);
         }
@@ -605,7 +616,7 @@
             box-shadow: var(--glow);
         }
         .reaction-count {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
         .message-input-area {
@@ -1379,16 +1390,98 @@
                         newCache.groups.push({ name: parts[1], avatar: parts[2], bgColor: parts[3], id: parts[4] });
                     } else if (type === 'GROUP_MEMBER' && parts.length === 3) {
                         newCache.groupMembers.push({ groupId: parts[1], userId: parts[2] });
+                    } else if (type === 'MESSAGE' && parts.length === 9) {
+                        newCache.messages.push({
+                            chatId: parts[1],
+                            senderId: parts[2],
+                            text: parts[3],
+                            image: parts[4],
+                            file: parts[5],
+                            reactions: parts[6] ? JSON.parse(parts[6]) : [],
+                            timestamp: parseInt(parts[7]),
+                            read: parts[8] === '1'
+                        });
                     } else if (type === 'MESSAGE' && parts.length === 8) {
-                        newCache.messages.push({ chatId: parts[1], senderId: parts[2], text: parts[3], image: parts[4], file: parts[5], reactions: parts[6] ? JSON.parse(parts[6]) : [], timestamp: parseInt(parts[7]) });
+                        newCache.messages.push({
+                            chatId: parts[1],
+                            senderId: parts[2],
+                            text: parts[3],
+                            image: parts[4],
+                            file: parts[5],
+                            reactions: parts[6] ? JSON.parse(parts[6]) : [],
+                            timestamp: parseInt(parts[7]),
+                            read: false
+                        });
                     }
                 });
                 dbCache = newCache;
                 rebuildChatsFromMessages();
-                if (currentChatId) updateMessages(); // обновляем только новые сообщения, без полной перерисовки
+                if (currentChatId) {
+                    await markMessagesAsRead();
+                    updateChatHeaderAvatar();
+                }
+                if (currentChatId) updateMessages();
             } catch (e) {
                 document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
             }
+        }
+
+        function updateChatHeaderAvatar() {
+            if (!currentChatId) return;
+            const chatAvatar = document.getElementById('chatAvatar');
+            const chatAvatarImg = document.getElementById('chatAvatarImg');
+            if (currentChatType === 'private') {
+                const otherId = currentChatId.split('_')[1] === myId ? currentChatId.split('_')[2] : currentChatId.split('_')[1];
+                const user = dbCache.users.find(u => u.id === otherId);
+                if (user && user.avatar) {
+                    chatAvatarImg.src = user.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👤';
+                }
+            } else {
+                const group = dbCache.groups.find(g => g.id === currentChatId);
+                if (group && group.avatar) {
+                    chatAvatarImg.src = group.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👥';
+                }
+            }
+        }
+
+        async function markMessagesAsRead() {
+            if (!currentChatId || currentChatType !== 'private') return;
+            let changed = false;
+            dbCache.messages.forEach(msg => {
+                if (msg.chatId === currentChatId && msg.senderId !== myId && !msg.read) {
+                    msg.read = true;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                await rewriteDatabase();
+                updateAllMessagesStatus();
+            }
+        }
+
+        function updateAllMessagesStatus() {
+            document.querySelectorAll('.message-wrapper').forEach(wrapper => {
+                const timestamp = wrapper.dataset.timestamp;
+                const msg = dbCache.messages.find(m => m.timestamp == timestamp);
+                if (msg) {
+                    const statusEl = wrapper.querySelector('.message-status');
+                    if (statusEl && msg.senderId === myId) {
+                        statusEl.innerHTML = msg.read ? '✓✓' : '✓';
+                    }
+                }
+            });
         }
 
         function rebuildChatsFromMessages() {
@@ -1477,7 +1570,7 @@
             dbCache.groupMembers.forEach(gm => lines.push(`GROUP_MEMBER|${gm.groupId}|${gm.userId}`));
             dbCache.messages.forEach(m => {
                 const reactionsStr = JSON.stringify(m.reactions || []);
-                lines.push(`MESSAGE|${m.chatId}|${m.senderId}|${m.text || ''}|${m.image || ''}|${m.file || ''}|${reactionsStr}|${m.timestamp}`);
+                lines.push(`MESSAGE|${m.chatId}|${m.senderId}|${m.text || ''}|${m.image || ''}|${m.file || ''}|${reactionsStr}|${m.timestamp}|${m.read ? '1' : '0'}`);
             });
             const newContent = lines.join('\n');
             const { token, owner, repo, path } = githubConfig;
@@ -1549,10 +1642,19 @@
         }
 
         async function addMessage(chatId, senderId, text, image, file) {
-            const msg = { chatId, senderId, text: text || '', image: image || '', file: file || '', reactions: [], timestamp: Date.now() };
+            const msg = {
+                chatId,
+                senderId,
+                text: text || '',
+                image: image || '',
+                file: file || '',
+                reactions: [],
+                timestamp: Date.now(),
+                read: false
+            };
             dbCache.messages.push(msg);
             const reactionsStr = JSON.stringify([]);
-            const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}`;
+            const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}|0`;
             const success = await appendToDatabase(line);
             if (success) {
                 rebuildChatsFromMessages();
@@ -1562,7 +1664,7 @@
 
         function appendMessageToDOM(msg) {
             if (!currentChatId || msg.chatId !== currentChatId) return;
-            if (displayedMessageTimestamps.has(msg.timestamp)) return; // уже есть
+            if (displayedMessageTimestamps.has(msg.timestamp)) return;
             const container = document.getElementById('messagesContainer');
             const isOwn = msg.senderId === myId;
             const wrapper = createMessageElement(msg, isOwn);
@@ -1610,6 +1712,20 @@
                 const textNode = document.createTextNode(msg.text);
                 msgDiv.appendChild(textNode);
             }
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'message-meta';
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'message-time';
+            const date = new Date(msg.timestamp);
+            timeSpan.innerText = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            metaDiv.appendChild(timeSpan);
+            if (isOwn && currentChatType === 'private') {
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'message-status';
+                statusSpan.innerText = msg.read ? '✓✓' : '✓';
+                metaDiv.appendChild(statusSpan);
+            }
+            msgDiv.appendChild(metaDiv);
             wrapper.appendChild(msgDiv);
             if (msg.reactions && msg.reactions.length > 0) {
                 const reactionsDiv = document.createElement('div');
@@ -1943,38 +2059,14 @@
             currentPeerInfo = peerInfo;
             document.getElementById('chatTitle').innerText = peerInfo;
             document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
-            const chatAvatar = document.getElementById('chatAvatar');
-            const chatAvatarImg = document.getElementById('chatAvatarImg');
-            if (type === 'private') {
-                const otherId = chatId.split('_')[1] === myId ? chatId.split('_')[2] : chatId.split('_')[1];
-                const user = dbCache.users.find(u => u.id === otherId);
-                if (user && user.avatar) {
-                    chatAvatarImg.src = user.avatar;
-                    chatAvatarImg.style.display = 'block';
-                    chatAvatar.querySelector('span').style.display = 'none';
-                } else {
-                    chatAvatarImg.style.display = 'none';
-                    chatAvatar.querySelector('span').style.display = 'block';
-                    chatAvatar.querySelector('span').innerText = '👤';
-                }
-            } else {
+            updateChatHeaderAvatar();
+            if (type === 'group') {
                 const group = dbCache.groups.find(g => g.id === chatId);
-                if (group && group.avatar) {
-                    chatAvatarImg.src = group.avatar;
-                    chatAvatarImg.style.display = 'block';
-                    chatAvatar.querySelector('span').style.display = 'none';
-                } else {
-                    chatAvatarImg.style.display = 'none';
-                    chatAvatar.querySelector('span').style.display = 'block';
-                    chatAvatar.querySelector('span').innerText = '👥';
-                }
                 if (group && group.bgColor && group.bgColor !== 'default') {
                     document.getElementById('messagesContainer').style.backgroundColor = group.bgColor;
                 } else {
                     document.getElementById('messagesContainer').style.backgroundColor = '';
                 }
-            }
-            if (type === 'group') {
                 document.getElementById('membersBtn').style.display = 'flex';
             } else {
                 document.getElementById('membersBtn').style.display = 'none';
@@ -2101,6 +2193,8 @@
                         localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: url, bio: myBio }));
                         updateSidebarUserInfo();
                         updateAvatarPreview();
+                        updateChatHeaderAvatar();
+                        renderChatsList();
                         alert('Аватар обновлен');
                     }
                 } else {
