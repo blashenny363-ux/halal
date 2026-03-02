@@ -1,1 +1,2 @@
 USER|bot|bot@gmail.com|bot|||p_mm94g65vcogz_person
+GROUP|тест||default|g_mm94guaf6qb0_group
