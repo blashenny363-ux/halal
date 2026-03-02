@@ -1348,10 +1348,10 @@
         let messagesUpdateInterval = null;
         let dbUpdateInterval = null;
         let chats = [];
-        let prevMessagesCount = 0;
         let users = JSON.parse(localStorage.getItem('halal_users')) || [];
         let longPressTimer = null;
         let currentMessageData = null;
+        let displayedMessageTimestamps = new Set();
 
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
         function generateGroupId() { return 'g_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_group'; }
@@ -1393,6 +1393,7 @@
                 });
                 dbCache = newCache;
                 rebuildChatsFromMessages();
+                if (currentChatId) renderMessages();
             } catch (e) {
                 document.getElementById('githubStatus').innerHTML = `<span style="color:#ffaaaa;">❌ ошибка чтения: ${e.message}</span>`;
             }
@@ -1551,7 +1552,111 @@
             const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}`;
             await appendToDatabase(line);
             rebuildChatsFromMessages();
-            renderMessages();
+            appendMessageToDOM(msg);
+        }
+
+        function appendMessageToDOM(msg) {
+            if (!currentChatId || msg.chatId !== currentChatId) return;
+            const container = document.getElementById('messagesContainer');
+            const isOwn = msg.senderId === myId;
+            const wrapper = createMessageElement(msg, isOwn);
+            wrapper.classList.add('new');
+            container.appendChild(wrapper);
+            setTimeout(() => wrapper.classList.remove('new'), 400);
+            container.scrollTop = container.scrollHeight;
+            displayedMessageTimestamps.add(msg.timestamp);
+            attachLongPressToElement(wrapper);
+        }
+
+        function createMessageElement(msg, isOwn) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${isOwn ? 'own' : ''}`;
+            wrapper.dataset.timestamp = msg.timestamp;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isOwn ? 'own' : ''}`;
+            const sender = dbCache.users.find(u => u.id === msg.senderId);
+            const senderName = sender ? sender.name : 'Неизвестно';
+            if (currentChatType === 'group' && !isOwn) {
+                const nameSpan = document.createElement('div');
+                nameSpan.className = 'sender-name';
+                nameSpan.innerText = senderName;
+                msgDiv.appendChild(nameSpan);
+            }
+            if (msg.image) {
+                const img = document.createElement('img');
+                img.src = msg.image;
+                img.className = 'message-image';
+                img.addEventListener('click', () => {
+                    document.getElementById('fullImage').src = msg.image;
+                    document.getElementById('imageModal').classList.add('active');
+                });
+                msgDiv.appendChild(img);
+            }
+            if (msg.file) {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'message-file';
+                fileDiv.innerHTML = `📎 <span>${msg.file.split('/').pop()}</span>`;
+                fileDiv.addEventListener('click', () => {
+                    window.open(msg.file, '_blank');
+                });
+                msgDiv.appendChild(fileDiv);
+            }
+            if (msg.text) {
+                const textNode = document.createTextNode(msg.text);
+                msgDiv.appendChild(textNode);
+            }
+            wrapper.appendChild(msgDiv);
+            if (msg.reactions && msg.reactions.length > 0) {
+                const reactionsDiv = document.createElement('div');
+                reactionsDiv.className = 'reactions';
+                const grouped = {};
+                msg.reactions.forEach(r => {
+                    if (!grouped[r.emoji]) grouped[r.emoji] = 0;
+                    grouped[r.emoji]++;
+                });
+                Object.entries(grouped).forEach(([emoji, count]) => {
+                    const react = document.createElement('span');
+                    react.className = 'reaction';
+                    react.innerHTML = `${emoji} <span class="reaction-count">${count}</span>`;
+                    reactionsDiv.appendChild(react);
+                });
+                wrapper.appendChild(reactionsDiv);
+            }
+            return wrapper;
+        }
+
+        function attachLongPressToElement(wrapper) {
+            wrapper.addEventListener('touchstart', (e) => {
+                longPressTimer = setTimeout(() => {
+                    const timestamp = wrapper.dataset.timestamp;
+                    const msgs = getMessagesForChat(currentChatId);
+                    const msg = msgs.find(m => m.timestamp == timestamp);
+                    if (msg && msg.senderId !== myId) {
+                        currentMessageData = msg;
+                        const menu = document.getElementById('reactionMenu');
+                        const rect = wrapper.getBoundingClientRect();
+                        menu.style.top = rect.top + 'px';
+                        menu.style.left = rect.left + 'px';
+                        menu.classList.add('active');
+                        const downloadBtn = document.getElementById('downloadMediaBtn');
+                        if (msg.image || msg.file) {
+                            downloadBtn.style.display = 'flex';
+                            downloadBtn.onclick = () => {
+                                window.open(msg.image || msg.file, '_blank');
+                                menu.classList.remove('active');
+                            };
+                        } else {
+                            downloadBtn.style.display = 'none';
+                        }
+                    }
+                }, 500);
+            });
+            wrapper.addEventListener('touchend', () => {
+                clearTimeout(longPressTimer);
+            });
+            wrapper.addEventListener('touchmove', () => {
+                clearTimeout(longPressTimer);
+            });
         }
 
         async function addReaction(chatId, messageTimestamp, emoji) {
@@ -1565,7 +1670,18 @@
                 msg.reactions.push({ userId: myId, emoji });
             }
             await rewriteDatabase();
-            renderMessages();
+            updateMessageInDOM(messageTimestamp);
+        }
+
+        function updateMessageInDOM(timestamp) {
+            const wrapper = document.querySelector(`.message-wrapper[data-timestamp="${timestamp}"]`);
+            if (!wrapper) return;
+            const msg = dbCache.messages.find(m => m.timestamp == timestamp);
+            if (!msg) return;
+            const isOwn = msg.senderId === myId;
+            const newWrapper = createMessageElement(msg, isOwn);
+            wrapper.replaceWith(newWrapper);
+            attachLongPressToElement(newWrapper);
         }
 
         function loadGitHubConfig() {
@@ -1786,125 +1902,23 @@
             if (!currentChatId) return;
             const msgs = getMessagesForChat(currentChatId);
             const container = document.getElementById('messagesContainer');
+            const newTimestamps = new Set(msgs.map(m => m.timestamp));
+            const added = [];
             container.innerHTML = '';
-            msgs.forEach(m => {
-                const isOwn = m.senderId === myId;
-                const wrapper = document.createElement('div');
-                wrapper.className = `message-wrapper ${isOwn ? 'own' : ''}`;
-                wrapper.dataset.timestamp = m.timestamp;
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `message ${isOwn ? 'own' : ''}`;
-                const sender = dbCache.users.find(u => u.id === m.senderId);
-                const senderName = sender ? sender.name : 'Неизвестно';
-                if (currentChatType === 'group' && !isOwn) {
-                    const nameSpan = document.createElement('div');
-                    nameSpan.className = 'sender-name';
-                    nameSpan.innerText = senderName;
-                    msgDiv.appendChild(nameSpan);
-                }
-                if (m.image) {
-                    const img = document.createElement('img');
-                    img.src = m.image;
-                    img.className = 'message-image';
-                    img.addEventListener('click', () => {
-                        document.getElementById('fullImage').src = m.image;
-                        document.getElementById('imageModal').classList.add('active');
-                    });
-                    msgDiv.appendChild(img);
-                }
-                if (m.file) {
-                    const fileDiv = document.createElement('div');
-                    fileDiv.className = 'message-file';
-                    fileDiv.innerHTML = `📎 <span>${m.file.split('/').pop()}</span>`;
-                    fileDiv.addEventListener('click', () => {
-                        window.open(m.file, '_blank');
-                    });
-                    msgDiv.appendChild(fileDiv);
-                }
-                if (m.text) {
-                    const textNode = document.createTextNode(m.text);
-                    msgDiv.appendChild(textNode);
-                }
-                wrapper.appendChild(msgDiv);
-                if (m.reactions && m.reactions.length > 0) {
-                    const reactionsDiv = document.createElement('div');
-                    reactionsDiv.className = 'reactions';
-                    const grouped = {};
-                    m.reactions.forEach(r => {
-                        if (!grouped[r.emoji]) grouped[r.emoji] = 0;
-                        grouped[r.emoji]++;
-                    });
-                    Object.entries(grouped).forEach(([emoji, count]) => {
-                        const react = document.createElement('span');
-                        react.className = 'reaction';
-                        react.innerHTML = `${emoji} <span class="reaction-count">${count}</span>`;
-                        reactionsDiv.appendChild(react);
-                    });
-                    wrapper.appendChild(reactionsDiv);
-                }
+            displayedMessageTimestamps.clear();
+            msgs.forEach(msg => {
+                const isOwn = msg.senderId === myId;
+                const wrapper = createMessageElement(msg, isOwn);
                 container.appendChild(wrapper);
+                displayedMessageTimestamps.add(msg.timestamp);
+                attachLongPressToElement(wrapper);
             });
-            animateNewMessages();
             container.scrollTop = container.scrollHeight;
-            attachLongPress();
-        }
-
-        function attachLongPress() {
-            document.querySelectorAll('.message-wrapper').forEach(w => {
-                w.addEventListener('touchstart', (e) => {
-                    longPressTimer = setTimeout(() => {
-                        const timestamp = w.dataset.timestamp;
-                        const msgs = getMessagesForChat(currentChatId);
-                        const msg = msgs.find(m => m.timestamp == timestamp);
-                        if (msg && msg.senderId !== myId) {
-                            currentMessageData = msg;
-                            const menu = document.getElementById('reactionMenu');
-                            const rect = w.getBoundingClientRect();
-                            menu.style.top = rect.top + 'px';
-                            menu.style.left = rect.left + 'px';
-                            menu.classList.add('active');
-                            const downloadBtn = document.getElementById('downloadMediaBtn');
-                            if (msg.image || msg.file) {
-                                downloadBtn.style.display = 'flex';
-                                downloadBtn.onclick = () => {
-                                    window.open(msg.image || msg.file, '_blank');
-                                    menu.classList.remove('active');
-                                };
-                            } else {
-                                downloadBtn.style.display = 'none';
-                            }
-                        }
-                    }, 500);
-                });
-                w.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
-                });
-                w.addEventListener('touchmove', () => {
-                    clearTimeout(longPressTimer);
-                });
-            });
-        }
-
-        function animateNewMessages() {
-            const container = document.getElementById('messagesContainer');
-            const messages = container.children;
-            const newCount = messages.length;
-            const diff = newCount - prevMessagesCount;
-            if (diff > 0) {
-                for (let i = newCount - diff; i < newCount; i++) {
-                    messages[i].classList.add('new');
-                    setTimeout(() => {
-                        messages[i].classList.remove('new');
-                    }, 400);
-                }
-            }
-            prevMessagesCount = newCount;
         }
 
         async function loadMessages() {
             if (!currentChatId) return;
             await loadDatabase();
-            renderMessages();
         }
 
         async function enterChat(chatId, type, peerInfo) {
@@ -1954,9 +1968,10 @@
             }
             renderChatsList();
             document.getElementById('messagesContainer').innerHTML = '';
-            prevMessagesCount = 0;
+            displayedMessageTimestamps.clear();
             if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
-            await loadMessages();
+            await loadDatabase();
+            renderMessages();
             messagesUpdateInterval = setInterval(loadMessages, 2000);
             showChat();
         }
