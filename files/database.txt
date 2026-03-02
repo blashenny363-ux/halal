@@ -1,2 +1,0 @@
-USER|bot|bot@gmail.com|bot|||p_mm9bhzjfqp4c_person
-GROUP|test||default|g_mm9bi6hcu1oh_group
