@@ -1,6 +1,3 @@
-{"type":"user","name":"безмятежний","email":"blashenny363@gmail.com","password":"SaD1SaD1","avatar":"","bio":"","id":"p_mm870cpmp7gq_person"}
-{"type":"user","name":"bot","email":"bot@gmail.com","password":"bot","avatar":"","bio":"","id":"p_mm872je6m96e_person"}
-{"type":"message","chatId":"private_p_mm870cpmp7gq_person_p_mm872je6m96e_person","senderId":"p_mm872je6m96e_person","text":"привет","image":"","file":"","reactions":[],"timestamp":1772396445509}
 USER|bot|bot@gmail.com|bot|||p_mm8ngcah5zim_person
 USER|bot2|bot2@gmail.com|bot2|||p_mm8ni1f287cm_person
-MESSAGE|private_p_mm8ngcah5zim_person_p_mm8ni1f287cm_person|p_mm8ngcah5zim_person|привет|||[]|1772424067478
+MESSAGE|private_p_mm8ngcah5zim_person_p_mm8ni1f287cm_person|p_mm8ngcah5zim_person|привет|||[{"userId":"p_mm8ni1f287cm_person","emoji":"❤️"}]|1772424067478
