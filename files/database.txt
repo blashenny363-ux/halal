@@ -7,3 +7,4 @@ USER|бот|bot@gmail.com|bot|||p_mm9j970r8grm_person
 GROUP|тест||default|g_mm9j9g3ddj5s_group
 GROUP_MEMBER|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person
 MESSAGE|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person||https://raw.githubusercontent.com/blashenny363-ux/halal/main/files/image_1772477402862_bceab94c278ee10454b30277abe1b2d3.png||[]|1772477404086|0
+MESSAGE|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person|хуй|||[]|1772477411257|0
