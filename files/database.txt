@@ -9,3 +9,4 @@ GROUP_MEMBER|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person
 MESSAGE|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person||https://raw.githubusercontent.com/blashenny363-ux/halal/main/files/image_1772477402862_bceab94c278ee10454b30277abe1b2d3.png||[]|1772477404086|0
 MESSAGE|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person|хуй|||[]|1772477411257|0
 MESSAGE|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person||https://raw.githubusercontent.com/blashenny363-ux/halal/main/files/image_1772477423333_Screenshot_20260220_095229_Google Play Store.png||[]|1772477424441|0
+MESSAGE|g_mm9j9g3ddj5s_group|p_mm9j970r8grm_person|||https://raw.githubusercontent.com/blashenny363-ux/halal/main/files/file_1772477439387_app-release.apk|[]|1772477440788|0
