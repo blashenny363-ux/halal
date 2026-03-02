@@ -3,3 +3,4 @@ GROUP|тест||default|g_mm8vrrfps87o_group
 GROUP|тест||#1e2b36|g_mm8x0epn6p7t_group
 GROUP_MEMBER|g_mm8x0epn6p7t_group|p_mm8vrfvd70yr_person
 MESSAGE|g_mm8x0epn6p7t_group|p_mm8vrfvd70yr_person|хуец|||[]|1772441981471
+MESSAGE|g_mm8x0epn6p7t_group|p_mm8vrfvd70yr_person|писда|||[]|1772443269453
