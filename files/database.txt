@@ -2,3 +2,4 @@ USER|bot|bot@gmail.com|bot|||p_mm8ngcah5zim_person
 USER|bot2|bot2@gmail.com|bot2|||p_mm8ni1f287cm_person
 MESSAGE|private_p_mm8ngcah5zim_person_p_mm8ni1f287cm_person|p_mm8ngcah5zim_person|привет|||[{"userId":"p_mm8ni1f287cm_person","emoji":"❤️"}]|1772424067478
 USER|bot2|bot2@gmail.com|bot2|||p_mm8oqalmfu7m_person
+USER|bot|bot@gmail.com|bot|||p_mm8orlli86g0_person
