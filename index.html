@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>halal</title>
     <style>
+        /* ========== СТИЛИ (максимально упрощены, но красивы) ========== */
         * {
             margin: 0;
             padding: 0;
@@ -34,51 +35,14 @@
             --message-own-bg: #d4af37;
             --message-other-bg: #182533;
             --accent-color: #d4af37;
-            --gradient-start: #17212b;
-            --gradient-end: #1e2b36;
             --hover-bg: #2b3b4a;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
             --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.45);
             --border-radius-message: 18px;
             --border-radius-item: 18px;
-            --transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+            --transition: all 0.25s ease;
             --glow: 0 0 15px var(--accent-color);
-        }
-        body.gradient-blue {
-            --gradient-start: #0f2027;
-            --gradient-end: #203a43;
-            --bg-primary: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-sidebar: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-header: rgba(30, 43, 54, 0.7);
-        }
-        body.gradient-green {
-            --gradient-start: #1a3b2e;
-            --gradient-end: #2d5a4b;
-            --bg-primary: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-sidebar: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-header: rgba(45, 90, 75, 0.7);
-        }
-        body.gradient-purple {
-            --gradient-start: #2b1b3a;
-            --gradient-end: #3e2a5a;
-            --bg-primary: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-sidebar: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-header: rgba(62, 42, 90, 0.7);
-        }
-        body.gradient-orange {
-            --gradient-start: #4a2e1e;
-            --gradient-end: #6b4a2e;
-            --bg-primary: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-sidebar: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-header: rgba(107, 74, 46, 0.7);
-        }
-        body.gradient-dark {
-            --gradient-start: #0b0f14;
-            --gradient-end: #1a1f26;
-            --bg-primary: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-sidebar: linear-gradient(145deg, var(--gradient-start), var(--gradient-end));
-            --bg-header: rgba(26, 31, 38, 0.7);
         }
         body.light-theme {
             --bg-primary: #f0f4fa;
@@ -93,9 +57,6 @@
             --message-other-bg: #ffffff;
             --accent-color: #d4af37;
             --hover-bg: #c0cbd8;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.15);
-            --glow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
         body.grey-theme {
             --bg-primary: #2c2f33;
@@ -110,9 +71,6 @@
             --message-other-bg: #3a3f44;
             --accent-color: #5865f2;
             --hover-bg: #40474f;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.4);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
-            --glow: 0 0 15px rgba(88, 101, 242, 0.6);
         }
         body.own-color-gold { --message-own-bg: #d4af37; }
         body.own-color-blue { --message-own-bg: #2b5278; }
@@ -130,20 +88,8 @@
         body.accent-color-red { --accent-color: #e53e3e; }
         body.accent-color-purple { --accent-color: #9b59b6; }
         body.accent-color-orange { --accent-color: #f39c12; }
-        .app {
-            position: relative;
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            background: var(--bg-primary);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            transition: background 0.4s ease;
-            margin: 0 auto;
-            z-index: 1;
-            border-radius: 36px;
-            backdrop-filter: blur(2px);
-        }
+
+        /* Скроллбары */
         .chats-list::-webkit-scrollbar,
         .messages-container::-webkit-scrollbar,
         .members-list::-webkit-scrollbar {
@@ -162,6 +108,24 @@
             border-radius: 4px;
             box-shadow: var(--glow);
         }
+
+        /* Основной контейнер */
+        .app {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            transition: background 0.4s ease;
+            margin: 0 auto;
+            z-index: 1;
+            border-radius: 36px;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Левая панель (список чатов) */
         .sidebar {
             position: absolute;
             top: 0;
@@ -171,7 +135,7 @@
             background: var(--bg-sidebar);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition: transform 0.3s ease;
             transform: translateX(0);
             z-index: 2;
             backdrop-filter: blur(12px);
@@ -228,7 +192,6 @@
             font-size: 18px;
             color: var(--text-primary);
             transition: color 0.2s;
-            letter-spacing: 0.3px;
         }
         .sidebar-actions {
             display: flex;
@@ -301,7 +264,7 @@
         }
         .chat-item:hover {
             background: var(--hover-bg);
-            transform: translateX(6px) scale(1.02);
+            transform: translateX(4px);
             box-shadow: var(--shadow-sm);
         }
         .chat-item.active {
@@ -397,6 +360,8 @@
             margin-left: 6px;
             font-size: 15px;
         }
+
+        /* Правая панель (чат) */
         .chat-panel {
             position: absolute;
             top: 0;
@@ -406,7 +371,7 @@
             background: var(--bg-secondary);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition: transform 0.3s ease;
             transform: translateX(100%);
             z-index: 4;
         }
@@ -510,6 +475,8 @@
             color: var(--text-primary);
             transform: scale(1.15);
         }
+
+        /* Сообщения */
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -553,7 +520,6 @@
             color: var(--text-secondary);
             margin-bottom: 6px;
             font-weight: 500;
-            transition: color 0.2s;
         }
         .message-image {
             max-width: 100%;
@@ -619,6 +585,8 @@
             font-size: 12px;
             color: var(--text-secondary);
         }
+
+        /* Поле ввода */
         .message-input-area {
             padding: 16px 20px;
             background: var(--bg-header);
@@ -740,6 +708,8 @@
             box-shadow: var(--glow);
             transform: scale(1.08);
         }
+
+        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -780,7 +750,6 @@
             color: var(--accent-color);
             font-weight: 600;
             font-size: 24px;
-            letter-spacing: -0.2px;
         }
         .modal-content input,
         .modal-content select,
@@ -877,6 +846,8 @@
             margin-top: 12px;
             font-size: 15px;
         }
+
+        /* Кастомизация */
         .customize-options {
             display: flex;
             flex-direction: column;
@@ -1042,6 +1013,8 @@
             padding: 8px 16px;
             border-radius: 40px;
         }
+
+        /* Меню реакций */
         .reaction-menu {
             position: absolute;
             background: var(--bg-header);
@@ -1100,6 +1073,7 @@
 </head>
 <body>
     <div class="app" id="app">
+        <!-- Левая панель (список чатов) -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-info" id="userInfoBlock">
@@ -1120,6 +1094,8 @@
             </div>
             <div class="chats-list" id="chatsList"></div>
         </div>
+
+        <!-- Правая панель (окно чата) -->
         <div class="chat-panel" id="chatPanel">
             <div class="chat-header" id="chatHeader" style="display: none;">
                 <div class="chat-header-left">
@@ -1154,6 +1130,8 @@
                 <input type="file" id="anyFileInput" accept="*/*" style="display: none;">
             </div>
         </div>
+
+        <!-- Модальные окна -->
         <div class="modal" id="githubModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeModalBtn">&times;</span>
@@ -1168,6 +1146,7 @@
                 <div id="githubStatus" class="small-note" style="color: var(--text-secondary); margin-top: 10px;"></div>
             </div>
         </div>
+
         <div class="modal" id="registerModal">
             <div class="modal-content">
                 <h3>Регистрация / Вход</h3>
@@ -1190,6 +1169,7 @@
                 <div id="authSuccess" class="success-text" style="display: none;"></div>
             </div>
         </div>
+
         <div class="modal" id="customizeModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeCustomizeBtn">&times;</span>
@@ -1226,17 +1206,7 @@
                                 <option value="grey">Серая</option>
                             </select>
                         </label>
-                        <label>Градиент фона:
-                            <select id="gradientSelect">
-                                <option value="none">Нет</option>
-                                <option value="blue">Синий</option>
-                                <option value="green">Зелёный</option>
-                                <option value="purple">Фиолетовый</option>
-                                <option value="orange">Оранжевый</option>
-                                <option value="dark">Тёмный</option>
-                            </select>
-                        </label>
-                        <label>Мои сообщения:
+                        <label>Цвет моих сообщений:
                             <select id="ownColorSelect">
                                 <option value="gold">Золотой</option>
                                 <option value="blue">Синий</option>
@@ -1246,7 +1216,7 @@
                                 <option value="orange">Оранжевый</option>
                             </select>
                         </label>
-                        <label>Сообщения собеседника:
+                        <label>Цвет сообщений собеседника:
                             <select id="otherColorSelect">
                                 <option value="default">Стандартный</option>
                                 <option value="light">Светлый</option>
@@ -1270,6 +1240,7 @@
                 <button id="saveCustomizeBtn">Сохранить</button>
             </div>
         </div>
+
         <div class="modal" id="groupSettingsModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeGroupSettingsBtn">&times;</span>
@@ -1296,6 +1267,7 @@
                 <button id="saveGroupSettingsBtn">Сохранить</button>
             </div>
         </div>
+
         <div class="modal" id="createGroupModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeGroupModalBtn">&times;</span>
@@ -1305,6 +1277,7 @@
                 <div id="groupError" class="error-text" style="display: none;"></div>
             </div>
         </div>
+
         <div class="modal" id="membersModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeMembersBtn">&times;</span>
@@ -1312,6 +1285,7 @@
                 <ul class="members-list" id="membersList"></ul>
             </div>
         </div>
+
         <div class="modal" id="profileModal">
             <div class="modal-content">
                 <span class="modal-close" id="closeProfileBtn">&times;</span>
@@ -1323,12 +1297,14 @@
                 </div>
             </div>
         </div>
+
         <div class="modal" id="imageModal">
             <div class="modal-content" style="max-width: 500px; text-align: center;">
                 <span class="modal-close" id="closeImageBtn">&times;</span>
                 <img src="" id="fullImage" style="max-width: 100%; max-height: 70vh; border-radius: 20px;">
             </div>
         </div>
+
         <div class="reaction-menu" id="reactionMenu">
             <button class="reaction-menu-item" data-reaction="❤️">❤️</button>
             <button class="reaction-menu-item" data-reaction="👍">👍</button>
@@ -1337,7 +1313,9 @@
             <button class="download-btn" id="downloadMediaBtn" style="display: none;">📥 Скачать</button>
         </div>
     </div>
+
     <script>
+        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
         let myId = null;
         let myName = null;
         let myEmail = null;
@@ -1346,19 +1324,21 @@
         let githubConfig = null;
         let dbCache = { users: [], groups: [], groupMembers: [], messages: [] };
         let currentChatId = null;
-        let currentChatType = null;
+        let currentChatType = null; // 'private' или 'group'
         let currentPeerInfo = '';
         let messagesUpdateInterval = null;
         let dbUpdateInterval = null;
-        let chats = [];
+        let chats = []; // список чатов для левой панели
         let users = JSON.parse(localStorage.getItem('halal_users')) || [];
         let longPressTimer = null;
         let currentMessageData = null;
         let displayedMessageTimestamps = new Set();
 
+        // ========== ГЕНЕРАЦИЯ ID ==========
         function generatePersonId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_person'; }
         function generateGroupId() { return 'g_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6) + '_group'; }
 
+        // ========== РАБОТА С БАЗОЙ ДАННЫХ (GitHub) ==========
         async function loadDatabase() {
             if (!githubConfig) return;
             const { token, owner, repo, path } = githubConfig;
@@ -1415,7 +1395,7 @@
                     }
                 });
                 dbCache = newCache;
-                rebuildChatsFromMessages();
+                rebuildChatsFromAllData();
                 if (currentChatId) {
                     await markMessagesAsRead();
                     updateChatHeaderAvatar();
@@ -1426,100 +1406,50 @@
             }
         }
 
-        function updateChatHeaderAvatar() {
-            if (!currentChatId) return;
-            const chatAvatar = document.getElementById('chatAvatar');
-            const chatAvatarImg = document.getElementById('chatAvatarImg');
-            if (currentChatType === 'private') {
-                const otherId = currentChatId.split('_')[1] === myId ? currentChatId.split('_')[2] : currentChatId.split('_')[1];
-                const user = dbCache.users.find(u => u.id === otherId);
-                if (user && user.avatar) {
-                    chatAvatarImg.src = user.avatar;
-                    chatAvatarImg.style.display = 'block';
-                    chatAvatar.querySelector('span').style.display = 'none';
-                } else {
-                    chatAvatarImg.style.display = 'none';
-                    chatAvatar.querySelector('span').style.display = 'block';
-                    chatAvatar.querySelector('span').innerText = '👤';
-                }
-            } else {
-                const group = dbCache.groups.find(g => g.id === currentChatId);
-                if (group && group.avatar) {
-                    chatAvatarImg.src = group.avatar;
-                    chatAvatarImg.style.display = 'block';
-                    chatAvatar.querySelector('span').style.display = 'none';
-                } else {
-                    chatAvatarImg.style.display = 'none';
-                    chatAvatar.querySelector('span').style.display = 'block';
-                    chatAvatar.querySelector('span').innerText = '👥';
-                }
-            }
-        }
-
-        async function markMessagesAsRead() {
-            if (!currentChatId || currentChatType !== 'private') return;
-            let changed = false;
-            dbCache.messages.forEach(msg => {
-                if (msg.chatId === currentChatId && msg.senderId !== myId && !msg.read) {
-                    msg.read = true;
-                    changed = true;
-                }
-            });
-            if (changed) {
-                await rewriteDatabase();
-                updateAllMessagesStatus();
-            }
-        }
-
-        function updateAllMessagesStatus() {
-            document.querySelectorAll('.message-wrapper').forEach(wrapper => {
-                const timestamp = wrapper.dataset.timestamp;
-                const msg = dbCache.messages.find(m => m.timestamp == timestamp);
-                if (msg) {
-                    const statusEl = wrapper.querySelector('.message-status');
-                    if (statusEl && msg.senderId === myId) {
-                        statusEl.innerHTML = msg.read ? '✓✓' : '✓';
-                    }
-                }
-            });
-        }
-
-        function rebuildChatsFromMessages() {
-            const chatSet = new Set();
+        // Перестроить список чатов на основе всех данных (пользователи, группы, сообщения)
+        function rebuildChatsFromAllData() {
+            const newChats = [];
+            // 1. Личные чаты из сообщений
+            const privateChatIds = new Set();
             dbCache.messages.forEach(msg => {
                 if (msg.chatId.startsWith('private_')) {
-                    chatSet.add(msg.chatId);
-                } else {
-                    chatSet.add(msg.chatId);
+                    privateChatIds.add(msg.chatId);
                 }
             });
-            dbCache.groupMembers.filter(gm => gm.userId === myId).forEach(gm => {
-                const group = dbCache.groups.find(g => g.id === gm.groupId);
-                if (group) chatSet.add(gm.groupId);
+            privateChatIds.forEach(chatId => {
+                const parts = chatId.split('_');
+                const otherId = parts[1] === myId ? parts[2] : parts[1];
+                const user = dbCache.users.find(u => u.id === otherId);
+                const name = user ? user.name : 'Неизвестно';
+                newChats.push({ id: chatId, name, type: 'private', lastMessage: '', pinned: false });
             });
-            const newChats = [];
-            chatSet.forEach(chatId => {
-                let name = '';
-                let type = '';
-                if (chatId.startsWith('private_')) {
-                    type = 'private';
-                    const parts = chatId.split('_');
-                    const otherId = parts[1] === myId ? parts[2] : parts[1];
-                    const user = dbCache.users.find(u => u.id === otherId);
-                    name = user ? user.name : getSenderName(otherId);
-                } else {
-                    type = 'group';
-                    const group = dbCache.groups.find(g => g.id === chatId);
-                    name = group ? group.name : 'Группа';
-                }
-                const existing = chats.find(c => c.id === chatId);
-                if (!existing) {
-                    newChats.push({ id: chatId, name, type, lastMessage: '', pinned: false });
-                } else {
-                    newChats.push(existing);
+
+            // 2. Группы, в которых я участник
+            const myGroupIds = dbCache.groupMembers.filter(gm => gm.userId === myId).map(gm => gm.groupId);
+            myGroupIds.forEach(groupId => {
+                const group = dbCache.groups.find(g => g.id === groupId);
+                if (group) {
+                    newChats.push({ id: groupId, name: group.name, type: 'group', lastMessage: '', pinned: false });
                 }
             });
-            chats = newChats;
+
+            // 3. Сохраняем закрепления из старого chats (если есть)
+            const pinnedMap = new Map();
+            chats.forEach(chat => {
+                if (chat.pinned) pinnedMap.set(chat.id, true);
+            });
+
+            // Объединяем, убираем дубликаты
+            const uniqueChats = [];
+            const seen = new Set();
+            newChats.forEach(chat => {
+                if (!seen.has(chat.id)) {
+                    seen.add(chat.id);
+                    if (pinnedMap.has(chat.id)) chat.pinned = true;
+                    uniqueChats.push(chat);
+                }
+            });
+            chats = uniqueChats;
             saveChatsToStorage();
             renderChatsList();
         }
@@ -1597,6 +1527,7 @@
             }
         }
 
+        // ========== ЗАГРУЗКА ФАЙЛОВ ==========
         async function uploadFileToGitHub(file, fileName) {
             if (!githubConfig) return null;
             const { token, owner, repo } = githubConfig;
@@ -1626,6 +1557,7 @@
             });
         }
 
+        // ========== СООБЩЕНИЯ ==========
         function getMessagesForChat(chatId) {
             return dbCache.messages.filter(m => m.chatId === chatId).sort((a,b) => a.timestamp - b.timestamp);
         }
@@ -1657,7 +1589,7 @@
             const line = `MESSAGE|${chatId}|${senderId}|${text || ''}|${image || ''}|${file || ''}|${reactionsStr}|${msg.timestamp}|0`;
             const success = await appendToDatabase(line);
             if (success) {
-                rebuildChatsFromMessages();
+                rebuildChatsFromAllData();
                 appendMessageToDOM(msg);
             }
         }
@@ -1805,6 +1737,187 @@
             attachLongPressToElement(newWrapper);
         }
 
+        // ========== СТАТУСЫ ПРОЧТЕНИЯ ==========
+        async function markMessagesAsRead() {
+            if (!currentChatId || currentChatType !== 'private') return;
+            let changed = false;
+            dbCache.messages.forEach(msg => {
+                if (msg.chatId === currentChatId && msg.senderId !== myId && !msg.read) {
+                    msg.read = true;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                await rewriteDatabase();
+                updateAllMessagesStatus();
+            }
+        }
+
+        function updateAllMessagesStatus() {
+            document.querySelectorAll('.message-wrapper').forEach(wrapper => {
+                const timestamp = wrapper.dataset.timestamp;
+                const msg = dbCache.messages.find(m => m.timestamp == timestamp);
+                if (msg) {
+                    const statusEl = wrapper.querySelector('.message-status');
+                    if (statusEl && msg.senderId === myId) {
+                        statusEl.innerHTML = msg.read ? '✓✓' : '✓';
+                    }
+                }
+            });
+        }
+
+        // ========== УПРАВЛЕНИЕ ЧАТАМИ ==========
+        function togglePinChat(chatId) {
+            const chat = chats.find(c => c.id === chatId);
+            if (chat) {
+                chat.pinned = !chat.pinned;
+                saveChatsToStorage();
+                renderChatsList();
+            }
+        }
+
+        function deleteChat(chatId) {
+            if (confirm('Удалить чат?')) {
+                chats = chats.filter(c => c.id !== chatId);
+                if (currentChatId === chatId) {
+                    currentChatId = null;
+                    document.getElementById('chatHeader').style.display = 'none';
+                    document.getElementById('messageArea').style.display = 'none';
+                    document.getElementById('messagesContainer').innerHTML = '<div style="color: var(--text-secondary); text-align:center; padding:40px;">👋 Начните общение</div>';
+                    document.getElementById('membersBtn').style.display = 'none';
+                }
+                saveChatsToStorage();
+                renderChatsList();
+            }
+        }
+
+        function showSidebar() {
+            document.getElementById('sidebar').classList.remove('hide');
+            document.getElementById('chatPanel').classList.remove('show');
+        }
+
+        function showChat() {
+            document.getElementById('sidebar').classList.add('hide');
+            document.getElementById('chatPanel').classList.add('show');
+        }
+
+        function renderMessages() {
+            if (!currentChatId) return;
+            const msgs = getMessagesForChat(currentChatId);
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            displayedMessageTimestamps.clear();
+            msgs.forEach(msg => {
+                const isOwn = msg.senderId === myId;
+                const wrapper = createMessageElement(msg, isOwn);
+                container.appendChild(wrapper);
+                displayedMessageTimestamps.add(msg.timestamp);
+                attachLongPressToElement(wrapper);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateMessages() {
+            if (!currentChatId) return;
+            const msgs = getMessagesForChat(currentChatId);
+            msgs.forEach(msg => {
+                if (!displayedMessageTimestamps.has(msg.timestamp)) {
+                    appendMessageToDOM(msg);
+                }
+            });
+        }
+
+        async function loadMessages() {
+            if (!currentChatId) return;
+            await loadDatabase();
+        }
+
+        async function enterChat(chatId, type, peerInfo) {
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('messageArea').style.display = 'flex';
+            document.getElementById('messagesContainer').style.display = 'flex';
+            currentChatId = chatId;
+            currentChatType = type;
+            currentPeerInfo = peerInfo;
+            document.getElementById('chatTitle').innerText = peerInfo;
+            document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
+            updateChatHeaderAvatar();
+            if (type === 'group') {
+                const group = dbCache.groups.find(g => g.id === chatId);
+                if (group && group.bgColor && group.bgColor !== 'default') {
+                    document.getElementById('messagesContainer').style.backgroundColor = group.bgColor;
+                } else {
+                    document.getElementById('messagesContainer').style.backgroundColor = '';
+                }
+                document.getElementById('membersBtn').style.display = 'flex';
+            } else {
+                document.getElementById('membersBtn').style.display = 'none';
+            }
+            renderChatsList();
+            document.getElementById('messagesContainer').innerHTML = '';
+            displayedMessageTimestamps.clear();
+            if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
+            await loadDatabase();
+            renderMessages();
+            messagesUpdateInterval = setInterval(loadMessages, 2000);
+            showChat();
+        }
+
+        async function addChatFromSearch(searchId) {
+            let user = dbCache.users.find(u => u.id === searchId);
+            if (user) {
+                const chatId = `private_${[myId, user.id].sort().join('_')}`;
+                ensureChatExists(chatId, user.name, 'private');
+                return { id: chatId, name: user.name, type: 'private' };
+            }
+            let group = dbCache.groups.find(g => g.id === searchId);
+            if (group) {
+                ensureChatExists(group.id, group.name, 'group');
+                return { id: group.id, name: group.name, type: 'group' };
+            }
+            return null;
+        }
+
+        function ensureChatExists(peerId, peerName, type) {
+            if (!chats.find(c => c.id === peerId)) {
+                chats.push({ id: peerId, name: peerName, type, lastMessage: '', pinned: false });
+                saveChatsToStorage();
+                renderChatsList();
+            }
+        }
+
+        // ========== ОБНОВЛЕНИЕ АВАТАРОК ==========
+        function updateChatHeaderAvatar() {
+            if (!currentChatId) return;
+            const chatAvatar = document.getElementById('chatAvatar');
+            const chatAvatarImg = document.getElementById('chatAvatarImg');
+            if (currentChatType === 'private') {
+                const otherId = currentChatId.split('_')[1] === myId ? currentChatId.split('_')[2] : currentChatId.split('_')[1];
+                const user = dbCache.users.find(u => u.id === otherId);
+                if (user && user.avatar) {
+                    chatAvatarImg.src = user.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👤';
+                }
+            } else {
+                const group = dbCache.groups.find(g => g.id === currentChatId);
+                if (group && group.avatar) {
+                    chatAvatarImg.src = group.avatar;
+                    chatAvatarImg.style.display = 'block';
+                    chatAvatar.querySelector('span').style.display = 'none';
+                } else {
+                    chatAvatarImg.style.display = 'none';
+                    chatAvatar.querySelector('span').style.display = 'block';
+                    chatAvatar.querySelector('span').innerText = '👥';
+                }
+            }
+        }
+
+        // ========== ЗАГРУЗКА/СОХРАНЕНИЕ КОНФИГУРАЦИИ ==========
         function loadGitHubConfig() {
             const stored = localStorage.getItem('halal_github_config');
             if (stored) {
@@ -1964,6 +2077,7 @@
             });
         }
 
+        // ========== ПРОСМОТР ПРОФИЛЯ ==========
         function showUserProfile(userId) {
             const entry = dbCache.users.find(u => u.id === userId);
             if (!entry) return;
@@ -1985,155 +2099,35 @@
             document.getElementById('groupSettingsModal').classList.add('active');
         }
 
-        function togglePinChat(chatId) {
-            const chat = chats.find(c => c.id === chatId);
-            if (chat) {
-                chat.pinned = !chat.pinned;
-                saveChatsToStorage();
-                renderChatsList();
-            }
-        }
-
-        function deleteChat(chatId) {
-            if (confirm('Удалить чат?')) {
-                chats = chats.filter(c => c.id !== chatId);
-                if (currentChatId === chatId) {
-                    currentChatId = null;
-                    document.getElementById('chatHeader').style.display = 'none';
-                    document.getElementById('messageArea').style.display = 'none';
-                    document.getElementById('messagesContainer').innerHTML = '<div style="color: var(--text-secondary); text-align:center; padding:40px;">👋 Начните общение</div>';
-                    document.getElementById('membersBtn').style.display = 'none';
-                }
-                saveChatsToStorage();
-                renderChatsList();
-            }
-        }
-
-        function showSidebar() {
-            document.getElementById('sidebar').classList.remove('hide');
-            document.getElementById('chatPanel').classList.remove('show');
-        }
-
-        function showChat() {
-            document.getElementById('sidebar').classList.add('hide');
-            document.getElementById('chatPanel').classList.add('show');
-        }
-
-        function renderMessages() {
-            if (!currentChatId) return;
-            const msgs = getMessagesForChat(currentChatId);
-            const container = document.getElementById('messagesContainer');
-            container.innerHTML = '';
-            displayedMessageTimestamps.clear();
-            msgs.forEach(msg => {
-                const isOwn = msg.senderId === myId;
-                const wrapper = createMessageElement(msg, isOwn);
-                container.appendChild(wrapper);
-                displayedMessageTimestamps.add(msg.timestamp);
-                attachLongPressToElement(wrapper);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function updateMessages() {
-            if (!currentChatId) return;
-            const msgs = getMessagesForChat(currentChatId);
-            msgs.forEach(msg => {
-                if (!displayedMessageTimestamps.has(msg.timestamp)) {
-                    appendMessageToDOM(msg);
-                }
-            });
-        }
-
-        async function loadMessages() {
-            if (!currentChatId) return;
-            await loadDatabase();
-        }
-
-        async function enterChat(chatId, type, peerInfo) {
-            document.getElementById('chatHeader').style.display = 'flex';
-            document.getElementById('messageArea').style.display = 'flex';
-            document.getElementById('messagesContainer').style.display = 'flex';
-            currentChatId = chatId;
-            currentChatType = type;
-            currentPeerInfo = peerInfo;
-            document.getElementById('chatTitle').innerText = peerInfo;
-            document.getElementById('chatStatus').innerText = type === 'group' ? '👥 группа' : '👤 личный чат';
-            updateChatHeaderAvatar();
-            if (type === 'group') {
-                const group = dbCache.groups.find(g => g.id === chatId);
-                if (group && group.bgColor && group.bgColor !== 'default') {
-                    document.getElementById('messagesContainer').style.backgroundColor = group.bgColor;
-                } else {
-                    document.getElementById('messagesContainer').style.backgroundColor = '';
-                }
-                document.getElementById('membersBtn').style.display = 'flex';
-            } else {
-                document.getElementById('membersBtn').style.display = 'none';
-            }
-            renderChatsList();
-            document.getElementById('messagesContainer').innerHTML = '';
-            displayedMessageTimestamps.clear();
-            if (messagesUpdateInterval) clearInterval(messagesUpdateInterval);
-            await loadDatabase();
-            renderMessages();
-            messagesUpdateInterval = setInterval(loadMessages, 2000);
-            showChat();
-        }
-
-        async function addChatFromSearch(searchId) {
-            let user = dbCache.users.find(u => u.id === searchId);
-            if (user) {
-                const chatId = `private_${[myId, user.id].sort().join('_')}`;
-                ensureChatExists(chatId, user.name, 'private');
-                return { id: chatId, name: user.name, type: 'private' };
-            }
-            let group = dbCache.groups.find(g => g.id === searchId);
-            if (group) {
-                ensureChatExists(group.id, group.name, 'group');
-                return { id: group.id, name: group.name, type: 'group' };
-            }
-            return null;
-        }
-
-        function ensureChatExists(peerId, peerName, type) {
-            if (!chats.find(c => c.id === peerId)) {
-                chats.push({ id: peerId, name: peerName, type, lastMessage: '', pinned: false });
-                saveChatsToStorage();
-                renderChatsList();
-            }
-        }
-
-        function applyCustomization(theme, gradient, ownColor, otherColor, accentColor) {
+        // ========== КАСТОМИЗАЦИЯ ==========
+        function applyCustomization(theme, ownColor, otherColor, accentColor) {
             document.body.classList.remove('light-theme', 'grey-theme');
             if (theme === 'light') document.body.classList.add('light-theme');
             else if (theme === 'grey') document.body.classList.add('grey-theme');
-            document.body.classList.remove('gradient-blue', 'gradient-green', 'gradient-purple', 'gradient-orange', 'gradient-dark');
-            if (gradient !== 'none') {
-                document.body.classList.add(`gradient-${gradient}`);
-            }
+
             document.body.classList.remove('own-color-gold', 'own-color-blue', 'own-color-green', 'own-color-red', 'own-color-purple', 'own-color-orange');
             if (ownColor) document.body.classList.add(`own-color-${ownColor}`);
+
             document.body.classList.remove('other-color-default', 'other-color-light', 'other-color-dark', 'other-color-mid');
             if (otherColor) document.body.classList.add(`other-color-${otherColor}`);
+
             document.body.classList.remove('accent-color-gold', 'accent-color-blue', 'accent-color-green', 'accent-color-red', 'accent-color-purple', 'accent-color-orange');
             if (accentColor) document.body.classList.add(`accent-color-${accentColor}`);
         }
 
         function loadCustomization() {
             const theme = localStorage.getItem('halal_theme') || 'dark';
-            const gradient = localStorage.getItem('halal_gradient') || 'none';
             const ownColor = localStorage.getItem('halal_own_color') || 'gold';
             const otherColor = localStorage.getItem('halal_other_color') || 'default';
             const accentColor = localStorage.getItem('halal_accent_color') || 'gold';
             document.getElementById('themeSelect').value = theme;
-            document.getElementById('gradientSelect').value = gradient;
             document.getElementById('ownColorSelect').value = ownColor;
             document.getElementById('otherColorSelect').value = otherColor;
             document.getElementById('accentColorSelect').value = accentColor;
-            applyCustomization(theme, gradient, ownColor, otherColor, accentColor);
+            applyCustomization(theme, ownColor, otherColor, accentColor);
         }
 
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         window.onload = async function () {
             const modalGithub = document.getElementById('githubModal');
             const modalRegister = document.getElementById('registerModal');
@@ -2146,6 +2140,7 @@
             const hasConfig = loadGitHubConfig();
             loadCustomization();
 
+            // Клик по аватару открывает настройки
             document.getElementById('userInfoBlock').addEventListener('click', () => {
                 if (myId) {
                     document.getElementById('profileName').value = myName || '';
@@ -2169,6 +2164,7 @@
                 }
             };
 
+            // Загрузка аватара
             document.getElementById('uploadAvatarBtn').onclick = () => {
                 document.getElementById('avatarInput').click();
             };
@@ -2202,27 +2198,23 @@
                 }
             };
 
+            // Обновление имени
             document.getElementById('updateNameBtn').onclick = async function () {
                 const newName = document.getElementById('profileName').value.trim();
                 if (!newName) {
                     alert('Имя не может быть пустым');
                     return;
                 }
-                const oldName = myName;
-                if (newName === oldName) return;
+                if (newName === myName) return;
                 const user = dbCache.users.find(u => u.id === myId);
-                if (user) {
-                    user.name = newName;
-                }
+                if (user) user.name = newName;
                 const success = await rewriteDatabase();
                 if (success) {
                     myName = newName;
                     localStorage.setItem('halal_my_profile', JSON.stringify({ id: myId, name: myName, email: myEmail, avatar: myAvatar, bio: myBio }));
                     const userIndex = users.findIndex(u => u.id === myId);
-                    if (userIndex !== -1) {
-                        users[userIndex].name = newName;
-                        localStorage.setItem('halal_users', JSON.stringify(users));
-                    }
+                    if (userIndex !== -1) users[userIndex].name = newName;
+                    localStorage.setItem('halal_users', JSON.stringify(users));
                     updateSidebarUserInfo();
                     alert('Имя обновлено');
                 } else {
@@ -2230,12 +2222,11 @@
                 }
             };
 
+            // Обновление био
             document.getElementById('updateBioBtn').onclick = async function () {
                 const newBio = document.getElementById('profileBio').value.trim();
                 const user = dbCache.users.find(u => u.id === myId);
-                if (user) {
-                    user.bio = newBio;
-                }
+                if (user) user.bio = newBio;
                 const success = await rewriteDatabase();
                 if (success) {
                     myBio = newBio;
@@ -2246,6 +2237,7 @@
                 }
             };
 
+            // Создание группы
             document.getElementById('createGroupBtn').onclick = () => {
                 if (!myId) {
                     alert('Сначала войдите в систему');
@@ -2274,6 +2266,7 @@
                     const memberLine = `GROUP_MEMBER|${newId}|${myId}`;
                     dbCache.groupMembers.push({ groupId: newId, userId: myId });
                     await appendToDatabase(memberLine);
+                    // Добавляем в список чатов
                     chats.push({ id: newId, name: groupName, type: 'group', lastMessage: '', pinned: false });
                     saveChatsToStorage();
                     renderChatsList();
@@ -2287,21 +2280,21 @@
                 }
             };
 
+            // Сохранение настроек кастомизации
             document.getElementById('saveCustomizeBtn').onclick = () => {
                 const theme = document.getElementById('themeSelect').value;
-                const gradient = document.getElementById('gradientSelect').value;
                 const ownColor = document.getElementById('ownColorSelect').value;
                 const otherColor = document.getElementById('otherColorSelect').value;
                 const accentColor = document.getElementById('accentColorSelect').value;
                 localStorage.setItem('halal_theme', theme);
-                localStorage.setItem('halal_gradient', gradient);
                 localStorage.setItem('halal_own_color', ownColor);
                 localStorage.setItem('halal_other_color', otherColor);
                 localStorage.setItem('halal_accent_color', accentColor);
-                applyCustomization(theme, gradient, ownColor, otherColor, accentColor);
+                applyCustomization(theme, ownColor, otherColor, accentColor);
                 modalCustomize.classList.remove('active');
             };
 
+            // Кнопка "Участники группы"
             document.getElementById('membersBtn').onclick = async function () {
                 if (!currentChatId || currentChatType !== 'group') return;
                 const members = dbCache.groupMembers.filter(gm => gm.groupId === currentChatId).map(gm => gm.userId);
@@ -2327,6 +2320,7 @@
                 modalMembers.classList.remove('active');
             };
 
+            // Настройки группы
             document.getElementById('closeGroupSettingsBtn').onclick = () => {
                 modalGroupSettings.classList.remove('active');
             };
@@ -2384,28 +2378,26 @@
                 alert('Настройки группы сохранены');
             };
 
+            // Закрытие модалок
             document.getElementById('closeProfileBtn').onclick = () => {
                 modalProfile.classList.remove('active');
             };
-
             document.getElementById('closeImageBtn').onclick = () => {
                 modalImage.classList.remove('active');
             };
 
+            // Прикрепление файлов
             document.getElementById('attachBtn').onclick = () => {
                 document.getElementById('attachMenu').classList.toggle('active');
             };
-
             document.getElementById('attachPhotoBtn').onclick = () => {
                 document.getElementById('fileInput').click();
                 document.getElementById('attachMenu').classList.remove('active');
             };
-
             document.getElementById('attachFileBtn').onclick = () => {
                 document.getElementById('anyFileInput').click();
                 document.getElementById('attachMenu').classList.remove('active');
             };
-
             document.getElementById('fileInput').onchange = async function(e) {
                 const file = e.target.files[0];
                 if (!file || !currentChatId) return;
@@ -2419,7 +2411,6 @@
                     await addMessage(currentChatId, myId, '', url, '');
                 }
             };
-
             document.getElementById('anyFileInput').onchange = async function(e) {
                 const file = e.target.files[0];
                 if (!file || !currentChatId) return;
@@ -2434,6 +2425,7 @@
                 }
             };
 
+            // Реакции
             document.querySelectorAll('.reaction-menu-item').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const emoji = btn.dataset.reaction;
@@ -2443,13 +2435,13 @@
                     }
                 });
             });
-
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.reaction-menu') && !e.target.closest('.message-wrapper')) {
                     document.getElementById('reactionMenu').classList.remove('active');
                 }
             });
 
+            // GitHub настройки
             if (!hasConfig) {
                 modalGithub.classList.add('active');
             } else {
@@ -2461,7 +2453,7 @@
                     updateSidebarUserInfo();
                     await loadDatabase();
                     loadChatsFromStorage();
-                    rebuildChatsFromMessages();
+                    rebuildChatsFromAllData();
                     dbUpdateInterval = setInterval(async () => {
                         await loadDatabase();
                     }, 2000);
@@ -2489,6 +2481,7 @@
                 }
             };
 
+            // Регистрация / Вход
             document.getElementById('tabRegister').onclick = () => {
                 document.getElementById('tabRegister').classList.add('active');
                 document.getElementById('tabLogin').classList.remove('active');
@@ -2570,13 +2563,14 @@
                 updateSidebarUserInfo();
                 await loadDatabase();
                 loadChatsFromStorage();
-                rebuildChatsFromMessages();
+                rebuildChatsFromAllData();
                 if (dbUpdateInterval) clearInterval(dbUpdateInterval);
                 dbUpdateInterval = setInterval(async () => {
                     await loadDatabase();
                 }, 2000);
             };
 
+            // Поиск по ID
             document.getElementById('searchIdInput').addEventListener('keypress', async function (e) {
                 if (e.key === 'Enter') {
                     const searchId = this.value.trim();
@@ -2591,6 +2585,7 @@
                 }
             });
 
+            // Отправка сообщения
             document.getElementById('sendMsgBtn').onclick = async function () {
                 const msg = document.getElementById('messageInput').value.trim();
                 if (!msg && !document.getElementById('fileInput').files.length && !document.getElementById('anyFileInput').files.length) {
@@ -2613,6 +2608,7 @@
                 }
             });
 
+            // Кнопка назад
             document.getElementById('backToChatsBtn').onclick = () => {
                 showSidebar();
             };
