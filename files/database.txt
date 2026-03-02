@@ -1,2 +1,3 @@
 USER|bott|bott@gmail.com|bott|||p_mm8rf5adlm1r_person
 USER|bbot|bbot@gmail.com|bbot|||p_mm8rfyt8r8z7_person
+MESSAGE|private_p_mm8rf5adlm1r_person_p_mm8rfyt8r8z7_person|p_mm8rfyt8r8z7_person|пр сука|||[]|1772430680289
